@@ -1,0 +1,7 @@
+Django
+psycopg2
+pytz
+djangorestframework
+django-filter
+django-guardian
+djangorestframework-guardian

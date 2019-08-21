@@ -1,0 +1,32 @@
+.mat-card-content {
+  padding: 2em;
+}
+
+form {
+  .mat-form-field {
+    display: block;
+    margin-bottom: 1em;
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: space-evenly;
+  }
+
+  .mat-form-field:last-of-type {
+    margin-bottom: 2em;
+  }
+
+  .formGroupError {
+    height: 1em;
+    margin-bottom: 1.5em;
+  }
+}
+
+form .mat-form-field:last-of-type {
+  margin-bottom: 0;
+}
+
+h1 {
+  hyphens: none;
+}

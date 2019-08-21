@@ -1,0 +1,24 @@
+<app-web-page *ngIf="(recipe$ | async) as recipe">
+  <app-web-page-header>
+    <app-web-page-title>
+      {{recipe.title}}
+    </app-web-page-title>
+    <app-web-page-subtitle>
+      Par : {{recipe.author}}
+    </app-web-page-subtitle>
+    <app-web-page-action-menu>
+      <a color="primary" mat-stroked-button [routerLink]="['/recipe/edit', recipe.slug]">
+        Modificer la recette
+        <mat-icon>edit</mat-icon>
+      </a>
+    </app-web-page-action-menu>
+  </app-web-page-header>
+  <app-web-page-content>
+    <ng-container *ngIf="(recipeImageList$ | async) as recipeImageList">
+      <div *ngFor="let recipeImage of recipeImageList">
+        <img [src]="recipeImage.image" alt="empty">
+      </div>
+    </ng-container>
+    <markdown class="markdown-body">{{recipe.instructions}}</markdown>
+  </app-web-page-content>
+</app-web-page>

@@ -1,0 +1,20 @@
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  max-width: 100%;
+}
+
+.web-page-content {
+  flex: 1;
+  margin-top: 3.2em;
+}
+
+footer {
+  margin-top: 2em;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  text-align: center;
+  color: black;
+  background-color: #76cc33;
+}

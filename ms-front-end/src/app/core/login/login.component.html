@@ -1,0 +1,37 @@
+<app-web-page>
+  <app-web-page-header>
+    <app-web-page-title>Connexion</app-web-page-title>
+  </app-web-page-header>
+  <app-web-page-content [pageSize]="webPageSize.ExtraSmall">
+    <mat-card>
+      <mat-card-content>
+        <ng-container *ngIf="(authService.currentUser$ | async) as curentUser">
+          <h1 i18n>You are already connected as {{ curentUser.name }}.</h1>
+        </ng-container>
+        <ng-container *ngIf="!(authService.currentUser$ | async)">
+          <form (ngSubmit)="tryLogin()" [formGroup]="loginForm" class="login-form">
+
+            <mat-form-field>
+              <mat-label>User Name</mat-label>
+              <input formControlName="userName" matInput name="username" type="text">
+              <mat-error>Please enter your user name</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Password</mat-label>
+              <input formControlName="password" matInput name="password" type="password">
+              <mat-error>Please enter your password</mat-error>
+            </mat-form-field>
+            <div class="formGroupError">
+              <mat-error *ngIf="loginForm.hasError('invalidUserOrPassword')">Invalid user name or password</mat-error>
+            </div>
+            <div class="button-container">
+              <button color="primary" mat-raised-button type="submit">
+                Login
+              </button>
+            </div>
+          </form>
+        </ng-container>
+      </mat-card-content>
+    </mat-card>
+  </app-web-page-content>
+</app-web-page>

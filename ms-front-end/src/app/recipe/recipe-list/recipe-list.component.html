@@ -1,0 +1,24 @@
+<app-web-page>
+  <app-web-page-header>
+    <app-web-page-title>
+      Toutes les recettes
+    </app-web-page-title>
+    <app-web-page-subtitle>
+      Ca donne envie !
+    </app-web-page-subtitle>
+    <app-web-page-action-menu>
+      <a color="primary" mat-stroked-button routerLink="/recipe/add">
+        Nouvelle Recette
+        <mat-icon>add</mat-icon>
+      </a>
+    </app-web-page-action-menu>
+  </app-web-page-header>
+  <app-web-page-content *ngIf="(recipeList$ | async) as recipeList">
+    <ng-container *ngFor="let recipe of recipeList">
+      <a [routerLink]="['/recipe/details', recipe.slug]" matRipple>
+        {{recipe.title}}
+      </a>
+      <br>
+    </ng-container>
+  </app-web-page-content>
+</app-web-page>

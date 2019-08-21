@@ -1,0 +1,13 @@
+<mat-toolbar class="mat-elevation-z6" color="primary">
+  <a mat-button routerLink="/">
+    <img [src]="iconUrl" class="png-icon" style="height: 26px;margin: 0 4px 6px 0;">
+    MushFood
+  </a>
+  <div class="menu__filler"></div>
+  <a *ngIf="(authService.currentUser$ | async)" mat-button routerLink="/logout">
+    Logout
+  </a>
+  <a *ngIf="!(authService.currentUser$ | async)" mat-button routerLink="/login">
+    Login
+  </a>
+</mat-toolbar>

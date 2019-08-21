@@ -1,0 +1,47 @@
+<app-web-page>
+  <app-web-page-header>
+    <app-web-page-title>
+      Modifier la recette
+    </app-web-page-title>
+    <app-web-page-subtitle>
+      Améliorez votre recette !
+    </app-web-page-subtitle>
+  </app-web-page-header>
+  <app-web-page-content>
+    <p *ngIf="recipeImage">
+      {{recipeImage.image}}
+      <button type="button" color="warn" mat-raised-button (click)="deleteRecipeImage()">Delete</button>
+    </p>
+    <button type="button" mat-raised-button (click)="fileInput.click()">Choose File</button>
+    <input hidden #fileInput type="file" id="file">
+    <button type="button" mat-raised-button [disabled]="!fileInput.files.length > 0" (click)="sendFile()">Send File</button>
+
+    <form (ngSubmit)="submit()" [formGroup]="recipeForm">
+      <mat-form-field>
+        <mat-label>Titre</mat-label>
+        <input #titleInput formControlName="title" matInput maxlength="50" type="text">
+        <mat-hint align="end">{{titleInput.value?.length || 0}}/50</mat-hint>
+        <mat-error>Entrez un titre pour votre recette</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Instructions</mat-label>
+        <textarea formControlName="instructions"
+                  matInput
+                  #autosize="cdkTextareaAutosize"
+                  cdkTextareaAutosize
+        ></textarea>
+      </mat-form-field>
+      <div class="button-container">
+        <button color="primary" mat-raised-button type="submit">
+          Modifier
+          <mat-icon>edit</mat-icon>
+        </button>
+        <a color="primary" mat-stroked-button [routerLink]="['/recipe/details', recipe.slug]">
+          <mat-icon>arrow_back</mat-icon>
+          Retour
+        </a>
+      </div>
+    </form>
+
+  </app-web-page-content>
+</app-web-page>

@@ -1,0 +1,12 @@
+.mat-list-item-content {
+  flex: 1;
+}
+
+.mat-list-base .mat-list-item {
+  height: auto;
+  transition: background-color 100ms ease, border 100ms ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, .1);
+  }
+}

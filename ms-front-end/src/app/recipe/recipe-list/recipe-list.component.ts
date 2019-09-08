@@ -14,7 +14,7 @@ export class RecipeListComponent implements OnInit {
 
   recipeList$: Observable<Recipe[]>;
 
-  constructor(private recipeService: RecipeService, private authService: AuthService) {
+  constructor(private recipeService: RecipeService, public authService: AuthService) {
   }
 
   ngOnInit() {

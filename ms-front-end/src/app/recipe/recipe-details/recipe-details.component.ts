@@ -16,7 +16,7 @@ export class RecipeDetailsComponent implements OnInit {
   recipe$: Observable<Recipe>;
 
   constructor(private recipeService: RecipeService,
-              private authService: AuthService,
+              public authService: AuthService,
               private route: ActivatedRoute,
               private router: Router) {
   }

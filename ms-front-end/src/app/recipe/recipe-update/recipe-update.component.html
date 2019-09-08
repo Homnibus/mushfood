@@ -1,4 +1,4 @@
-<app-web-page>
+<app-web-page *ngIf="recipe">
   <app-web-page-header>
     <app-web-page-title>
       Modifier la recette
@@ -6,22 +6,40 @@
     <app-web-page-subtitle>
       Améliorez votre recette !
     </app-web-page-subtitle>
+    <app-web-page-action-menu>
+      <button type="button" mat-raised-button color="warn" (click)="deleteRecipe()">
+        Delete
+        <mat-icon>delete</mat-icon>
+      </button>
+    </app-web-page-action-menu>
   </app-web-page-header>
   <app-web-page-content>
-    <p *ngIf="recipeImage">
-      {{recipeImage.image}}
-      <button type="button" color="warn" mat-raised-button (click)="deleteRecipeImage()">Delete</button>
-    </p>
-    <button type="button" mat-raised-button (click)="fileInput.click()">Choose File</button>
-    <input hidden #fileInput type="file" id="file">
-    <button type="button" mat-raised-button [disabled]="!fileInput.files.length > 0" (click)="sendFile()">Send File</button>
+    <div class="image-form">
+      <p *ngIf="recipeImage">
+        {{recipeImage.image}}
+        <button type="button" color="warn" mat-raised-button (click)="deleteRecipeImage()">Delete</button>
+      </p>
+      <button type="button" mat-raised-button (click)="fileInput.click()">Choose File</button>
+      <input hidden #fileInput type="file" id="file">
+      <button type="button" mat-raised-button [disabled]="!fileInput.files.length > 0" (click)="sendFile()">Send File
+      </button>
+    </div>
+    <div class="ingredient-form" *ngIf="recipe">
+      <app-ingredient-quantity-update [recipe]="recipe"></app-ingredient-quantity-update>
+    </div>
 
-    <form (ngSubmit)="submit()" [formGroup]="recipeForm">
+    <form (ngSubmit)="submit()" [formGroup]="recipeForm" class="recipe-form">
+      <h1>Instructions</h1>
       <mat-form-field>
         <mat-label>Titre</mat-label>
         <input #titleInput formControlName="title" matInput maxlength="50" type="text">
         <mat-hint align="end">{{titleInput.value?.length || 0}}/50</mat-hint>
         <mat-error>Entrez un titre pour votre recette</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Inspiration</mat-label>
+        <input #inspirationInput formControlName="inspiration" matInput maxlength="100" type="text">
+        <mat-hint align="end">{{inspirationInput.value?.length || 0}}/100</mat-hint>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Instructions</mat-label>
@@ -42,6 +60,5 @@
         </a>
       </div>
     </form>
-
   </app-web-page-content>
 </app-web-page>

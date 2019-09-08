@@ -4,21 +4,32 @@
       {{recipe.title}}
     </app-web-page-title>
     <app-web-page-subtitle>
-      Par : {{recipe.author}}
+      {{recipe.inspiration}}
     </app-web-page-subtitle>
-    <app-web-page-action-menu>
-      <a color="primary" mat-stroked-button [routerLink]="['/recipe/edit', recipe.slug]">
+    <app-web-page-action-menu *ngIf="authService.currentUser$ | async">
+      <a color="accent" mat-flat-button [routerLink]="['/recipe/edit', recipe.slug]">
         Modificer la recette
         <mat-icon>edit</mat-icon>
       </a>
     </app-web-page-action-menu>
   </app-web-page-header>
   <app-web-page-content>
-    <ng-container *ngIf="(recipeImageList$ | async) as recipeImageList">
-      <div *ngFor="let recipeImage of recipeImageList">
-        <img [src]="recipeImage.image" alt="empty">
+    <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+    <div class="image-ingredient">
+      <div class="image">
+        <div class="polaroide">
+          <img *ngIf="recipe.recipeImage" [src]="recipe.recipeImage.image" alt="empty">
+<!--          <div class="image-label">Du text en plus</div>-->
+        </div>
       </div>
-    </ng-container>
-    <markdown class="markdown-body">{{recipe.instructions}}</markdown>
+      <div class="ingredient">
+        <h1>Ingrédient</h1>
+        <app-ingredient-quantity-list [recipe]="recipe"></app-ingredient-quantity-list>
+      </div>
+    </div>
+    <div class="instructions">
+      <h1>Instructions</h1>
+      <markdown class="markdown-body">{{recipe.instructions}}</markdown>
+    </div>
   </app-web-page-content>
 </app-web-page>

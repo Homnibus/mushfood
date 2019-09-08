@@ -1,9 +1,10 @@
 :host {
   display: block;
+  margin-top: 1em;
 }
 
 .header {
-  max-width: 1024px;
+  max-width: 850px;
   margin-right: auto;
   margin-left: auto;
 
@@ -19,5 +20,8 @@
 
   > div {
     flex: 1;
+  }
+  > .header__text{
+    min-width: 60%;
   }
 }

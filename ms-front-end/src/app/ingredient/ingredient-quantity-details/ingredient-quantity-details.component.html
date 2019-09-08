@@ -1,0 +1,43 @@
+<mat-list-item>
+  <mat-icon matListIcon>folder</mat-icon>
+  <h4 *ngIf="!modificationIsActive" mat-line>{{ingredientQuantity.quantity}} {{ingredientQuantity.measurementUnit.name}}
+    de {{ingredientQuantity.ingredient.name}}</h4>
+  <ng-container *ngIf="(filteredIngredientList$ | async) as filteredIngredientList">
+    <form *ngIf="modificationIsActive" (ngSubmit)="update()" [formGroup]="ingredientForm">
+      <mat-form-field>
+        <mat-label>Quantité</mat-label>
+        <input formControlName="quantity" matInput min="0" max="9999" step="0.1" type="number">
+        <mat-error>Entrez une quantité de votre ingrédient</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Unitée de mesure</mat-label>
+        <mat-select placeholder="Unitée de mesure" formControlName="measurementUnit" [compareWith]="compareFn">
+          <mat-option *ngFor="let measurementUnit of measurementUnitList" [value]="measurementUnit">
+            {{measurementUnit.name}}
+          </mat-option>
+        </mat-select>
+        <mat-error>Entrez l'unité de mesure de votre ingrédient</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Ingrédient</mat-label>
+        <input #ingredientInput formControlName="ingredient" matInput maxlength="50" type="text"
+               [matAutocomplete]="auto">
+        <mat-hint align="end">{{ingredientInput.value?.length || 0}}/50</mat-hint>
+        <mat-error>Entrez le nom de votre ingredient</mat-error>
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayIngredient">
+          <mat-option *ngFor="let ingredient of filteredIngredientList"
+                      [value]="ingredient">{{ingredient.name}}</mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+        <button color="primary" mat-icon-button type="submit">
+          <mat-icon>save</mat-icon>
+        </button>
+    </form>
+  </ng-container>
+  <button *ngIf="!modificationIsActive" mat-icon-button (click)="activeModification()">
+    <mat-icon>edit</mat-icon>
+  </button>
+  <button color="warn" mat-icon-button (click)="delete()">
+    <mat-icon>delete</mat-icon>
+  </button>
+</mat-list-item>

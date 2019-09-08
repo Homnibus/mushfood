@@ -5,9 +5,9 @@
   </a>
   <div class="menu__filler"></div>
   <a *ngIf="(authService.currentUser$ | async)" mat-button routerLink="/logout">
-    Logout
+    Déconnexion
   </a>
   <a *ngIf="!(authService.currentUser$ | async)" mat-button routerLink="/login">
-    Login
+    Connexion
   </a>
 </mat-toolbar>

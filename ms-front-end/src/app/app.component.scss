@@ -1,3 +1,5 @@
+@import '../sass/theme/mushfood-theme';
+
 :host {
   display: flex;
   flex: 1;
@@ -15,6 +17,7 @@ footer {
   padding-top: 1em;
   padding-bottom: 1em;
   text-align: center;
-  color: black;
-  background-color: #76cc33;
+  color: white;
+  //background-color: mat-color($mat-secondary, 500);
+  background-color: #5c7346;
 }

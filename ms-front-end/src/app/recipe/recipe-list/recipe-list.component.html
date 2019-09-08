@@ -4,21 +4,22 @@
       Toutes les recettes
     </app-web-page-title>
     <app-web-page-subtitle>
-      Ca donne envie !
+      Approuvées par le chef Mushroom !
     </app-web-page-subtitle>
-    <app-web-page-action-menu>
-      <a color="primary" mat-stroked-button routerLink="/recipe/add">
-        Nouvelle Recette
+    <app-web-page-action-menu *ngIf="authService.currentUser$ | async">
+      <a color="accent" mat-flat-button routerLink="/recipe/add">
+        Nouvelle recette
         <mat-icon>add</mat-icon>
       </a>
     </app-web-page-action-menu>
   </app-web-page-header>
   <app-web-page-content *ngIf="(recipeList$ | async) as recipeList">
-    <ng-container *ngFor="let recipe of recipeList">
-      <a [routerLink]="['/recipe/details', recipe.slug]" matRipple>
-        {{recipe.title}}
+    <mat-nav-list>
+      <a mat-list-item *ngFor="let recipe of recipeList" [routerLink]="['/recipe/details', recipe.slug]">
+        <img *ngIf="recipe.recipeImage" matListAvatar [src]="recipe.recipeImage.image">
+        <p matLine >{{recipe.title}}</p>
+        <p matLine class="subtitle">{{recipe.updateDate | date: 'd LLL y'}}</p>
       </a>
-      <br>
-    </ng-container>
+    </mat-nav-list>
   </app-web-page-content>
 </app-web-page>

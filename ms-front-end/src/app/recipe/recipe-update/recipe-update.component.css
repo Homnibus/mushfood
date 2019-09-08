@@ -2,3 +2,21 @@ form{
   display: flex;
   flex-direction: column;
 }
+
+.image-form, .recipe-form, .ingredient-form{
+ margin: 2em;
+}
+
+h1{
+  margin-bottom: 1em;
+}
+
+h2{
+  margin-top: 0.5em;
+}
+
+.ingredient-form form{
+  flex-direction: row;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}

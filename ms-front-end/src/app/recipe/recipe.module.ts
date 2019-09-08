@@ -6,6 +6,7 @@ import { RecipeDetailsComponent } from './recipe-details/recipe-details.componen
 import { RecipeAddComponent } from './recipe-add/recipe-add.component';
 import { RecipeUpdateComponent } from './recipe-update/recipe-update.component';
 import {MarkdownModule} from 'ngx-markdown';
+import {IngredientModule} from '../ingredient/ingredient.module';
 
 
 @NgModule({
@@ -14,6 +15,7 @@ import {MarkdownModule} from 'ngx-markdown';
     SharedModule,
     RecipeRoutingModule,
     MarkdownModule,
+    IngredientModule,
   ]
 })
 export class RecipeModule { }

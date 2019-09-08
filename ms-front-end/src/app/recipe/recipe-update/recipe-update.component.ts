@@ -16,7 +16,8 @@ export class RecipeUpdateComponent implements OnInit {
 
   recipeForm = this.fb.group({
     title: ['', Validators.required],
-    instructions: ['']
+    instructions: [''],
+    inspiration: ['']
   });
 
   recipe$: Observable<Recipe>;
@@ -37,24 +38,28 @@ export class RecipeUpdateComponent implements OnInit {
     );
     this.recipe$.subscribe(recipe => {
       this.recipe = recipe;
-      this.initForm(recipe);
-      this.recipeImageService.filteredList(`recipe__id=${recipe.id}`).pipe(
-        map(recipeImageList => recipeImageList.length ? recipeImageList[0] : undefined)
-      ).subscribe(recipeImage => this.recipeImage = recipeImage);
+      if (this.recipe.logicalDelete) {
+        this.router.navigateByUrl('/error/not-found');
+      } else {
+        this.initForm(recipe);
+        this.recipeImageService.filteredList(`recipe__id=${recipe.id}`).pipe(
+          map(recipeImageList => recipeImageList.length ? recipeImageList[0] : undefined)
+        ).subscribe(recipeImage => this.recipeImage = recipeImage);
+      }
     });
-
   }
 
   initForm(recipe: Recipe): void {
-    this.recipeForm.reset({title: recipe.title, instructions: recipe.instructions});
+    this.recipeForm.reset({title: recipe.title, instructions: recipe.instructions, inspiration: recipe.inspiration});
   }
 
   submit(): void {
     if (this.recipeForm.valid && this.recipeForm.dirty) {
-
       const updatedRecipe = Object.assign({}, this.recipe);
       updatedRecipe.title = this.recipeForm.get('title').value;
       updatedRecipe.instructions = this.recipeForm.get('instructions').value;
+      updatedRecipe.inspiration = this.recipeForm.get('inspiration').value;
+
       this.recipeService.update(updatedRecipe).subscribe(
         recipe => {
           const recipeDetailsUrl = this.router.createUrlTree(['/recipe/details', recipe.slug]);
@@ -63,6 +68,16 @@ export class RecipeUpdateComponent implements OnInit {
       );
     }
   }
+
+  sendFile() {
+    const inputNode: any = document.querySelector('#file');
+    if (inputNode.files.length > 0) {
+      this.createOrUpdate(inputNode.files[0]).subscribe(value => this.recipeImage = value);
+    } else {
+      console.log('no file');
+    }
+  }
+
 
   /*
     onFileSelected() {
@@ -83,15 +98,6 @@ export class RecipeUpdateComponent implements OnInit {
       }
     }*/
 
-  sendFile() {
-    const inputNode: any = document.querySelector('#file');
-    if (inputNode.files.length > 0) {
-      this.createOrUpdate(inputNode.files[0]).subscribe(value => this.recipeImage = value);
-    } else {
-      console.log('no file');
-    }
-  }
-
   deleteRecipeImage(): void {
     this.recipeImageService.delete(this.recipeImage).subscribe(data => this.recipeImage = undefined);
   }
@@ -109,6 +115,11 @@ export class RecipeUpdateComponent implements OnInit {
       httpObservable = this.recipeImageService.update(recipeImageCopy);
     }
     return httpObservable;
+  }
+
+  deleteRecipe(): void {
+    this.recipe.logicalDelete = true;
+    this.recipeService.update(this.recipe).subscribe(() => this.router.navigateByUrl('/recipe'));
   }
 
 }

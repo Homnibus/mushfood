@@ -2,11 +2,12 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {
+  MatAutocompleteModule,
   MatButtonModule, MatCardModule,
   MatCheckboxModule, MatChipsModule,
-  MatDialogModule, MatDividerModule,
+  MatDialogModule, MatDividerModule, MatGridListModule,
   MatIconModule, MatInputModule,
-  MatListModule, MatRippleModule,
+  MatListModule, MatRippleModule, MatSelectModule,
   MatSidenavModule, MatSnackBarModule, MatTabsModule,
   MatToolbarModule, MatTooltipModule
 } from '@angular/material';
@@ -31,6 +32,7 @@ import {LayoutModule} from '@angular/cdk/layout';
     MatDialogModule,
     MatSnackBarModule,
     MatListModule,
+    MatGridListModule,
     MatRippleModule,
     MatCardModule,
     MatTooltipModule,
@@ -38,6 +40,8 @@ import {LayoutModule} from '@angular/cdk/layout';
     MatChipsModule,
     MatDividerModule,
     MatTabsModule,
+    MatSelectModule,
+    MatAutocompleteModule,
     WebPageModule,
   ],
 })

@@ -10,3 +10,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
   serializer_class = RecipeSerializer
   lookup_field = 'slug'
   permission_classes = (ObjectPermissionsOrReadOnly,)
+  filterset_fields = ['logical_delete']

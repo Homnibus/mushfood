@@ -27,11 +27,16 @@ class Recipe(models.Model):
     help_text="Slug created from the title",
   )
   instructions = models.TextField(
-    "description",
+    "instructions",
     blank=True,
     null=False,
-    max_length=500,
     help_text="Instructions of the recipe",
+  )
+  inspiration = models.TextField(
+    "inspiration",
+    blank=True,
+    null=True,
+    help_text="Inspiration of the recipe",
   )
   author = models.ForeignKey(
     User,
@@ -54,6 +59,12 @@ class Recipe(models.Model):
     editable=False,
     null=False,
     help_text="Date of last modification one of the recipe",
+  )
+  logical_delete = models.BooleanField(
+    "logical delete",
+    null=False,
+    default=False,
+    help_text="True if the recipe is deleted.",
   )
 
   class Meta:
@@ -111,6 +122,13 @@ class RecipeImage(models.Model):
     null=False,
     help_text="Date of creation of the picture",
   )
+  update_date = models.DateTimeField(
+    "update date",
+    auto_now=True,
+    editable=False,
+    null=False,
+    help_text="Date of last modification one of the picture",
+  )
 
   class Meta:
     verbose_name = "recipe-image"
@@ -123,10 +141,11 @@ class RecipeImage(models.Model):
 
   def save(self, *args, **kwargs):
     """
-    Override the save method to assign the permission and resize the image
+    Override the save method to assign the permission and
+     resize the image
     """
     # Resize and crop the image if needed
-    self.image = resize_and_crop(self.image, (1024, 512), 'middle')
+    self.image = resize_and_crop(self.image, (512, 512), 'middle')
 
     # Save the image
     super(RecipeImage, self).save(*args, **kwargs)
@@ -201,7 +220,6 @@ class IngredientImage(models.Model):
     null=False,
     editable=False,
   )
-
   creation_date = models.DateTimeField(
     "creation date",
     auto_now_add=True,
@@ -209,7 +227,13 @@ class IngredientImage(models.Model):
     null=False,
     help_text="Date of creation of the picture",
   )
-
+  update_date = models.DateTimeField(
+    "update date",
+    auto_now=True,
+    editable=False,
+    null=False,
+    help_text="Date of last modification one of the picture",
+  )
   class Meta:
     verbose_name = "ingredient-image"
     verbose_name_plural = "ingredient-images"
@@ -289,8 +313,13 @@ class IngredientQuantity(models.Model):
     Ingredient,
     on_delete=models.CASCADE,
     null=False,
-    editable=False,
     related_name="quantity",
+  )
+  recipe = models.ForeignKey(
+    Recipe,
+    on_delete=models.CASCADE,
+    null=False,
+    related_name="recipe_quantity",
   )
   creation_date = models.DateTimeField(
     "creation date",
@@ -312,5 +341,5 @@ class IngredientQuantity(models.Model):
     verbose_name_plural = "ingredient-quantities"
 
   def __str__(self):
-    return str(self.quantity) + " " + self.measurement_unit.name + " of " + self.ingredient.name
+    return str(self.quantity) + " " + self.measurement_unit.name + " of " + self.ingredient.name + " for the " + self.recipe.title
 

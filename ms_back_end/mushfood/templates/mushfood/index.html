@@ -1,10 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
+{% load static %}
+<!doctype html>
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="utf-8">
+  <title>MushFood</title>
+  <base href="/">
+
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link href="{% static "img/favicon.png" %}" rel="icon" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="{% static "angular/styles.css" %}">
 </head>
 <body>
-
+<app-root></app-root>
+<script type="module" src="{% static "angular/runtime-es2015.js" %}"></script>
+<script type="module" src="{% static "angular/polyfills-es2015.js" %}"></script>
+<script type="module" src="{% static "angular/main-es2015.js" %}"></script>
+<script nomodule defer src="{% static "angular/runtime-es5.js" %}"></script>
+<script nomodule defer src="{% static "angular/polyfills-es5.js" %}"></script>
+<script nomodule defer src="{% static "angular/main-es5.js" %}"></script>
 </body>
 </html>

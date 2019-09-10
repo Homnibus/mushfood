@@ -20,9 +20,10 @@ from django.views.generic import TemplateView
 
 from ms_back_end import settings
 
-urlpatterns = [
+urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + \
+  [
     path('admin/', admin.site.urls),
     path("", include("mushfood.urls")),
     path("", TemplateView.as_view(template_name='mushfood/index.html')),
     path("<path:path>", TemplateView.as_view(template_name='mushfood/index.html'))
-] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
+  ]

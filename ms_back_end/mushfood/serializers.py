@@ -7,7 +7,7 @@ from mushfood.models import Recipe, RecipeImage, Ingredient, IngredientImage, Me
 
 class RecipeImageSerializer(serializers.ModelSerializer):
   recipe = serializers.PrimaryKeyRelatedField(many=False, queryset=Recipe.objects.all())
-  image = serializers.ImageField(max_length=None, allow_empty_file=False, use_url=False)
+  image = serializers.ImageField(max_length=None, allow_empty_file=False, use_url=True)
 
   class Meta:
     model = RecipeImage

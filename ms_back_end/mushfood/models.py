@@ -1,4 +1,5 @@
 import os
+from uuid import uuid4
 
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
@@ -6,7 +7,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 
 from mushfood.utils.image_utils import resize_and_crop
-from mushfood.utils.model_utils import assign_all_perm, hash_directory_path
+from mushfood.utils.model_utils import assign_all_perm
 
 
 class Recipe(models.Model):
@@ -108,9 +109,8 @@ class RecipeImage(models.Model):
     editable=False,
     related_name="recipe_image",
   )
-
   image = models.ImageField(
-    upload_to=hash_directory_path,
+    upload_to='recipe',
     null=False,
     editable=False,
   )
@@ -146,6 +146,7 @@ class RecipeImage(models.Model):
     """
     # Resize and crop the image if needed
     self.image = resize_and_crop(self.image, (512, 512), 'middle')
+    self.image.name = '{0}.jpg'.format(uuid4().hex)
 
     # Save the image
     super(RecipeImage, self).save(*args, **kwargs)
@@ -216,7 +217,7 @@ class IngredientImage(models.Model):
   )
 
   image = models.ImageField(
-    upload_to=hash_directory_path,
+    upload_to='ingredient',
     null=False,
     editable=False,
   )
@@ -249,6 +250,7 @@ class IngredientImage(models.Model):
     """
     # Resize and crop the image if needed
     self.image = resize_and_crop(self.image, (128, 128), 'middle')
+    self.image.name = '{0}.jpg'.format(uuid4().hex)
 
     # Save the image
     super().save(*args, **kwargs)

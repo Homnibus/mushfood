@@ -2,7 +2,7 @@
   <mat-list>
     <mat-list-item *ngFor="let ingredientQuantity of ingredientQuantityList">
       <mat-icon matListIcon>local_offer</mat-icon>
-      <h4 mat-line>{{ingredientQuantity.quantity}} {{ingredientQuantity.measurementUnit.name}}
+      <h4 mat-line>{{ingredientQuantity.quantity | noDecimal }} {{ingredientQuantity.measurementUnit.name}}
         de {{ingredientQuantity.ingredient.name}}</h4>
     </mat-list-item>
   </mat-list>

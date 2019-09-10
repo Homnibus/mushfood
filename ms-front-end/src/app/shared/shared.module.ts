@@ -13,17 +13,19 @@ import {
 } from '@angular/material';
 import {WebPageModule} from './web-page/web-page.module';
 import {LayoutModule} from '@angular/cdk/layout';
+import { NoDecimalPipe } from './no-decimal.pipe';
 
 
 
 @NgModule({
-  declarations: [],
+  declarations: [NoDecimalPipe],
   imports: [],
   exports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     LayoutModule,
+    NoDecimalPipe,
     MatToolbarModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -43,6 +45,7 @@ import {LayoutModule} from '@angular/cdk/layout';
     MatSelectModule,
     MatAutocompleteModule,
     WebPageModule,
+    NoDecimalPipe,
   ],
 })
 export class SharedModule { }

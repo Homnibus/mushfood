@@ -1,6 +1,6 @@
 <mat-list-item>
   <mat-icon matListIcon>folder</mat-icon>
-  <h4 *ngIf="!modificationIsActive" mat-line>{{ingredientQuantity.quantity}} {{ingredientQuantity.measurementUnit.name}}
+  <h4 *ngIf="!modificationIsActive" mat-line>{{ingredientQuantity.quantity | noDecimal}} {{ingredientQuantity.measurementUnit.name}}
     de {{ingredientQuantity.ingredient.name}}</h4>
   <ng-container *ngIf="(filteredIngredientList$ | async) as filteredIngredientList">
     <form *ngIf="modificationIsActive" (ngSubmit)="update()" [formGroup]="ingredientForm">

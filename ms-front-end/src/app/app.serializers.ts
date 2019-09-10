@@ -16,7 +16,7 @@ export class RecipeImageSerializer implements ModelSerializer<RecipeImage> {
     const recipeImage = new RecipeImage();
     recipeImage.id = parseInt(json.id, 10);
     recipeImage.recipe = parseInt(json.recipe, 10);
-    recipeImage.image =  environment.baseUrl + json.image;
+    recipeImage.image = json.image;
     recipeImage.creationDate = new Date(json.creation_date);
     recipeImage.state = state;
 
@@ -118,7 +118,7 @@ export class IngredientImageSerializer implements ModelSerializer<IngredientImag
     const ingredientImage = new IngredientImage();
     ingredientImage.id = parseInt(json.id, 10);
     ingredientImage.ingredient = parseInt(json.ingredient, 10);
-    ingredientImage.image =  environment.baseUrl + json.image;
+    ingredientImage.image = json.image;
     ingredientImage.creationDate = new Date(json.creation_date);
     ingredientImage.state = state;
 

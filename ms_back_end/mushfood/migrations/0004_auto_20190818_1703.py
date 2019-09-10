@@ -2,9 +2,6 @@
 
 from django.db import migrations, models
 
-from mushfood.utils.model_utils import hash_directory_path
-
-
 class Migration(migrations.Migration):
   dependencies = [
     ('mushfood', '0003_auto_20190818_1606'),
@@ -14,7 +11,7 @@ class Migration(migrations.Migration):
     migrations.AlterField(
       model_name='recipeimage',
       name='image',
-      field=models.ImageField(editable=False, upload_to=hash_directory_path),
+      field=models.ImageField(editable=False, upload_to='recipe'),
     ),
     migrations.DeleteModel(
       name='Image',

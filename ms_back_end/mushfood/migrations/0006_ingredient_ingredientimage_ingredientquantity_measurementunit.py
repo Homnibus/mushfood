@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
             name='IngredientImage',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', models.ImageField(editable=False, upload_to=mushfood.utils.model_utils.hash_directory_path)),
+                ('image', models.ImageField(editable=False, upload_to='ingredient')),
                 ('creation_date', models.DateTimeField(auto_now_add=True, help_text='Date of creation of the picture', verbose_name='creation date')),
                 ('ingredient', models.OneToOneField(editable=False, on_delete=django.db.models.deletion.CASCADE, related_name='ingredient_image', to='mushfood.Ingredient')),
             ],

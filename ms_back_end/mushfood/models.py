@@ -301,7 +301,9 @@ class IngredientQuantity(models.Model):
   """
   Quantity of a Ingredient in a Recipe
   """
-  quantity = models.IntegerField(
+  quantity = models.DecimalField(
+    decimal_places=2,
+    max_digits=6,
     null=False,
     validators=[MinValueValidator(0)]
   )

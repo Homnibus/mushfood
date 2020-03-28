@@ -1,4 +1,9 @@
 :host {
-  display: block;
-  padding: 1em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  > ::ng-deep * {
+    margin: 0 .5em 1em 0;
+  }
 }

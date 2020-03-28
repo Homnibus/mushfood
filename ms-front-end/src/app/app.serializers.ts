@@ -1,5 +1,4 @@
 import {Ingredient, IngredientImage, IngredientQuantity, MeasurementUnit, Model, ModelState, Recipe, RecipeImage} from './app.models';
-import {environment} from '../environments/environment';
 
 export abstract class ModelSerializer<T extends Model> {
   abstract fromJson(json: any, state: ModelState): T;
@@ -16,7 +15,7 @@ export class RecipeImageSerializer implements ModelSerializer<RecipeImage> {
     const recipeImage = new RecipeImage();
     recipeImage.id = parseInt(json.id, 10);
     recipeImage.recipe = parseInt(json.recipe, 10);
-    recipeImage.image = json.image;
+    recipeImage.imageUrl = json.image;
     recipeImage.creationDate = new Date(json.creation_date);
     recipeImage.state = state;
 
@@ -24,24 +23,18 @@ export class RecipeImageSerializer implements ModelSerializer<RecipeImage> {
   }
 
   toJson(recipeImage: RecipeImage): any {
-    return {
-      recipe: recipeImage.recipe,
-      image: recipeImage.image
-    };
+    const formData = new FormData();
+    formData.append('image', recipeImage.imageFile);
+    formData.append('recipe', recipeImage.recipe.toString());
+    return formData;
   }
 
   toCreateJson(recipeImage: RecipeImage): any {
-    const formData = new FormData();
-    formData.append('image', recipeImage.image);
-    formData.append('recipe', recipeImage.recipe.toString());
-    return formData;
+    return this.toJson(recipeImage);
   }
 
   toUpdateJson(recipeImage: RecipeImage): any {
-    const formData = new FormData();
-    formData.append('image', recipeImage.image);
-    formData.append('recipe', recipeImage.recipe.toString());
-    return formData;
+    return this.toJson(recipeImage);
   }
 }
 

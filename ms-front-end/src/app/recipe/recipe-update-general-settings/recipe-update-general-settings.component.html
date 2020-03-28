@@ -1,0 +1,27 @@
+<form [formGroup]="recipeForm" class="recipe-form">
+  <h1>Instructions</h1>
+  <mat-form-field appearance="outline">
+    <mat-label>Titre</mat-label>
+    <input #titleInput formControlName="title" matInput maxlength="50" type="text">
+    <mat-hint align="end">{{titleInput.value?.length || 0}}/50</mat-hint>
+    <mat-error>Entrez un titre pour votre recette</mat-error>
+  </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>Inspiration</mat-label>
+    <input #inspirationInput formControlName="inspiration" matInput maxlength="100" type="text">
+    <mat-hint align="end">{{inspirationInput.value?.length || 0}}/100</mat-hint>
+  </mat-form-field>
+  <div class="button">
+    <button (click)="deleteRecipe()" color="warn" mat-raised-button type="button">
+      Delete Recipe
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+</form>
+<div>
+  <h1>Image d'illustration</h1>
+  <app-recipe-image-update (recipeImageCreated)="recipeUpdateService.createActiveRecipeImage($event)"
+                           (recipeImageFileChanged)="recipeUpdateService.updateActiveRecipeImage($event)"
+                           [recipeImage]="recipeUpdateService.activeRecipeImage$ | async"></app-recipe-image-update>
+</div>
+

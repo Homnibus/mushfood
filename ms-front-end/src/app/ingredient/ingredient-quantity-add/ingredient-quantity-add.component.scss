@@ -1,0 +1,33 @@
+:host {
+  display: block;
+  margin: 1em 0;
+}
+
+.add-ingredient-form {
+  display: flex;
+  flex-wrap: wrap;
+
+  .button-container,
+  .form-field {
+    flex: 1;
+  }
+
+  .button-container {
+    text-align: center;
+    margin: 0.5em;
+  }
+
+  .last-form-field {
+    flex: 10;
+    margin: 0 0.5em;
+  }
+
+  .quantity {
+    max-width: 8em;
+  }
+
+  .unity {
+    max-width: 12em;
+  }
+
+}

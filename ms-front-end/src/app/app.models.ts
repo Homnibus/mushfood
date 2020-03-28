@@ -1,7 +1,5 @@
 // List of models used by the application
 
-import {IngredientSerializer} from './app.serializers';
-
 export enum ModelState {
   Retrieved = 'RETRIEVED',
   Created = 'CREATED',
@@ -39,7 +37,8 @@ export class RecipeImage extends BaseModel implements Model {
 
   id: number;
   recipe: number;
-  image: any;
+  imageUrl: string;
+  imageFile: File;
   creationDate: Date;
 }
 
@@ -101,6 +100,7 @@ export class IngredientQuantity extends BaseModel implements Model {
   static modelPlural = 'ingredient-quantities';
 
   id: number;
+  tempId: number;
   quantity: number;
   measurementUnit: MeasurementUnit;
   ingredient: Ingredient;

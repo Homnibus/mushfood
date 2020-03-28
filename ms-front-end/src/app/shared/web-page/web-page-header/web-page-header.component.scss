@@ -16,12 +16,10 @@
 .header__content {
   display: flex;
   flex-wrap: wrap;
-  padding: 1em 2em;
+  margin: 0 2em;
 
   > div {
     flex: 1;
-  }
-  > .header__text{
-    min-width: 60%;
+    margin: 1em 0;
   }
 }

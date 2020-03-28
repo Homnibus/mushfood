@@ -9,4 +9,4 @@ class RecipeImageViewSet(viewsets.ModelViewSet):
   queryset = RecipeImage.objects.all().order_by('-creation_date')
   serializer_class = RecipeImageSerializer
   permission_classes = (ObjectPermissionsOrReadOnly,)
-  filterset_fields = ['recipe__id']
+  filterset_fields = ['recipe__id', 'recipe__slug']

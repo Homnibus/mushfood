@@ -1,0 +1,18 @@
+<app-web-page *ngIf="recipe">
+  <app-web-page-header>
+    <app-web-page-title>Modifier la recette</app-web-page-title>
+    <app-web-page-subtitle>Améliorez votre recette !</app-web-page-subtitle>
+    <app-web-page-action-menu>
+      <a [routerLink]="['/recipe/details', recipe.slug]" color="primary" mat-stroked-button>
+        <mat-icon>arrow_back</mat-icon>
+        Retour
+      </a>
+      <button (click)="onClickUpdate()" color="primary" mat-raised-button>
+        Modifier
+        <mat-icon>edit</mat-icon>
+      </button>
+    </app-web-page-action-menu>
+  </app-web-page-header>
+  <app-web-page-tabs [tabLinkList]="tabLinkList">
+  </app-web-page-tabs>
+</app-web-page>

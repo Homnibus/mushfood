@@ -3,8 +3,9 @@ import {Observable} from 'rxjs';
 import {Recipe} from '../../app.models';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {map, switchMap} from 'rxjs/operators';
-import {RecipeService} from '../services/recipes.service';
+import {RecipeService} from '../services/recipe.service';
 import {AuthService} from '../../core/services/auth.service';
+import {DomSanitizer} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-recipe-details',
@@ -18,7 +19,8 @@ export class RecipeDetailsComponent implements OnInit {
   constructor(private recipeService: RecipeService,
               public authService: AuthService,
               private route: ActivatedRoute,
-              private router: Router) {
+              private router: Router,
+              public sanitizer: DomSanitizer) {
   }
 
   ngOnInit() {

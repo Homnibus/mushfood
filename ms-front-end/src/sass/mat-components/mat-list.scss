@@ -6,6 +6,10 @@
   height: auto;
   transition: background-color 100ms ease, border 100ms ease;
 
+  &.mat-list-item-with-avatar {
+    height: auto;
+  }
+
   &:hover {
     background: rgba(0, 0, 0, .1);
   }

@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {IngredientQuantity, Recipe} from '../../app.models';
 import {Observable} from 'rxjs';
-import {IngredientQuantityService} from '../services/ingredientQuantity.service';
+import {IngredientQuantityService} from '../services/ingredient-quantity.service';
 
 @Component({
   selector: 'app-ingredient-quantity-list',

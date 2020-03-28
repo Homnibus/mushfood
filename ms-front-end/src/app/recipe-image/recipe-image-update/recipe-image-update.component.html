@@ -1,0 +1,25 @@
+<div class="image-form">
+  <form [formGroup]="recipeImageFormGroup">
+    <mat-form-field appearance="outline">
+      <mat-label>Select a file</mat-label>
+      <input #fileInput (change)="updateFormValue(fileInput.files)" hidden id="file" type="file">
+      <input (click)="fileInput.click()"
+             [value]="fileInput.files.length > 0 ? fileInput.files[0].name : 'Select a file'"
+             formControlName="recipeImageFile"
+             matInput
+             readonly>
+      <mat-error *ngIf="recipeImageFormGroup.get('recipeImageFile').hasError('forbiddenFileType')">
+        Please provide a image type file
+      </mat-error>
+    </mat-form-field>
+    <button (click)="fileInput.click()" mat-raised-button type="button">Choose File</button>
+  </form>
+  <div *ngIf="imgURL" class="image-flex-container">
+    <div class="item-shape">
+      <div [ngStyle]="{'background-image': 'url('+imgURL+') '}" class="image-mask"></div>
+    </div>
+  </div>
+  <!--  <div class="image">-->
+  <!--    <img *ngIf="imgURL" [src]="imgURL">-->
+  <!--  </div>-->
+</div>

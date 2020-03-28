@@ -10,4 +10,5 @@ class IngredientQuantityViewSet(viewsets.ModelViewSet, CreationModelViewSet):
   serializer_class = IngredientQuantitySerializer
   permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
   create_serializer_class = IngredientQuantityCreateSerializer
+  update_serializer_class = IngredientQuantityCreateSerializer
   filterset_fields = ['recipe__id']

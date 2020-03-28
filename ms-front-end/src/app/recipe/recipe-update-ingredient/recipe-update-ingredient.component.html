@@ -1,0 +1,23 @@
+<div *ngIf="recipe && ingredientQuantityList && ingredientList" class="ingredient-form">
+  <ng-container *ngIf="this.recipeUpdateService.measurementUnitList as measurementUnitList">
+    <h1>Ajouter un ingrédient</h1>
+    <app-ingredient-quantity-add (created)="addIngredientQuantity($event)"
+                                 [ingredientList]="ingredientList"
+                                 [measurementUnitList]="measurementUnitList"
+                                 [recipe]="recipe">
+    </app-ingredient-quantity-add>
+    <h1>Liste des ingrédients</h1>
+    <mat-list>
+      <ng-container *ngFor="let ingredientQuantity of ingredientQuantityList">
+        <app-ingredient-quantity-details (deleted)="deleteIngredientQuantity(ingredientQuantity)"
+                                         (updated)="updateIngredientQuantity($event)"
+                                         *ngIf="ingredientList"
+                                         [ingredientList]="ingredientList"
+                                         [ingredientQuantity]="ingredientQuantity"
+                                         [measurementUnitList]="measurementUnitList"
+                                         class="mat-list-item-content">
+        </app-ingredient-quantity-details>
+      </ng-container>
+    </mat-list>
+  </ng-container>
+</div>

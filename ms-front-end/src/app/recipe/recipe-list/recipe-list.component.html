@@ -13,13 +13,23 @@
       </a>
     </app-web-page-action-menu>
   </app-web-page-header>
-  <app-web-page-content *ngIf="(recipeList$ | async) as recipeList">
-    <mat-nav-list>
-      <a mat-list-item *ngFor="let recipe of recipeList" [routerLink]="['/recipe/details', recipe.slug]">
-        <img *ngIf="recipe.recipeImage" matListAvatar [src]="recipe.recipeImage.image">
-        <p matLine >{{recipe.title}}</p>
-        <p matLine class="subtitle">{{recipe.updateDate | date: 'd LLL y'}}</p>
-      </a>
-    </mat-nav-list>
+  <app-web-page-content>
+    <div (resized)="onResized($event)" *ngIf="recipeListHexagon" class="recipe-list">
+      <div *ngFor="let recipe of recipeList; let index = index"
+           [class.last-left]="this.recipeListHexagon[index]===positionEnum.LastRowLeft"
+           [class.left]="this.recipeListHexagon[index]===positionEnum.Left || this.recipeListHexagon[index]===positionEnum.All"
+           [class.right]="this.recipeListHexagon[index]===positionEnum.Right || this.recipeListHexagon[index]===positionEnum.All"
+           class="recipe-item">
+        <a [routerLink]="['/recipe/details', recipe.slug]" class="item-shape" mat-ripple>
+          <div [ngStyle]="{'background-image': 'url('+recipe.recipeImage.imageUrl+') '}" class="image-mask">
+            <div class="text">
+              <div class="reverse-mask-left"></div>
+              <div class="reverse-mask-right"></div>
+              <p>{{recipe.title}}</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
   </app-web-page-content>
 </app-web-page>

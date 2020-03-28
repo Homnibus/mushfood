@@ -68,14 +68,13 @@ class MeasurementUnitSerializer(serializers.ModelSerializer):
 
 
 class IngredientQuantitySerializer(serializers.ModelSerializer):
-  measurement_unit = MeasurementUnitSerializer(many=False, read_only=True)
-  ingredient = IngredientSerializer(many=False, read_only=True)
+  measurement_unit = MeasurementUnitSerializer(many=False)
+  ingredient = IngredientSerializer(many=False)
   recipe = serializers.PrimaryKeyRelatedField(many=False, queryset=Recipe.objects.all())
 
   class Meta:
     model = IngredientQuantity
     fields = "__all__"
-
 
 class IngredientQuantityCreateSerializer(serializers.ModelSerializer):
   measurement_unit = serializers.PrimaryKeyRelatedField(many=False, queryset=MeasurementUnit.objects.all())

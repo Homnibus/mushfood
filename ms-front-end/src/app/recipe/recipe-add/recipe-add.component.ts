@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {FormBuilder, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {RecipeService} from '../services/recipes.service';
+import {RecipeService} from '../services/recipe.service';
 import {Recipe} from '../../app.models';
 
 @Component({

@@ -16,10 +16,9 @@
   <app-web-page-content>
     <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
     <div class="image-ingredient">
-      <div class="image">
-        <div class="polaroide">
-          <img *ngIf="recipe.recipeImage" [src]="recipe.recipeImage.image" alt="empty">
-<!--          <div class="image-label">Du text en plus</div>-->
+      <div *ngIf="recipe.recipeImage" class="image-flex-container">
+        <div class="item-shape">
+          <div [ngStyle]="{'background-image': 'url('+recipe.recipeImage.imageUrl+') '}" class="image-mask"></div>
         </div>
       </div>
       <div class="ingredient">
@@ -29,7 +28,7 @@
     </div>
     <div class="instructions">
       <h1>Instructions</h1>
-      <markdown class="markdown-body">{{recipe.instructions}}</markdown>
+      <div [innerHTML]="sanitizer.bypassSecurityTrustHtml(recipe.instructions)" class="ck-content"></div>
     </div>
   </app-web-page-content>
 </app-web-page>

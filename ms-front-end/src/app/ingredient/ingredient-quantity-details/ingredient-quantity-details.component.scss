@@ -1,0 +1,31 @@
+.update-ingredient-form {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+
+  .button-container,
+  .form-field {
+    flex: 1;
+  }
+
+  .button-container {
+    text-align: center;
+    margin: 0.5em;
+    display: flex;
+    align-items: center;
+  }
+
+  .last-form-field {
+    flex: 10;
+    margin: 0 0.5em;
+  }
+
+  .quantity {
+    max-width: 8em;
+  }
+
+  .unity {
+    max-width: 12em;
+  }
+
+}

@@ -10,7 +10,7 @@ import {RecipeUpdateIngredientComponent} from './recipe-update-ingredient/recipe
 import {RecipeUpdateGeneralSettingsComponent} from './recipe-update-general-settings/recipe-update-general-settings.component';
 import {RecipeResolver} from './services/recipe.resolver';
 import {RecipeImageResolver} from '../recipe-image/services/recipe-image.resolver';
-import {IngredientQuantityResolver} from '../ingredient/services/ingredient-quantity.resolver';
+import {IngredientQuantityUpdateResolver} from '../ingredient/services/ingredient-quantity-update.resolver';
 import {MeasurementUnitResolver} from '../ingredient/services/measurement-unit.resolver';
 import {IngredientResolver} from '../ingredient/services/ingredient.resolver';
 
@@ -41,7 +41,7 @@ const routes: Routes = [
             path: 'ingredient',
             component: RecipeUpdateIngredientComponent,
             resolve: {
-              ingredientQuantityList: IngredientQuantityResolver,
+              ingredientQuantityList: IngredientQuantityUpdateResolver,
               measurementUnitList: MeasurementUnitResolver,
               ingredientList: IngredientResolver,
             },
@@ -56,6 +56,7 @@ const routes: Routes = [
       {
         path: 'details/:slug',
         component: RecipeDetailsComponent,
+        resolve: {recipe: RecipeResolver},
       },
     ]
   },

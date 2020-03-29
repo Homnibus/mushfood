@@ -1,4 +1,4 @@
-<app-web-page *ngIf="(recipe$ | async) as recipe">
+<app-web-page *ngIf="recipe">
   <app-web-page-header>
     <app-web-page-title>
       {{recipe.title}}

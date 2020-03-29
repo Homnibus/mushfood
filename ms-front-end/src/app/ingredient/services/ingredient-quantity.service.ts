@@ -19,7 +19,6 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
 
   filterIngredientList(ingredient: Ingredient | string, ingredientList: Ingredient[]): Ingredient[] {
     let filterValue = '';
-    console.log(ingredientList);
     if (ingredient) {
       if (ingredient instanceof Ingredient) {
         filterValue = ingredient.name.trim().toLowerCase();

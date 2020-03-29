@@ -9,7 +9,7 @@ import {first, switchMap} from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
-export class IngredientQuantityResolver implements Resolve<IngredientQuantity[]> {
+export class IngredientQuantityUpdateResolver implements Resolve<IngredientQuantity[]> {
 
   constructor(private recipeUpdateService: RecipeUpdateService) {
   }

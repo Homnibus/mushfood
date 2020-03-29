@@ -21,7 +21,8 @@
            [class.right]="this.recipeListHexagon[index]===positionEnum.Right || this.recipeListHexagon[index]===positionEnum.All"
            class="recipe-item">
         <a [routerLink]="['/recipe/details', recipe.slug]" class="item-shape" mat-ripple>
-          <div [ngStyle]="{'background-image': 'url('+recipe.recipeImage.imageUrl+') '}" class="image-mask">
+          <div [ngStyle]="{'background-image': 'url('+(recipe.recipeImage ? recipe.recipeImage.imageUrl : '')  +') '}"
+               class="image-mask">
             <div class="text">
               <div class="reverse-mask-left"></div>
               <div class="reverse-mask-right"></div>

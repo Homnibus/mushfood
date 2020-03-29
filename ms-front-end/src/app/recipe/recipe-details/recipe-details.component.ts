@@ -1,8 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {Observable} from 'rxjs';
-import {Recipe} from '../../app.models';
-import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {map, switchMap} from 'rxjs/operators';
+import {IngredientQuantity, Recipe} from '../../app.models';
+import {ActivatedRoute, Router} from '@angular/router';
 import {RecipeService} from '../services/recipe.service';
 import {AuthService} from '../../core/services/auth.service';
 import {DomSanitizer} from '@angular/platform-browser';
@@ -14,7 +12,8 @@ import {DomSanitizer} from '@angular/platform-browser';
 })
 export class RecipeDetailsComponent implements OnInit {
 
-  recipe$: Observable<Recipe>;
+  recipe: Recipe;
+  ingredientQuantityList: IngredientQuantity[];
 
   constructor(private recipeService: RecipeService,
               public authService: AuthService,
@@ -24,19 +23,12 @@ export class RecipeDetailsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.recipe$ = this.route.paramMap.pipe(
-      switchMap((params: ParamMap) => this.recipeService.get(params.get('slug'))),
-      map(recipeList => {
-        if (recipeList.length > 0) {
-          if (recipeList[0].logicalDelete) {
-            this.router.navigateByUrl('/error/not-found');
-          }
-          return recipeList[0];
-        } else {
-          return undefined;
-        }
-      })
-    );
+    this.route.data.subscribe(data => {
+      this.recipe = data.recipe;
+      if (this.recipe.logicalDelete) {
+        this.router.navigateByUrl('/error/not-found');
+      }
+    });
   }
 
 }

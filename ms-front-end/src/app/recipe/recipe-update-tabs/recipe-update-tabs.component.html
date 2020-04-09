@@ -7,8 +7,8 @@
         <mat-icon>arrow_back</mat-icon>
         Retour
       </a>
-      <button (click)="onClickUpdate()" color="primary" mat-raised-button>
-        Modifier
+      <button (click)="onClickUpdate()" [disabled]="isSaving" color="primary" mat-raised-button>
+        Sauvegarder
         <mat-icon>edit</mat-icon>
       </button>
     </app-web-page-action-menu>

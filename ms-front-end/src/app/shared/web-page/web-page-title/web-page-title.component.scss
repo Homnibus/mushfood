@@ -1,11 +1,22 @@
+@import '../../../../sass/theme/mushfood-theme';
+
 :host {
   display: block;
 }
 
 h1 {
-  margin: 0 0 0.3em 0;
+  margin: 0 auto 0.3em auto;
+  hyphens: none;
 
   &:first-letter {
     text-transform: uppercase;
+  }
+}
+
+:host.recipe {
+  h1 {
+    text-align: center;
+    font-size: 2em;
+    color: mat-color($mat-primary, 900);
   }
 }

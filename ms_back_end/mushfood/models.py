@@ -27,6 +27,13 @@ class Recipe(models.Model):
     null=False,
     help_text="Slug created from the title",
   )
+  portions = models.PositiveIntegerField(
+    "portions",
+    default=1,
+    null=False,
+    blank=False,
+    help_text="Number of portion this recipe provide",
+  )
   instructions = models.TextField(
     "instructions",
     blank=True,
@@ -273,6 +280,12 @@ class MeasurementUnit(models.Model):
   """
   name = models.CharField(
     "name", max_length=50, blank=False, null=False, help_text="Name of the measurement unit"
+  )
+  short_name = models.CharField(
+    "short name", max_length=50, blank=True, null=True, help_text="Short name of the measurement unit"
+  )
+  is_ignorable = models.BooleanField(
+    "is ignorable", default=False, null=False, help_text=" Can the measurement unit be ignored"
   )
   creation_date = models.DateTimeField(
     "creation date",

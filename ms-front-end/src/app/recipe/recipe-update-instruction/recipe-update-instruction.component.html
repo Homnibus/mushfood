@@ -1,5 +1,6 @@
 <form [formGroup]="recipeForm" class="recipe-form">
   <ckeditor [editor]="Editor"
+            [config]="option"
             formControlName="instructions"
   ></ckeditor>
 </form>

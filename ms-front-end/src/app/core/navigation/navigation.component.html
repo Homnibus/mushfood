@@ -1,12 +1,15 @@
 <mat-toolbar class="mat-elevation-z6" color="primary">
-  <a mat-button routerLink="/">
-    MushFood
-  </a>
-  <div class="menu__filler"></div>
-  <a *ngIf="(authService.currentUser$ | async)" mat-button routerLink="/logout">
-    Déconnexion
-  </a>
-  <a *ngIf="!(authService.currentUser$ | async)" mat-button routerLink="/login">
-    Connexion
-  </a>
+  <div class="menu__max-size">
+    <a mat-button routerLink="/">
+      MushFood
+    </a>
+    <div class="menu__filler"></div>
+    <a *ngIf="(authService.currentUser$ | async)" mat-button routerLink="/logout">
+      Déconnexion
+    </a>
+    <a *ngIf="!(authService.currentUser$ | async)" mat-button routerLink="/login">
+      Connexion
+    </a>
+  </div>
 </mat-toolbar>
+<mat-progress-bar *ngIf="isLoading" color="accent" mode="indeterminate"></mat-progress-bar>

@@ -14,9 +14,9 @@ export const routerTransition = trigger('routerTransition', [
         style({
           opacity: 1,
           position: 'absolute',
-          top: 0,
-          left: '1em',
-          right: '1em',
+          top: '50px',
+          left: 0,
+          right: 0,
         }),
         animate('0.2s', style({opacity: 0}))
       ],

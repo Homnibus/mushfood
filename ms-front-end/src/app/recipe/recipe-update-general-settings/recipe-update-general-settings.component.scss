@@ -1,7 +1,9 @@
+@import '../../../sass/theme/mushfood-theme';
+
 :host {
   display: flex;
   flex-wrap: wrap;
-  margin: 1em;
+  margin: 0 1em;
 
   > * {
     flex: 1;
@@ -13,6 +15,7 @@
 
     > h1 {
       margin-bottom: 0.8em;
+      color: mat-color($mat-primary, 900);
     }
 
     > mat-form-field {

@@ -1,7 +1,7 @@
-<app-navigation></app-navigation>
-<div class="web-page-content">
-  <router-outlet></router-outlet>
+<app-navigation class="mushfood"></app-navigation>
+<div [@routerTransition]="getState(o)" class="web-page-content mushfood">
+  <router-outlet #o="outlet"></router-outlet>
 </div>
-<footer>
-  <h2>MushFood 2019.08.13</h2>
+<footer class="mushfood">
+  <h2>MushFood 2020.04.09</h2>
 </footer>

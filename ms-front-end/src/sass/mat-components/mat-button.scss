@@ -15,6 +15,14 @@
   }
 }
 
+.mat-raised-button.mat-accent {
+  border-bottom: 2px solid mat-color($mat-accent, 900);
+
+  &[disabled] {
+    border-bottom: 2px solid mat-color($mat-accent, 300);
+  }
+}
+
 .mat-raised-button.mat-warn {
   border-bottom: 2px solid mat-color($mat-warn, 900);
 

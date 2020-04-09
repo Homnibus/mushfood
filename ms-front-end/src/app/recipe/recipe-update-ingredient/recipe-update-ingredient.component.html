@@ -1,5 +1,5 @@
 <div *ngIf="recipe && ingredientQuantityList && ingredientList" class="ingredient-form">
-  <ng-container *ngIf="this.recipeUpdateService.measurementUnitList as measurementUnitList">
+  <ng-container *ngIf="this.measurementUnitService.measurementUnitList as measurementUnitList">
     <h1>Ajouter un ingrédient</h1>
     <app-ingredient-quantity-add (created)="addIngredientQuantity($event)"
                                  [ingredientList]="ingredientList"

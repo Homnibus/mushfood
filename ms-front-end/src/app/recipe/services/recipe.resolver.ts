@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
 import {Recipe} from '../../app.models';
 import {Observable} from 'rxjs';
-import {RecipeUpdateService} from './recipe-update.service';
+import {RecipeService} from './recipe.service';
 
 
 @Injectable({
@@ -10,10 +10,11 @@ import {RecipeUpdateService} from './recipe-update.service';
 })
 export class RecipeResolver implements Resolve<Recipe> {
 
-  constructor(private recipeDetailsService: RecipeUpdateService) {
+  constructor(private recipeService: RecipeService) {
   }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Recipe> {
-    return this.recipeDetailsService.setActiveRecipe(route.paramMap.get('slug'));
+    return this.recipeService.setActiveRecipe(route.paramMap.get('slug'));
   }
+
 }

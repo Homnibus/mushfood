@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Ingredient, IngredientQuantity, MeasurementUnit, Recipe} from '../../app.models';
 import {FormBuilder, Validators} from '@angular/forms';
 import {Observable} from 'rxjs';
-import {map, startWith, tap} from 'rxjs/operators';
+import {map, startWith} from 'rxjs/operators';
 import {IngredientQuantityService} from '../services/ingredient-quantity.service';
 
 @Component({
@@ -34,7 +34,6 @@ export class IngredientQuantityAddComponent implements OnInit {
 
   ngOnInit(): void {
     this.filteredIngredientList$ = this.ingredientForm.get('ingredient').valueChanges.pipe(
-      tap(() => console.log('oups')),
       startWith(''), // Needed to create the ingredient filtered list before the user start using the input.
       map(ingredient => this.ingredientQuantityService.filterIngredientList(ingredient, this.ingredientList))
     );

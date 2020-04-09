@@ -1,24 +1,11 @@
 @import '../../../sass/theme/mushfood-theme';
-//.image{
-//  order: 1;
-//  flex-grow: 1;
-//  flex-shrink: 0;
-//  img {
-//    @include mat-elevation(5);
-//    display: block;
-//    max-width: 256px;
-//    margin: auto;
-//    border-radius: 50px 15px 50px 15px;
-//    border: 1em solid mat-color($mat-primary,700);
-//  }
-//}
-
 $item-height: 360;
 $item-width: 300;
 $image-mask-margin: 8;
 $image-mask-width: $item-width - ($image-mask-margin*2);
 
 .image-flex-container {
+  display: flex;
   order: 1;
   flex-grow: 1;
   flex-shrink: 0;
@@ -56,23 +43,47 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
     margin: 1.5em;
   }
 
-}
+  .ingredient {
+    flex: 1;
+    margin-bottom: 4em;
+    margin-top: 1em;
 
-.ingredient {
-  flex: 1;
-
-  h1 {
-    margin-bottom: 0.3em;
+    h1 {
+      margin-bottom: 0.3em;
+      color: mat-color($mat-primary, 900);
+    }
   }
 }
 
 .instructions {
-  margin: 0 1.5em 1.5em 1.5em;
+  margin: -2.2em 1.5em 1.5em 1.5em;
+
   h1 {
     margin-bottom: 1em;
+    color: mat-color($mat-primary, 900);
   }
+
   markdown {
     padding-left: 1em;
     display: block;
+  }
+}
+
+.portion-picker {
+  display: flex;
+
+  button {
+    margin: 0 -2px;
+  }
+
+  mat-icon {
+    font-size: 2.1em;
+    margin-left: -5px;
+    margin-top: -1px;
+  }
+
+  h2 {
+    align-self: center;
+    margin-right: 0.4em;
   }
 }

@@ -1,0 +1,15 @@
+@import "../theme/mushfood-theme";
+
+.ck-content .mention {
+  display: inline-block;
+  border-radius: 3px;
+  padding: 0 0.3em;
+  margin: 0 -0.3em;
+  background-color: inherit;
+  color: mat-color($mat-primary, 600);
+  font-weight: bold;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+}

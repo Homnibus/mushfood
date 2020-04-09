@@ -46,6 +46,7 @@ export class RecipeSerializer implements ModelSerializer<Recipe> {
     recipe.id = parseInt(json.id, 10);
     recipe.title = json.title;
     recipe.slug = json.slug;
+    recipe.portions = json.portions;
     recipe.instructions = json.instructions;
     recipe.inspiration = json.inspiration;
     recipe.recipeImage = json.recipe_image ? recipeImageSerializer.fromJson(json.recipe_image, ModelState.Retrieved) : undefined;
@@ -62,6 +63,7 @@ export class RecipeSerializer implements ModelSerializer<Recipe> {
     return {
       title: recipe.title,
       instructions: recipe.instructions,
+      portions: recipe.portions,
       inspiration: recipe.inspiration,
       logical_delete: recipe.logicalDelete
     };
@@ -146,6 +148,8 @@ export class MeasurementUnitSerializer implements ModelSerializer<MeasurementUni
     const measurementUnit = new MeasurementUnit();
     measurementUnit.id = parseInt(json.id, 10);
     measurementUnit.name = json.name;
+    measurementUnit.shortName = json.short_name;
+    measurementUnit.isIgnorable = json.is_ignorable;
     measurementUnit.creationDate = new Date(json.creation_date);
     measurementUnit.updateDate = new Date(json.update_date);
     measurementUnit.state = state;
@@ -175,10 +179,10 @@ export class IngredientQuantitySerializer implements ModelSerializer<IngredientQ
     const ingredientQuantity = new IngredientQuantity();
 
     ingredientQuantity.id = parseInt(json.id, 10);
-    ingredientQuantity.quantity = json.quantity;
+    ingredientQuantity.quantity = +json.quantity;
     ingredientQuantity.measurementUnit = measurementUnitSerializer.fromJson(json.measurement_unit, ModelState.Retrieved);
     ingredientQuantity.ingredient = ingredientSerializer.fromJson(json.ingredient, ModelState.Retrieved);
-    ingredientQuantity.recipe = json.recipe;
+    ingredientQuantity.recipe = parseInt(json.recipe, 10);
     ingredientQuantity.creationDate = new Date(json.creation_date);
     ingredientQuantity.updateDate = new Date(json.update_date);
     ingredientQuantity.state = state;

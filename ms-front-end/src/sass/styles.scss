@@ -1,6 +1,7 @@
 @import "base/reset";
 @import "theme/mushfood-theme";
 @import "base/base";
+@import "ckeditor/content";
 
 .mushfood {
   @import "mat-components/mat-list";
@@ -9,4 +10,5 @@
   @import "mat-components/mat-button";
   @import "mat-components/mat-textarea";
   @import "mat-components/mat-snack-bar";
+  @import "ckeditor/theme";
 }

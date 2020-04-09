@@ -7,10 +7,10 @@
       Approuvées par le chef Mushroom !
     </app-web-page-subtitle>
     <app-web-page-action-menu *ngIf="authService.currentUser$ | async">
-      <a color="accent" mat-flat-button routerLink="/recipe/add">
+      <button (click)="createRecipe()" color="accent" mat-raised-button>
         Nouvelle recette
         <mat-icon>add</mat-icon>
-      </a>
+      </button>
     </app-web-page-action-menu>
   </app-web-page-header>
   <app-web-page-content>

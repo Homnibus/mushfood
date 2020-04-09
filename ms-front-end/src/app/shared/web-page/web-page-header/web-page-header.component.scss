@@ -1,16 +1,27 @@
 :host {
   display: block;
-  margin-top: 1em;
+
+  &.recipe {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  &:not(.recipe) {
+    .divider {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    .mat-divider {
+      margin: 0 1em;
+    }
+  }
 }
 
 .header {
   max-width: 850px;
+  padding-top: 0.5em;
   margin-right: auto;
   margin-left: auto;
-
-  .mat-divider {
-    margin: 0 1em;
-  }
 }
 
 .header__content {
@@ -18,8 +29,9 @@
   flex-wrap: wrap;
   margin: 0 2em;
 
-  > div {
+  .header__text {
     flex: 1;
+    flex-basis: auto;
     margin: 1em 0;
   }
 }

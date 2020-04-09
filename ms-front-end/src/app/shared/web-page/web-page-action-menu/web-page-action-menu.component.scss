@@ -1,9 +1,11 @@
 :host {
+  justify-content: center;
+  margin: 0 auto .5em auto;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
 
-  > ::ng-deep * {
-    margin: 0 .5em 1em 0;
+  > ::ng-deep .mat-button-base {
+    margin: 0 .5em .5em .5em;
   }
 }

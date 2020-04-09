@@ -1,5 +1,4 @@
 import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
-import {RecipeUpdateService} from '../services/recipe-update.service';
 import {Recipe, RecipeImage} from '../../app.models';
 import {Subscription} from 'rxjs';
 import {FormBuilder, FormGroup} from '@angular/forms';
@@ -7,6 +6,8 @@ import {first} from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {RecipeService} from '../services/recipe.service';
+import {RecipeImageService} from '../../recipe-image/services/recipe-image.service';
 
 @Component({
   selector: 'app-recipe-update-general-settings',
@@ -21,7 +22,8 @@ export class RecipeUpdateGeneralSettingsComponent implements OnInit, OnDestroy {
   activeRecipeImageSubscription: Subscription;
   recipeForm: FormGroup;
 
-  constructor(public recipeUpdateService: RecipeUpdateService,
+  constructor(private recipeService: RecipeService,
+              public recipeImageService: RecipeImageService,
               private fb: FormBuilder,
               private router: Router,
               public dialog: MatDialog,
@@ -29,20 +31,21 @@ export class RecipeUpdateGeneralSettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.activeRecipeSubscription = this.recipeUpdateService.activeRecipe$.subscribe(data => {
+    this.activeRecipeSubscription = this.recipeService.activeRecipe$.subscribe(data => {
       this.recipe = data;
     });
-    this.recipeUpdateService.activeRecipe$.pipe(first()).subscribe(data => {
+    this.recipeService.activeRecipe$.pipe(first()).subscribe(data => {
       this.recipeForm = this.fb.group({
         title: [data.title],
         inspiration: [data.inspiration],
+        portions: [data.portions],
       });
     });
-    this.activeRecipeImageSubscription = this.recipeUpdateService.activeRecipeImage$.subscribe(data => {
+    this.activeRecipeImageSubscription = this.recipeImageService.activeRecipeImage$.subscribe(data => {
       this.recipeImage = data;
     });
     this.recipeForm.valueChanges.subscribe(
-      data => this.recipeUpdateService.updateActiveRecipeGeneralSettings(data.title, data.inspiration)
+      data => this.recipeService.updateActiveRecipeGeneralSettings(data.title, data.inspiration, data.portions)
     );
 
   }
@@ -60,13 +63,12 @@ export class RecipeUpdateGeneralSettingsComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result === 'delete') {
-        this.recipeUpdateService.deleteRecipe().subscribe(() => {
+        this.recipeService.deleteRecipe().subscribe(() => {
           this.snackBar.open('Recipe Deleted !', 'Close', {duration: 2000,});
           this.router.navigateByUrl('/recipe');
         });
       }
     });
-
 
   }
 

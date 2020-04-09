@@ -1,14 +1,14 @@
 <app-web-page *ngIf="recipe">
-  <app-web-page-header>
-    <app-web-page-title>
+  <app-web-page-header [type]="'recipe'">
+    <app-web-page-title [type]="'recipe'">
       {{recipe.title}}
     </app-web-page-title>
-    <app-web-page-subtitle>
+    <app-web-page-subtitle [type]="'recipe'">
       {{recipe.inspiration}}
     </app-web-page-subtitle>
     <app-web-page-action-menu *ngIf="authService.currentUser$ | async">
-      <a color="accent" mat-flat-button [routerLink]="['/recipe/edit', recipe.slug]">
-        Modificer la recette
+      <a [routerLink]="['/recipe/edit', recipe.slug]" color="accent" mat-raised-button>
+        Modifier
         <mat-icon>edit</mat-icon>
       </a>
     </app-web-page-action-menu>
@@ -22,8 +22,31 @@
         </div>
       </div>
       <div class="ingredient">
+        <div class="portion-picker">
+          <h2>Pour {{updatedPortions}} parts</h2>
+          <button (click)="removePortions()" [disabled]="updatedPortions <= 1"
+                  aria-label="Example icon-button with a heart icon" color="primary"
+                  mat-icon-button>
+            <mat-icon>remove_circle</mat-icon>
+          </button>
+          <button (click)="addPortions()" aria-label="Example icon-button with a heart icon" color="primary"
+                  mat-icon-button>
+            <mat-icon>add_circle</mat-icon>
+          </button>
+        </div>
         <h1>Ingrédient</h1>
-        <app-ingredient-quantity-list [recipe]="recipe"></app-ingredient-quantity-list>
+        <ng-container *ngIf="ingredientQuantityList">
+          <mat-list>
+            <mat-list-item *ngFor="let ingredientQuantity of ingredientQuantityList">
+              <mat-icon color="accent" matListIcon>local_dining</mat-icon>
+              <h4 *ngIf="!ingredientQuantity.measurementUnit.isIgnorable"
+                  mat-line>{{quantityToString(ingredientQuantity.quantity)}} {{ingredientQuantity.measurementUnit.name}}
+                de {{ingredientQuantity.ingredient.name}}</h4>
+              <h4 *ngIf="ingredientQuantity.measurementUnit.isIgnorable"
+                  mat-line>{{quantityToString(ingredientQuantity.quantity)}} {{ingredientQuantity.ingredient.name}}</h4>
+            </mat-list-item>
+          </mat-list>
+        </ng-container>
       </div>
     </div>
     <div class="instructions">

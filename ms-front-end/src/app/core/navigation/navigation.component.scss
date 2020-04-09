@@ -1,11 +1,17 @@
 // Navigation bar container
+:host {
+  position: relative;
+}
+
 .mat-toolbar {
-  //position: fixed;
-  //z-index: 999;
-  //top: 0;
-  //right: 0;
   color: white;
-  //border-bottom: 2px solid map_get($md-primary, 900);
+  justify-content: center;
+}
+
+.menu__max-size {
+  flex: 1;
+  max-width: 850px;
+  display: flex;
 }
 
 .mat-toolbar-row, .mat-toolbar-single-row {
@@ -21,3 +27,11 @@
 .mat-button {
   font-size: 0.9em;
 }
+
+mat-progress-bar {
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+}
+

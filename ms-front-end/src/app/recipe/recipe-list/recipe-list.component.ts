@@ -4,6 +4,8 @@ import {Subscription} from 'rxjs';
 import {Recipe} from '../../app.models';
 import {AuthService} from '../../core/services/auth.service';
 import {ResizedEvent} from 'angular-resize-event';
+import {MatDialog} from '@angular/material/dialog';
+import {RecipeAddDialogComponent} from '../recipe-add-dialog/recipe-add-dialog.component';
 
 enum Position {
   Middle,
@@ -27,6 +29,7 @@ export class RecipeListComponent implements OnInit, OnDestroy {
 
   constructor(
     private recipeService: RecipeService,
+    public dialog: MatDialog,
     public authService: AuthService) {
   }
 
@@ -42,6 +45,12 @@ export class RecipeListComponent implements OnInit, OnDestroy {
     this.recipeListSubscription.unsubscribe();
   }
 
+  createRecipe() {
+    const dialogRef = this.dialog.open(RecipeAddDialogComponent, {
+      width: '250px',
+    });
+  }
+
   onResized(event: ResizedEvent) {
     const itemSize = 190;
     const maxItemNumber = Math.floor(event.newWidth / itemSize);
@@ -49,29 +58,36 @@ export class RecipeListComponent implements OnInit, OnDestroy {
   }
 
   makeHoney(isFirstOfEvenLineList: number[], maxItemPerRow: number): number[] {
-    const resultList = isFirstOfEvenLineList.map(value => Position.Middle);
-    const listLength = isFirstOfEvenLineList.length;
-    for (let i = 0; (maxItemPerRow - 1) * i + maxItemPerRow * i < listLength; i++) {
-      resultList.splice((maxItemPerRow - 1) * i + maxItemPerRow * i, 1, Position.Left);
-    }
-    for (let i = 0; (maxItemPerRow - 1) * (i + 1) + maxItemPerRow * i - 1 < listLength; i++) {
-      const position = (maxItemPerRow - 1) * (i + 1) + maxItemPerRow * i - 1;
-      resultList.splice(position, 1, resultList[position] + 2);
-    }
-    const lastEvenRow = Math.floor(listLength / (maxItemPerRow * 2 - 1));
-    let lastLeftItem;
-    if (lastEvenRow * (maxItemPerRow * 2 - 1) + maxItemPerRow - 1 < listLength) {
-      lastLeftItem = lastEvenRow * (maxItemPerRow * 2 - 1) + maxItemPerRow - 1;
-      if (((listLength - lastLeftItem) % 2) !== maxItemPerRow % 2) {
-        resultList.splice(lastLeftItem, 1, Position.LastRowLeft);
+    let resultList = isFirstOfEvenLineList;
+    if (maxItemPerRow > 1) {
+      resultList = isFirstOfEvenLineList.map(value => Position.Middle);
+      const listLength = isFirstOfEvenLineList.length;
+      for (let i = 0; (maxItemPerRow - 1) * i + maxItemPerRow * i < listLength; i++) {
+        resultList[(maxItemPerRow - 1) * i + maxItemPerRow * i] = Position.Left;
       }
-    } else if (lastEvenRow * (maxItemPerRow * 2 - 1) < listLength) {
-      lastLeftItem = lastEvenRow * (maxItemPerRow * 2 - 1);
-      if (((listLength - lastLeftItem) % 2) === maxItemPerRow % 2) {
-        resultList.splice(lastLeftItem, 1, Position.LastRowLeft);
-      } else if (listLength - lastLeftItem !== maxItemPerRow - 1) {
-        resultList.splice(lastLeftItem, 1, Position.Middle);
+      for (let i = 0; (maxItemPerRow - 1) * (i + 1) + maxItemPerRow * i - 1 < listLength; i++) {
+        const position = (maxItemPerRow - 1) * (i + 1) + maxItemPerRow * i - 1;
+        resultList[position] = (resultList[position] + 2);
       }
+      const lastEvenRow = Math.floor(listLength / (maxItemPerRow * 2 - 1));
+      let lastLeftItem;
+      if (lastEvenRow * (maxItemPerRow * 2 - 1) + maxItemPerRow - 1 < listLength) {
+        lastLeftItem = lastEvenRow * (maxItemPerRow * 2 - 1) + maxItemPerRow - 1;
+        if (((listLength - lastLeftItem) % 2) !== maxItemPerRow % 2) {
+          resultList[lastLeftItem] = Position.LastRowLeft;
+        }
+      } else if (lastEvenRow * (maxItemPerRow * 2 - 1) < listLength) {
+        lastLeftItem = lastEvenRow * (maxItemPerRow * 2 - 1);
+        if (((listLength - lastLeftItem) % 2) === maxItemPerRow % 2) {
+          resultList[lastLeftItem] = Position.LastRowLeft;
+        } else if (listLength - lastLeftItem !== maxItemPerRow - 1) {
+          resultList[lastLeftItem] = Position.Middle;
+        }
+      }
+    } else {
+      resultList = resultList.map((value, index) =>
+        (index % 2) ? Position.Right : Position.Left
+      );
     }
     return resultList;
   }

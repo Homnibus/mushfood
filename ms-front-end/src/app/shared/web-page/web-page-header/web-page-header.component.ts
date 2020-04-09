@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, HostBinding, Input} from '@angular/core';
 
 @Component({
   selector: 'app-web-page-header',
@@ -6,6 +6,10 @@ import {Component} from '@angular/core';
   styleUrls: ['./web-page-header.component.scss']
 })
 export class WebPageHeaderComponent {
+
+  @Input()
+  @HostBinding('class')
+  type: string;
 
   constructor() {
   }

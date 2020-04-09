@@ -51,6 +51,7 @@ export class Recipe extends BaseModel implements Model {
   id: number;
   title: string;
   slug: string;
+  portions: number;
   instructions: string;
   inspiration: string;
   author: string;
@@ -90,6 +91,8 @@ export class MeasurementUnit extends BaseModel implements Model {
 
   id: number;
   name: string;
+  shortName: string;
+  isIgnorable: boolean;
   creationDate: Date;
   updateDate: Date;
 }

@@ -1,6 +1,6 @@
 import {BaseModel, Model, ModelState} from '../../app.models';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {Observable, throwError} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 import {ModelSerializer} from '../../app.serializers';
 import {AuthService} from './auth.service';
 import {environment} from '../../../environments/environment';

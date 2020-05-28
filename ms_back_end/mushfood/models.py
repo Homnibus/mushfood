@@ -360,3 +360,18 @@ class IngredientQuantity(models.Model):
   def __str__(self):
     return str(self.quantity) + " " + self.measurement_unit.name + " of " + self.ingredient.name + " for the " + self.recipe.title
 
+class Category(models.Model):
+  """
+  A specific type of recipe
+  """
+  name = models.CharField(
+    "name", max_length=50, blank=False, null=False, help_text="Name of the category"
+  )
+  recipes = models.ManyToManyField(Recipe, blank=True)
+
+  class Meta:
+    verbose_name = "category"
+    verbose_name_plural = "categories"
+
+  def __str__(self):
+    return self.name

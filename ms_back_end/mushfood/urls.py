@@ -11,6 +11,7 @@ api_router.register(r'measurement-units', views.MeasurementUnitViewSet, basename
 api_router.register(r'ingredients', views.IngredientViewSet, basename='ingredient')
 api_router.register(r'ingredient-images', views.IngredientImageViewSet, basename='ingredient-image')
 api_router.register(r'ingredient-quantities', views.IngredientQuantityViewSet, basename='ingredient-quantity')
+api_router.register(r'categories', views.CategoryViewSet, basename='category')
 
 urlpatterns = [
   path("api/", include(api_router.urls), name="api"),

@@ -56,7 +56,7 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
 }
 
 .instructions {
-  margin: -2.2em 1.5em 1.5em 1.5em;
+  margin: -2.2em 1.5em 2.5em 1.5em;
 
   h1 {
     margin-bottom: 1em;
@@ -85,5 +85,22 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
   h2 {
     align-self: center;
     margin-right: 0.4em;
+    white-space: nowrap;
+  }
+}
+
+.categories {
+  margin: 1em 1.5em 0em 1.5em;
+  h2, mat-chip-list {
+    display: inline-block;
+  }
+  h2 {
+    white-space: nowrap;
+    margin-right: 0.5em;
+    margin-left: .2em;
+    color: mat-color($mat-primary, 900);
+  }
+  mat-chip {
+    cursor: pointer;
   }
 }

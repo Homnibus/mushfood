@@ -1,13 +1,18 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {RecipeService} from '../services/recipe.service';
-import {Subscription} from 'rxjs';
-import {Recipe} from '../../app.models';
+import {Observable, Subscription} from 'rxjs';
+import {Category, Recipe} from '../../app.models';
 import {AuthService} from '../../core/services/auth.service';
 import {ResizedEvent} from 'angular-resize-event';
 import {MatDialog} from '@angular/material/dialog';
 import {RecipeAddDialogComponent} from '../recipe-add-dialog/recipe-add-dialog.component';
+import {environment} from '../../../environments/environment';
+import {ActivatedRoute, Params, Router} from '@angular/router';
+import {HoneyService} from '../../shared/services/honey.service';
+import {map, tap} from 'rxjs/operators';
+import {FormBuilder, Validators} from '@angular/forms';
 
-enum Position {
+export enum Position {
   Middle,
   Left,
   Right,
@@ -20,76 +25,146 @@ enum Position {
   templateUrl: './recipe-list.component.html',
   styleUrls: ['./recipe-list.component.scss']
 })
-export class RecipeListComponent implements OnInit, OnDestroy {
+export class RecipeListComponent implements OnInit {
+
+  readonly itemSize = 190;
+  // List of size that need to recalculate the margin needed to make the honey comb
+  readonly breakPoint = [380, 570, 760]
+  readonly addRecipeImgUrl = `url(${environment.staticUrl}img/add-recipe.png)`;
+  readonly modalWidth = '250px'
 
   recipeList: Recipe[];
-  recipeListSubscription: Subscription;
   recipeListHexagon: Position[];
-  positionEnum = Position;
+  categoryList: Category[];
+  categorySelectedList: boolean[];
+  honeyCombDivWidth = 0;
+  searchForm = this.fb.group({
+    searchWords: [''],
+  });
 
   constructor(
+    private fb: FormBuilder,
     private recipeService: RecipeService,
+    private route: ActivatedRoute,
+    private router: Router,
     public dialog: MatDialog,
+    private honeyService: HoneyService,
     public authService: AuthService) {
+  };
+
+  private static isInSameInterval(x: number, y: number, intervalList: number[]):boolean {
+    let intervalStart = 0;
+    for (const intervalEnd of intervalList) {
+      if (x < intervalEnd && y < intervalEnd) {
+        break;
+      } else {
+        intervalStart = intervalEnd;
+      }
+    }
+    return (x >= intervalStart && y >= intervalStart)
   }
 
   ngOnInit() {
-    this.recipeListSubscription = this.recipeService.filteredList(`logical_delete=false`)
+    this.initCategoryList();
+    const searchWords = this.route.snapshot.queryParamMap.get('search');
+    if(searchWords) {
+      this.searchForm.get('searchWords').setValue(searchWords);
+    }
+    this.recipeService.filteredList(this.getFilterString(searchWords))
       .subscribe(recipeList => {
         this.recipeList = recipeList;
-        this.recipeListHexagon = this.recipeList.map(() => Position.Middle);
+        // Format the margin of the honey like shape containing the recipes
+        this.initHoneyComb();
+        this.recipeListHexagon = this.honeyService.makeHoney(this.recipeListHexagon, this.itemSize, this.honeyCombDivWidth);
       });
-  }
-
-  ngOnDestroy() {
-    this.recipeListSubscription.unsubscribe();
   }
 
   createRecipe() {
     const dialogRef = this.dialog.open(RecipeAddDialogComponent, {
-      width: '250px',
+      width: this.modalWidth,
     });
   }
 
   onResized(event: ResizedEvent) {
-    const itemSize = 190;
-    const maxItemNumber = Math.floor(event.newWidth / itemSize);
-    this.recipeListHexagon = this.makeHoney(this.recipeListHexagon, maxItemNumber);
+    if (!RecipeListComponent.isInSameInterval(this.honeyCombDivWidth,event.newWidth,this.breakPoint)) {
+      this.recipeListHexagon = this.honeyService.makeHoney(this.recipeListHexagon, this.itemSize, event.newWidth);
+    }
+    this.honeyCombDivWidth = event.newWidth
   }
 
-  makeHoney(isFirstOfEvenLineList: number[], maxItemPerRow: number): number[] {
-    let resultList = isFirstOfEvenLineList;
-    if (maxItemPerRow > 1) {
-      resultList = isFirstOfEvenLineList.map(value => Position.Middle);
-      const listLength = isFirstOfEvenLineList.length;
-      for (let i = 0; (maxItemPerRow - 1) * i + maxItemPerRow * i < listLength; i++) {
-        resultList[(maxItemPerRow - 1) * i + maxItemPerRow * i] = Position.Left;
-      }
-      for (let i = 0; (maxItemPerRow - 1) * (i + 1) + maxItemPerRow * i - 1 < listLength; i++) {
-        const position = (maxItemPerRow - 1) * (i + 1) + maxItemPerRow * i - 1;
-        resultList[position] = (resultList[position] + 2);
-      }
-      const lastEvenRow = Math.floor(listLength / (maxItemPerRow * 2 - 1));
-      let lastLeftItem;
-      if (lastEvenRow * (maxItemPerRow * 2 - 1) + maxItemPerRow - 1 < listLength) {
-        lastLeftItem = lastEvenRow * (maxItemPerRow * 2 - 1) + maxItemPerRow - 1;
-        if (((listLength - lastLeftItem) % 2) !== maxItemPerRow % 2) {
-          resultList[lastLeftItem] = Position.LastRowLeft;
-        }
-      } else if (lastEvenRow * (maxItemPerRow * 2 - 1) < listLength) {
-        lastLeftItem = lastEvenRow * (maxItemPerRow * 2 - 1);
-        if (((listLength - lastLeftItem) % 2) === maxItemPerRow % 2) {
-          resultList[lastLeftItem] = Position.LastRowLeft;
-        } else if (listLength - lastLeftItem !== maxItemPerRow - 1) {
-          resultList[lastLeftItem] = Position.Middle;
-        }
-      }
-    } else {
-      resultList = resultList.map((value, index) =>
-        (index % 2) ? Position.Right : Position.Left
-      );
+  onSearch():void {
+    const searchWords = this.searchForm.get('searchWords').value;
+    this.searchRecipes(searchWords);
+  }
+
+  getIndexForRecipeList(index: number): number {
+    if (this.authService.currentUser){
+      return index+1;
     }
-    return resultList;
+    return index;
+  }
+
+  selectCategory(index: number) {
+    this.categorySelectedList[index] = !this.categorySelectedList[index];
+
+  }
+
+  private searchRecipes(searchWords:string): void {
+    this.recipeService.filteredList(this.getFilterString(searchWords))
+      .subscribe(recipeList => {
+        const oldRecipeListSize = this.recipeList.length
+        // Sort the recipe list regarding the title.
+        this.recipeList = recipeList.sort((x,y) =>
+          (x.title.toLowerCase() > y.title.toLowerCase()) ? 1 : ((x.title.toLowerCase() < y.title.toLowerCase()) ? -1 : 0)
+        );
+        // If the number of recipe as change, the honey comb need to be updated
+        if(this.recipeList.length !== oldRecipeListSize){
+          // Format the margin of the honey like shape containing the recipes
+          this.initHoneyComb();
+          this.recipeListHexagon = this.honeyService.makeHoney(this.recipeListHexagon, this.itemSize, this.honeyCombDivWidth);
+        }
+      });
+  }
+
+  private getFilterString(searchWords:string): string{
+    const queryParams: Params = {};
+    let filterString = `logical_delete=false`;
+    if (searchWords){
+      filterString = `${filterString}&search=${searchWords}`;
+      queryParams.search=searchWords;
+    }
+    const categoryListFormatted = this.categoryList.filter((value,index) => this.categorySelectedList[index])
+      .map(category => category.name).join(',');
+    if (categoryListFormatted){
+      filterString = `category__name=${categoryListFormatted}&${filterString}`;
+      queryParams.category=categoryListFormatted;
+    }
+    this.router.navigate(
+      [],
+      {relativeTo: this.route,queryParams: queryParams}
+    );
+    return filterString;
+  }
+
+  private initHoneyComb() {
+    this.recipeListHexagon = this.recipeList.map(() => Position.Middle);
+    // add a first item to the recipeListHexagon to simulate the add recipe button
+    if (this.authService.currentUser){
+      this.recipeListHexagon.unshift(Position.Middle);
+    }
+  }
+
+  private initCategoryList() {
+    const categoryListFromURL = [].concat(this.route.snapshot.queryParamMap.get('category')?.toLowerCase().split(','));
+    this.route.data.subscribe(data => {
+      this.categoryList = data.categoryList;
+      this.categorySelectedList = this.categoryList.map(category => {
+          return categoryListFromURL.indexOf(category.name) >= 0;
+        }
+      );
+    });
+
   }
 
 }
+

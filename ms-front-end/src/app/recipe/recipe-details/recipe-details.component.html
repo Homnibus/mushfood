@@ -53,5 +53,18 @@
       <h1>Instructions</h1>
       <div [innerHTML]="sanitizer.bypassSecurityTrustHtml(recipe.instructions)" class="ck-content"></div>
     </div>
+    <mat-divider></mat-divider>
+    <div class="categories">
+      <mat-chip-list aria-label="Categories" multiple>
+        <h2>Categories :</h2>
+        <mat-chip
+          *ngFor="let category of recipe.categories"
+          color="accent"
+          selected
+          [routerLink]="['/recipe']"
+          [queryParams]="{category: category.name}"
+        >{{category.name | titlecase}}</mat-chip>
+      </mat-chip-list>
+    </div>
   </app-web-page-content>
 </app-web-page>

@@ -15,4 +15,9 @@ export class AppComponent {
   getState(outlet) {
     return outlet.activatedRouteData.state;
   }
+
+  onActivate(event) {
+    window.scroll(0,0);
+  }
+
 }

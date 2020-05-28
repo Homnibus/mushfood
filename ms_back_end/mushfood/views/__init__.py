@@ -4,3 +4,4 @@ from .api_measurement_unit_view import MeasurementUnitViewSet
 from .api_ingredient_view import IngredientViewSet
 from .api_ingredient_image_view import IngredientImageViewSet
 from .api_ingredient_quantity_view import IngredientQuantityViewSet
+from .api_category_view import CategoryViewSet

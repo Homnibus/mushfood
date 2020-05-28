@@ -17,6 +17,10 @@ h1 {
   h1 {
     text-align: center;
     font-size: 2em;
+    font-family: Impact, sans-serif;
     color: mat-color($mat-primary, 900);
+    &:first-letter {
+      color: mat-color($mat-primary, 400);
+    }
   }
 }

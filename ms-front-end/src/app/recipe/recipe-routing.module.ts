@@ -13,6 +13,8 @@ import {IngredientQuantityResolver} from '../ingredient/services/ingredient-quan
 import {MeasurementUnitResolver} from '../ingredient/services/measurement-unit.resolver';
 import {IngredientResolver} from '../ingredient/services/ingredient.resolver';
 import {RecipeIngredientQuantityResolver} from './services/recipe-ingredient-quantity.resolver';
+import {CategoryResolver} from '../category/services/category.resolver';
+import {RecipeUpdateCategoriesComponent} from './recipe-update-categories/recipe-update-categories.component';
 
 const routes: Routes = [
   {
@@ -21,6 +23,7 @@ const routes: Routes = [
       {
         path: '',
         component: RecipeListComponent,
+        resolve: {categoryList: CategoryResolver},
         data: {state: 1},
       },
       {
@@ -28,12 +31,12 @@ const routes: Routes = [
         component: RecipeUpdateTabsComponent,
         resolve: {recipe: RecipeResolver},
         canActivateChild: [AuthGuard],
-        data: {state: 3},
+        data: {state: 2},
         children: [
           {
             path: '',
             component: RecipeUpdateInstructionComponent,
-            data: {state: 3.0},
+            data: {state: 2.0},
             resolve: {
               ingredientQuantityList: IngredientQuantityResolver,
             }
@@ -41,7 +44,7 @@ const routes: Routes = [
           {
             path: 'ingredient',
             component: RecipeUpdateIngredientComponent,
-            data: {state: 3.1},
+            data: {state: 2.1},
             resolve: {
               ingredientQuantityList: IngredientQuantityResolver,
               measurementUnitList: MeasurementUnitResolver,
@@ -49,9 +52,15 @@ const routes: Routes = [
             },
           },
           {
+            path: 'categories',
+            component: RecipeUpdateCategoriesComponent,
+            data: {state: 2.2},
+            resolve: {categoryList: CategoryResolver},
+          },
+          {
             path: 'general-settings',
             component: RecipeUpdateGeneralSettingsComponent,
-            data: {state: 3.2},
+            data: {state: 2.3},
             resolve: {recipeImage: RecipeImageResolver},
           },
         ]
@@ -59,7 +68,7 @@ const routes: Routes = [
       {
         path: 'details/:slug',
         component: RecipeDetailsComponent,
-        data: {state: 4},
+        data: {state: 3},
         resolve: {recipeIngredientQuantityList: RecipeIngredientQuantityResolver},
       },
     ]

@@ -1,4 +1,14 @@
-import {Ingredient, IngredientImage, IngredientQuantity, MeasurementUnit, Model, ModelState, Recipe, RecipeImage} from './app.models';
+import {
+  Category,
+  Ingredient,
+  IngredientImage,
+  IngredientQuantity,
+  MeasurementUnit,
+  Model,
+  ModelState,
+  Recipe,
+  RecipeImage
+} from './app.models';
 
 export abstract class ModelSerializer<T extends Model> {
   abstract fromJson(json: any, state: ModelState): T;
@@ -42,6 +52,7 @@ export class RecipeImageSerializer implements ModelSerializer<RecipeImage> {
 export class RecipeSerializer implements ModelSerializer<Recipe> {
   fromJson(json: any, state: ModelState): Recipe {
     const recipeImageSerializer = new RecipeImageSerializer();
+    const categorySerializer = new CategorySerializer();
     const recipe = new Recipe();
     recipe.id = parseInt(json.id, 10);
     recipe.title = json.title;
@@ -51,6 +62,7 @@ export class RecipeSerializer implements ModelSerializer<Recipe> {
     recipe.inspiration = json.inspiration;
     recipe.recipeImage = json.recipe_image ? recipeImageSerializer.fromJson(json.recipe_image, ModelState.Retrieved) : undefined;
     recipe.author = json.author;
+    recipe.categories = json.category_set ? json.category_set.map(jsonCategory => categorySerializer.fromJson(jsonCategory, ModelState.Retrieved)) : [];
     recipe.creationDate = new Date(json.creation_date);
     recipe.updateDate = new Date(json.update_date);
     recipe.logicalDelete = json.logical_delete;
@@ -60,17 +72,21 @@ export class RecipeSerializer implements ModelSerializer<Recipe> {
   }
 
   toJson(recipe: Recipe): any {
+    const categorySerializer = new CategorySerializer();
     return {
       title: recipe.title,
       instructions: recipe.instructions,
       portions: recipe.portions,
       inspiration: recipe.inspiration,
-      logical_delete: recipe.logicalDelete
+      logical_delete: recipe.logicalDelete,
+      category_set: recipe.categories.map(category => categorySerializer.toJson(category)),
     };
   }
 
   toCreateJson(recipe: Recipe): any {
-    return this.toJson(recipe);
+    return {
+      title: recipe.title,
+    };
   }
 
   toUpdateJson(recipe: Recipe): any {
@@ -205,5 +221,29 @@ export class IngredientQuantitySerializer implements ModelSerializer<IngredientQ
 
   toUpdateJson(ingredientQuantity: IngredientQuantity): any {
     return this.toJson(ingredientQuantity);
+  }
+}
+
+export class CategorySerializer implements ModelSerializer<Category> {
+  fromJson(json: any, state: ModelState): Category {
+    const category = new Category();
+    category.id = parseInt(json.id, 10);
+    category.name = json.name;
+    return category;
+  }
+
+  toJson(category: Category): any {
+    return {
+      id: category.id,
+      name: category.name,
+    };
+  }
+
+  toCreateJson(category: Category): any {
+    return this.toJson(category);
+  }
+
+  toUpdateJson(category: Category): any {
+    return this.toJson(category);
   }
 }

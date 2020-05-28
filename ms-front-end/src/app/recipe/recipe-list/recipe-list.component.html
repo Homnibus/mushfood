@@ -1,36 +1,54 @@
 <app-web-page>
-  <app-web-page-header>
-    <app-web-page-title>
-      Toutes les recettes
-    </app-web-page-title>
-    <app-web-page-subtitle>
-      Approuvées par le chef Mushroom !
-    </app-web-page-subtitle>
-    <app-web-page-action-menu *ngIf="authService.currentUser$ | async">
-      <button (click)="createRecipe()" color="accent" mat-raised-button>
-        Nouvelle recette
-        <mat-icon>add</mat-icon>
-      </button>
-    </app-web-page-action-menu>
-  </app-web-page-header>
   <app-web-page-content>
-    <div (resized)="onResized($event)" *ngIf="recipeListHexagon" class="recipe-list">
-      <div *ngFor="let recipe of recipeList; let index = index"
-           [class.last-left]="this.recipeListHexagon[index]===positionEnum.LastRowLeft"
-           [class.left]="this.recipeListHexagon[index]===positionEnum.Left || this.recipeListHexagon[index]===positionEnum.All"
-           [class.right]="this.recipeListHexagon[index]===positionEnum.Right || this.recipeListHexagon[index]===positionEnum.All"
-           class="recipe-item">
-        <a [routerLink]="['/recipe/details', recipe.slug]" class="item-shape" mat-ripple>
-          <div [ngStyle]="{'background-image': 'url('+(recipe.recipeImage ? recipe.recipeImage.imageUrl : '')  +') '}"
-               class="image-mask">
-            <div class="text">
-              <div class="reverse-mask-left"></div>
-              <div class="reverse-mask-right"></div>
-              <p>{{recipe.title}}</p>
-            </div>
-          </div>
-        </a>
-      </div>
+    <h1>
+      <span class="mush">MUSH</span><span class="food">FOOD</span>
+    </h1>
+    <form (ngSubmit)="onSearch()" [formGroup]="searchForm" class="search">
+      <mat-form-field appearance="outline">
+        <mat-label> </mat-label>
+        <input matInput placeholder="Recherche" formControlName="searchWords">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <button color="accent" mat-raised-button type="submit">
+        Rechercher
+      </button>
+    </form>
+    <div class="categories">
+      <h2>Par catégories:</h2>
+      <!--         [routerLink]="['/recipe/category', category.name]"-->
+      <ng-container *ngFor="let category of categoryList; let index = index">
+        <button *ngIf="!categorySelectedList[index]"
+          color="primary" mat-stroked-button
+          (click)="selectCategory(index)">
+          {{category.name | titlecase}}
+        </button>
+        <button *ngIf="categorySelectedList[index]"
+                color="primary" mat-flat-button
+                (click)="selectCategory(index)">
+          {{category.name | titlecase}}
+        </button>
+      </ng-container>
     </div>
+    <ng-container *ngIf="recipeList">
+    <div (resized)="onResized($event)" *ngIf="recipeListHexagon" class="recipe-list">
+      <app-recipe-hexagon
+        *ngIf="authService.currentUser$ | async"
+        [index]="0"
+        [routerLink]=""
+        [backgroundImageLink]="addRecipeImgUrl"
+        [hexagonTitle]="'Nouvelle recette'"
+        [recipeListHexagon]="this.recipeListHexagon"
+        (click)="createRecipe()"
+      ></app-recipe-hexagon>
+      <app-recipe-hexagon
+        *ngFor="let recipe of recipeList; let index = index"
+        [index]="this.getIndexForRecipeList(index)"
+        [routerLink]="['/recipe/details', recipe.slug]"
+        [backgroundImageLink]="'url('+(recipe.recipeImage ? recipe.recipeImage.imageUrl : '') + ') '"
+        [hexagonTitle]="recipe.title"
+        [recipeListHexagon]="this.recipeListHexagon"
+      ></app-recipe-hexagon>
+    </div>
+    </ng-container>
   </app-web-page-content>
 </app-web-page>

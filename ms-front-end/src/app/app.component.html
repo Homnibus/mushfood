@@ -1,6 +1,6 @@
 <app-navigation class="mushfood"></app-navigation>
 <div [@routerTransition]="getState(o)" class="web-page-content mushfood">
-  <router-outlet #o="outlet"></router-outlet>
+  <router-outlet #o="outlet" (activate)="onActivate($event)"></router-outlet>
 </div>
 <footer class="mushfood">
   <h2>MushFood 2020.04.09</h2>

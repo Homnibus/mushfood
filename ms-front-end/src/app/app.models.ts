@@ -56,6 +56,7 @@ export class Recipe extends BaseModel implements Model {
   inspiration: string;
   author: string;
   recipeImage: RecipeImage;
+  categories: Category[];
   creationDate: Date;
   updateDate: Date;
   logicalDelete: boolean;
@@ -112,3 +113,11 @@ export class IngredientQuantity extends BaseModel implements Model {
   updateDate: Date;
 }
 
+
+export class Category extends BaseModel implements Model {
+  static modelName = 'category';
+  static modelPlural = 'categories';
+
+  id: number;
+  name: string;
+}

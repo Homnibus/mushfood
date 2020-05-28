@@ -48,7 +48,8 @@ export class RecipeUpdateTabsComponent implements OnInit, OnDestroy {
     this.tabLinkList = [
       new TabLink(0, 'Instruction', '/recipe/edit/' + recipe.slug),
       new TabLink(1, 'Ingredient', '/recipe/edit/' + recipe.slug + '/ingredient'),
-      new TabLink(2, 'General Settings', '/recipe/edit/' + recipe.slug + '/general-settings'),
+      new TabLink(2, 'Categories', '/recipe/edit/' + recipe.slug + '/categories'),
+      new TabLink(3, 'General Settings', '/recipe/edit/' + recipe.slug + '/general-settings'),
     ];
   }
 

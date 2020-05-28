@@ -15,6 +15,8 @@ import {
 import {RecipeImageModule} from '../recipe-image/recipe-image.module';
 import {AngularResizedEventModule} from 'angular-resize-event';
 import {RecipeAddDialogComponent} from './recipe-add-dialog/recipe-add-dialog.component';
+import { RecipeHexagonComponent } from './recipe-hexagon/recipe-hexagon.component';
+import { RecipeUpdateCategoriesComponent } from './recipe-update-categories/recipe-update-categories.component';
 
 
 @NgModule({
@@ -27,7 +29,9 @@ import {RecipeAddDialogComponent} from './recipe-add-dialog/recipe-add-dialog.co
     RecipeUpdateIngredientComponent,
     RecipeUpdateGeneralSettingsComponent,
     RecipeUpdateDeleteDialogComponent,
-    RecipeAddDialogComponent],
+    RecipeAddDialogComponent,
+    RecipeHexagonComponent,
+    RecipeUpdateCategoriesComponent],
   imports: [
     AngularResizedEventModule,
     SharedModule,

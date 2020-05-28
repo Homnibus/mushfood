@@ -1,5 +1,5 @@
 import {ModelService} from '../../core/services/model.service';
-import {Recipe} from '../../app.models';
+import {Category, Recipe} from '../../app.models';
 import {AuthService} from '../../core/services/auth.service';
 import {RecipeSerializer} from '../../app.serializers';
 import {Injectable} from '@angular/core';
@@ -47,6 +47,13 @@ export class RecipeService extends ModelService<Recipe> {
   updateActiveRecipeInstruction(instructions: string): Recipe {
     this.toUpdateRecipe = true;
     this.activeRecipe.instructions = instructions;
+    this.activeRecipeSubject.next(this.activeRecipe);
+    return this.activeRecipe;
+  }
+
+  updateActiveRecipeCategories(categories: Category[]): Recipe {
+    this.toUpdateRecipe = true;
+    this.activeRecipe.categories = categories;
     this.activeRecipeSubject.next(this.activeRecipe);
     return this.activeRecipe;
   }

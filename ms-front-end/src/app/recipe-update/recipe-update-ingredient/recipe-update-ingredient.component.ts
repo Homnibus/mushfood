@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Ingredient, IngredientQuantity, Recipe} from '../../app.models';
 import {Subscription} from 'rxjs';
-import {RecipeService} from '../services/recipe.service';
+import {RecipeService} from '../../recipe/services/recipe.service';
 import {IngredientQuantityService} from '../../ingredient/services/ingredient-quantity.service';
 import {IngredientService} from '../../ingredient/services/ingredient.service';
 import {MeasurementUnitService} from '../../ingredient/services/measurement-unit.service';

@@ -5,6 +5,9 @@
   <a [routerLink]="routerLink" class="item-shape" mat-ripple>
     <div [ngStyle]="{'background-image': backgroundImageLink}"
          class="image-mask">
+      <div *ngIf="variant && variant.length > 0" class="variant">
+        ×{{variant.length}}
+      </div>
       <div class="text">
         <div class="reverse-mask-left"></div>
         <div class="reverse-mask-right"></div>

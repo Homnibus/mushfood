@@ -10,7 +10,6 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {AuthInterceptor} from './core/interceptor/auth.interceptor';
 import {AppRoutingModule} from './app-routing.module';
 import {RecipeModule} from './recipe/recipe.module';
-import {MarkdownModule} from 'ngx-markdown';
 
 @NgModule({
   declarations: [
@@ -23,7 +22,6 @@ import {MarkdownModule} from 'ngx-markdown';
     BrowserAnimationsModule,
     RecipeModule,
     ErrorRoutingModule,
-    MarkdownModule.forRoot(),
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},

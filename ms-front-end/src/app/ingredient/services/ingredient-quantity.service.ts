@@ -3,7 +3,7 @@ import {Ingredient, IngredientQuantity, Recipe} from '../../app.models';
 import {AuthService} from '../../core/services/auth.service';
 import {IngredientQuantitySerializer} from '../../app.serializers';
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, forkJoin, Observable, of} from 'rxjs';
+import {BehaviorSubject, forkJoin, Observable, of, pipe} from 'rxjs';
 import {map, switchMap, tap} from 'rxjs/operators';
 
 @Injectable({
@@ -72,8 +72,9 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
       .map(x => x.tempId)
       .indexOf(ingredientQuantity.tempId);
     let elementPos: number;
+    // If the ingredientQuantity to update is already in the creation list, only update the creation list
     if (indexOfIngredientQuantityInCreateList >= 0) {
-      this.toCreateIngredientQuantity.splice(indexOfIngredientQuantityInCreateList, 1, ingredientQuantity);
+      this.toCreateIngredientQuantity[indexOfIngredientQuantityInCreateList] =  ingredientQuantity;
       elementPos = this.activeIngredientQuantityList.map(x => x.tempId).indexOf(ingredientQuantity.tempId);
     } else {
       this.toUpdateIngredientQuantity.push(ingredientQuantity);
@@ -167,6 +168,9 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
         return forkJoin(listOfIngredientQuantityToCreateObservable
           .concat(listOfIngredientQuantityToUpdateObservable)
           .concat(listOfIngredientQuantityToDeleteObservable)
+        ).pipe(
+          // remove all the undefined ingredientQuantity produced by the of(undefined)
+          map(ingredientQuantityList => ingredientQuantityList.filter(ingredientQuantity => ingredientQuantity)),
         );
       }),
       tap(() => {
@@ -178,8 +182,37 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
     );
   }
 
-  removeActiveIngredientQuantityList() {
-    this.activeIngredientQuantityListSubject.next(undefined);
+  createVariant(variantRecipe: Recipe,toCopyIngredientList: IngredientQuantity[] ): Observable<[IngredientQuantity[],Recipe]> {
+    const newActiveIngredientQuantityList = toCopyIngredientList.map( ingredientQuantity => {
+      const newIngredientQuantity = new IngredientQuantity();
+      newIngredientQuantity.tempId = Date.now();
+      newIngredientQuantity.ingredient = ingredientQuantity.ingredient;
+      newIngredientQuantity.recipe = variantRecipe.id;
+      newIngredientQuantity.quantity = ingredientQuantity.quantity;
+      newIngredientQuantity.measurementUnit = ingredientQuantity.measurementUnit;
+      return newIngredientQuantity;
+    });
+    return forkJoin(
+      newActiveIngredientQuantityList.map(newIngredientQuantity =>
+        this.create(newIngredientQuantity).pipe(
+          map(createdIngredientQuantity => {
+              const elementPos = newActiveIngredientQuantityList.map(x => x.tempId).indexOf(newIngredientQuantity.tempId);
+              newIngredientQuantity.id = createdIngredientQuantity.id;
+              newIngredientQuantity.creationDate = createdIngredientQuantity.creationDate;
+              newIngredientQuantity.updateDate = createdIngredientQuantity.updateDate;
+              newIngredientQuantity.state = createdIngredientQuantity.state;
+              return newIngredientQuantity;
+            }
+          ))
+      )
+    ).pipe(
+      map(ingredientQuantityList => [ingredientQuantityList,variantRecipe])
+    );
   }
 
+  resetModification() {
+    this.toCreateIngredientQuantity = [];
+    this.toUpdateIngredientQuantity = [];
+    this.toDeleteIngredientQuantity = [];
+  }
 }

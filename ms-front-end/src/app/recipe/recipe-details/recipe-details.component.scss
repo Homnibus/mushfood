@@ -1,6 +1,6 @@
-@import '../../../sass/theme/mushfood-theme';
-$item-height: 360;
-$item-width: 300;
+@import '../../../sass/theme/theme-small';
+$item-height: 366;
+$item-width: 306;
 $image-mask-margin: 8;
 $image-mask-width: $item-width - ($image-mask-margin*2);
 
@@ -16,7 +16,7 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
   display: block;
   height: $item-height + 0px;
   width: $item-width + 0px;
-  background: mat-color($mat-primary, 400);
+  background: $mat-primary-400;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   position: relative;
   margin: auto;
@@ -50,7 +50,7 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
 
     h1 {
       margin-bottom: 0.3em;
-      color: mat-color($mat-primary, 900);
+      color: $mat-primary-900;
     }
   }
 }
@@ -60,12 +60,7 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
 
   h1 {
     margin-bottom: 1em;
-    color: mat-color($mat-primary, 900);
-  }
-
-  markdown {
-    padding-left: 1em;
-    display: block;
+    color: $mat-primary-900;
   }
 }
 
@@ -89,18 +84,48 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
   }
 }
 
-.categories {
-  margin: 1em 1.5em 0em 1.5em;
-  h2, mat-chip-list {
+.categories,
+.auteur,
+.variant {
+  margin: 1em 1.5em 0 1.5em;
+  h2 {
     display: inline-block;
   }
   h2 {
     white-space: nowrap;
     margin-right: 0.5em;
     margin-left: .2em;
-    color: mat-color($mat-primary, 900);
+    color: $mat-primary-900;
   }
+}
+
+.categories{
   mat-chip {
     cursor: pointer;
   }
+  mat-chip-list {
+    display: inline-block;
+  }
+}
+
+
+.variant {
+  margin-bottom: 1em;
+  a {
+    padding: 0 4px;
+    font-size: 16px;
+    font-family: impact, sans-serif;
+    color: $mat-primary-900;
+    &:first-letter{
+      color: $mat-primary-400;
+      text-transform: capitalize;
+    }
+  }
+  .variant_list {
+    display: inline;
+  }
+}
+
+.auteur{
+  margin-bottom: 1em;
 }

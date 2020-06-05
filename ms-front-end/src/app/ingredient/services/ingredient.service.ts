@@ -37,7 +37,7 @@ export class IngredientService extends ModelService<Ingredient> {
     }
   }
 
-  saveIngredient(recipe: Recipe, toUpdateIngredientQuantity: IngredientQuantity[],
+  saveIngredient(toUpdateIngredientQuantity: IngredientQuantity[],
                  toCreateIngredientQuantity: IngredientQuantity[]): Observable<Ingredient[]> {
     // List all the new ingredient to create
     let toCreateIngredientNameList = toCreateIngredientQuantity

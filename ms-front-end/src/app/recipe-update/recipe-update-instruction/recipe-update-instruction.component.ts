@@ -5,7 +5,7 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import {first, map} from 'rxjs/operators';
 import {FeedItem, IngredientQuantityMentionService} from '../../ingredient/services/ingredient-quantity-mention.service';
-import {RecipeService} from '../services/recipe.service';
+import {RecipeService} from '../../recipe/services/recipe.service';
 import {IngredientQuantityService} from '../../ingredient/services/ingredient-quantity.service';
 
 @Component({

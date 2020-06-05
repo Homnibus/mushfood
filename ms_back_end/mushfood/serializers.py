@@ -1,5 +1,6 @@
 import os
 
+from django.db.models import Q
 from django.utils.translation import gettext
 from rest_framework import serializers
 
@@ -31,16 +32,51 @@ class RecipeImageSerializer(serializers.ModelSerializer):
     return update_recipe_image
 
 
-class RecipeSerializer(serializers.ModelSerializer):
-  author = serializers.HiddenField(default=serializers.CurrentUserDefault())
-  recipe_image = RecipeImageSerializer(many=False, read_only=True)
-  category_set = CategorySerializer(many=True,required=False)
+class RecipeVariantSerializer(serializers.ModelSerializer):
 
   class Meta:
     model = Recipe
-    fields = ["id", "title", "slug", "portions", "instructions", "inspiration", "author", "creation_date", "update_date", "recipe_image",
-              "logical_delete", "category_set"]
+    fields = ["id", "slug", "title"]
+    read_only_fields = ("id", "slug", "title")
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+  author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+  author_full_name = serializers.SerializerMethodField()
+  author_username = serializers.SerializerMethodField()
+  recipe_image = RecipeImageSerializer(many=False, read_only=True)
+  category_set = CategorySerializer(many=True, required=False)
+  variant_of = serializers.PrimaryKeyRelatedField(many=False, queryset=Recipe.objects.all(), required=False, allow_null=True)
+  variant = serializers.SerializerMethodField()
+
+  class Meta:
+    model = Recipe
+    fields = ["id", "title", "slug", "portions", "instructions", "inspiration", "author", "author_full_name",
+              "author_username", "creation_date", "update_date", "recipe_image", "logical_delete", "category_set",
+              "variant_of", "variant"]
     read_only_fields = ("slug", "recipe_image")
+
+  def get_variant(self, instance):
+    return Recipe.objects.filter(id=instance.id)\
+      .filter(Q(variant__logical_delete=False) & Q(variant__isnull=False))\
+      .values_list('variant', flat=True)
+
+  def get_author_full_name(self, instance):
+    if (instance.author):
+      return str(instance.author.first_name + " " + instance.author.last_name)
+    else:
+      return None
+
+  def get_author_username(self, instance):
+    if (instance.author):
+      return str(instance.author.username)
+    else:
+      return None
+
+  def validate_variant_of(self, value):
+    if self.initial_data.get('id') and self.initial_data.get('id') == value.id:
+      raise serializers.ValidationError(gettext("The recipe can't be a variant of itself."))
+    return value
 
   def validate_category_set(self, value):
     if value is not None and len(value) > 0:
@@ -68,6 +104,14 @@ class RecipeSerializer(serializers.ModelSerializer):
     for category in category_data:
       instance.category_set.add(category)
     return super().update(instance, validated_data)
+
+  def create(self, validated_data):
+    category_data = validated_data.pop('category_set', [])
+    newRecipe = Recipe.objects.create(**validated_data)
+    for category in category_data:
+      newRecipe.category_set.add(category)
+    return newRecipe
+
 
 class IngredientSerializer(serializers.ModelSerializer):
   author = serializers.HiddenField(default=serializers.CurrentUserDefault())

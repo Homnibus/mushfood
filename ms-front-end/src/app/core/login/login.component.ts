@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthService} from '../services/auth.service';
 import {FormBuilder, Validators} from '@angular/forms';
-import {webPageSize} from '../../shared/web-page/web-page/web-page.component';
 import {throwError} from 'rxjs';
 
 @Component({
@@ -16,8 +15,6 @@ export class LoginComponent {
     userName: ['', Validators.required],
     password: ['', Validators.required]
   });
-  hide = true;
-  webPageSize = webPageSize;
 
   constructor(public authService: AuthService, private router: Router, private route: ActivatedRoute, private fb: FormBuilder) {
   }

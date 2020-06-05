@@ -6,7 +6,7 @@ import {first} from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
-import {RecipeService} from '../services/recipe.service';
+import {RecipeService} from '../../recipe/services/recipe.service';
 import {RecipeImageService} from '../../recipe-image/services/recipe-image.service';
 
 @Component({

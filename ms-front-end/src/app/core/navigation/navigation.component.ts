@@ -10,7 +10,7 @@ import {NavigationEnd, NavigationStart, Router} from '@angular/router';
 })
 export class NavigationComponent implements OnInit {
 
-  iconUrl = `${environment.staticUrl}img/favicon.jpg`;
+  readonly iconUrl = `${environment.staticUrl}img/favicon.ico`;
   isLoading = false;
 
   constructor(public authService: AuthService, private router: Router) {

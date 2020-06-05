@@ -1,4 +1,4 @@
-@import '../../../sass/theme/mushfood-theme.scss';
+@import '../../../sass/theme/theme-small.scss';
 
 .search{
   display: flex;
@@ -19,9 +19,7 @@
   h2 {
     display: inline-block;
     font-weight: bold;
-    color: mat-color($mat-primary, 900);
-    //color:mat-color($mat-primary, 400);
-    //color: black;
+    color: $mat-primary-900;
   }
 
   a {
@@ -34,32 +32,6 @@
   .mat-flat-button{
     border: 1px solid rgba(0, 0, 0, 0.12);
   }
-
-  /*
-  a {
-    font-family: Roboto, "Helvetica Neue", sans-serif;
-    &:link {
-      color: mat-color($mat-primary, 400);
-      //color: black;
-      text-decoration: none;
-    }
-    &:visited {
-      color: mat-color($mat-primary, 400);
-      //color: black;
-      text-decoration: none;
-    }
-    &:hover {
-      //color: mat-color($mat-primary, 400);
-      color: mat-color($mat-accent, 700);
-      text-decoration: none;
-    }
-    &:active {
-      //color: mat-color($mat-primary, 400);
-      color: mat-color($mat-accent, 700);
-      text-decoration: none;
-    }
-  }
-  */
 
   @media (max-width: 768px){
     margin-bottom: 0.5rem;
@@ -93,6 +65,6 @@ app-web-page-content h1{
     color:black;
   }
   .food{
-    color:mat-color($mat-primary, 400);
+    color:$mat-primary-400;
   }
 }

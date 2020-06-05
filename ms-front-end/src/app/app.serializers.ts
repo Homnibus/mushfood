@@ -61,8 +61,11 @@ export class RecipeSerializer implements ModelSerializer<Recipe> {
     recipe.instructions = json.instructions;
     recipe.inspiration = json.inspiration;
     recipe.recipeImage = json.recipe_image ? recipeImageSerializer.fromJson(json.recipe_image, ModelState.Retrieved) : undefined;
-    recipe.author = json.author;
+    recipe.authorUserName = json.author_username;
+    recipe.authorFullName = json.author_full_name;
     recipe.categories = json.category_set ? json.category_set.map(jsonCategory => categorySerializer.fromJson(jsonCategory, ModelState.Retrieved)) : [];
+    recipe.variantOf = json.variant_of;
+    recipe.variant = json.variant;
     recipe.creationDate = new Date(json.creation_date);
     recipe.updateDate = new Date(json.update_date);
     recipe.logicalDelete = json.logical_delete;
@@ -80,12 +83,19 @@ export class RecipeSerializer implements ModelSerializer<Recipe> {
       inspiration: recipe.inspiration,
       logical_delete: recipe.logicalDelete,
       category_set: recipe.categories.map(category => categorySerializer.toJson(category)),
+      variant_of: recipe.variantOf,
     };
   }
 
   toCreateJson(recipe: Recipe): any {
+    const categorySerializer = new CategorySerializer();
     return {
       title: recipe.title,
+      instructions: recipe.instructions,
+      portions: recipe.portions,
+      inspiration: recipe.inspiration,
+      category_set: recipe.categories ? recipe.categories.map(category => categorySerializer.toJson(category)) : [],
+      variant_of: recipe.variantOf,
     };
   }
 
@@ -159,6 +169,7 @@ export class IngredientImageSerializer implements ModelSerializer<IngredientImag
 }
 
 
+
 export class MeasurementUnitSerializer implements ModelSerializer<MeasurementUnit> {
   fromJson(json: any, state: ModelState): MeasurementUnit {
     const measurementUnit = new MeasurementUnit();
@@ -193,7 +204,6 @@ export class IngredientQuantitySerializer implements ModelSerializer<IngredientQ
     const measurementUnitSerializer = new MeasurementUnitSerializer();
     const ingredientSerializer = new IngredientSerializer();
     const ingredientQuantity = new IngredientQuantity();
-
     ingredientQuantity.id = parseInt(json.id, 10);
     ingredientQuantity.quantity = +json.quantity;
     ingredientQuantity.measurementUnit = measurementUnitSerializer.fromJson(json.measurement_unit, ModelState.Retrieved);

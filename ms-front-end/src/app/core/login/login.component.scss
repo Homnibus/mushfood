@@ -1,3 +1,17 @@
+@import '../../../sass/theme/theme-small';
+
+h1 {
+  font-size: 2em;
+  color: $mat-primary-900;
+  text-align: center;
+  margin: 4rem 0 3rem 0;
+}
+
+mat-card{
+  max-width: 320px;
+  margin: auto;
+}
+
 .mat-card-content {
   padding: 2em;
 }
@@ -18,7 +32,7 @@ form {
   }
 
   .formGroupError {
-    height: 1em;
+    height: 2em;
     margin-bottom: 1.5em;
   }
 }
@@ -27,6 +41,6 @@ form .mat-form-field:last-of-type {
   margin-bottom: 0;
 }
 
-h1 {
-  hyphens: none;
+.user-name {
+  color: $mat-accent-500;
 }

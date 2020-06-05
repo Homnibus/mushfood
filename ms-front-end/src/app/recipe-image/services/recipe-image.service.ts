@@ -4,7 +4,7 @@ import {AuthService} from '../../core/services/auth.service';
 import {RecipeImageSerializer} from '../../app.serializers';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 import {FormControl} from '@angular/forms';
 
 @Injectable({
@@ -41,10 +41,9 @@ export class RecipeImageService extends ModelService<RecipeImage> {
     if (this.activeRecipe !== recipe) {
       this.activeRecipe = recipe;
       return this.getRecipeImage(recipe.id).pipe(
-        map(recipeImage => {
+        tap(recipeImage => {
           this.activeRecipeImage = recipeImage;
           this.activeRecipeImageSubject.next(recipeImage);
-          return recipeImage;
         })
       );
       // Else return the current image
@@ -68,10 +67,6 @@ export class RecipeImageService extends ModelService<RecipeImage> {
     return createdRecipeImage;
   }
 
-  removeActiveRecipeImage(): void {
-    this.activeRecipeImageSubject.next(undefined);
-  }
-
   saveRecipeImage(): Observable<RecipeImage> {
     if (this.activeRecipeImage?.imageFile) {
       let saveRecipeImageObservable: Observable<RecipeImage>;
@@ -80,10 +75,9 @@ export class RecipeImageService extends ModelService<RecipeImage> {
       } else {
         saveRecipeImageObservable = this.create(this.activeRecipeImage);
       }
-      return saveRecipeImageObservable.pipe(map(recipeImage => {
+      return saveRecipeImageObservable.pipe(tap(recipeImage => {
           this.activeRecipeImage = recipeImage;
           this.activeRecipeImageSubject.next(recipeImage);
-          return recipeImage;
         })
       );
     } else {
@@ -91,4 +85,7 @@ export class RecipeImageService extends ModelService<RecipeImage> {
     }
   }
 
+  resetModification() {
+    this.activeRecipeImage.imageFile = undefined;
+  }
 }

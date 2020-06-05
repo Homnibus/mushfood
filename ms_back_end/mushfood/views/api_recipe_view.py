@@ -1,11 +1,15 @@
-from django.db.models import Count, Max
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet, BaseInFilter, NumberFilter, CharFilter, Filter
+from django_filters.rest_framework import (DjangoFilterBackend, FilterSet, Filter, BooleanFilter)
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
+from rest_framework.pagination import PageNumberPagination
 
 from mushfood.guardian_permissions import ObjectPermissionsOrReadOnly
 from mushfood.models import Recipe
 from mushfood.serializers import RecipeSerializer
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+  page_size_query_param = 'size'
 
 
 class InAllCharListFilter(Filter):
@@ -21,10 +25,11 @@ class InAllCharListFilter(Filter):
 
 class RecipeFilter(FilterSet):
   category__name = InAllCharListFilter(field_name='category__name')
+  no_variant = BooleanFilter(field_name='variant_of', lookup_expr='isnull')
 
   class Meta:
     model = Recipe
-    fields = ['logical_delete', 'category__name']
+    fields = ['logical_delete', 'category__name', 'id']
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -34,4 +39,5 @@ class RecipeViewSet(viewsets.ModelViewSet):
   permission_classes = (ObjectPermissionsOrReadOnly,)
   filter_backends = [SearchFilter, DjangoFilterBackend]
   filter_class = RecipeFilter
-  search_fields = ['title', 'recipe_quantity__ingredient__name', '=author__username']
+  search_fields = ['title', 'recipe_quantity__ingredient__name', '=author__username','variant__title', 'variant__recipe_quantity__ingredient__name']
+  pagination_class = StandardResultsSetPagination

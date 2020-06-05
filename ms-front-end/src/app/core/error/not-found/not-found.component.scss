@@ -1,9 +1,28 @@
-h1 {
-  padding: 1em;
+@import '../../../../sass/theme/theme-small';
+
+h1,h2,.underline{
   text-align: center;
 }
 
-img {
-  display: block;
-  margin: 4em auto;
+h1{
+  font-size: 5em;
+  font-family: Impact, sans-serif;
+  > .accent,  {
+    color: $mat-primary-400;
+  }
+  margin: 4rem 0 2rem 0;
+}
+
+h2,.underline {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+h2{
+  font-size: 2em;
+  margin-bottom: 1rem;
+  color: $mat-primary-900;
+}
+
+.underline{
+ color: $mat-accent-500;
 }

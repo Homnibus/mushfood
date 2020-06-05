@@ -14,8 +14,7 @@
       </button>
     </form>
     <div class="categories">
-      <h2>Par catégories:</h2>
-      <!--         [routerLink]="['/recipe/category', category.name]"-->
+      <h2>Catégories:</h2>
       <ng-container *ngFor="let category of categoryList; let index = index">
         <button *ngIf="!categorySelectedList[index]"
           color="primary" mat-stroked-button
@@ -47,6 +46,7 @@
         [backgroundImageLink]="'url('+(recipe.recipeImage ? recipe.recipeImage.imageUrl : '') + ') '"
         [hexagonTitle]="recipe.title"
         [recipeListHexagon]="this.recipeListHexagon"
+        [variant]="this.recipe.variant"
       ></app-recipe-hexagon>
     </div>
     </ng-container>

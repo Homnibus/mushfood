@@ -6,15 +6,22 @@
     <app-web-page-subtitle [type]="'recipe'">
       {{recipe.inspiration}}
     </app-web-page-subtitle>
-    <app-web-page-action-menu *ngIf="authService.currentUser$ | async">
-      <a [routerLink]="['/recipe/edit', recipe.slug]" color="accent" mat-raised-button>
+    <app-web-page-action-menu>
+      <button *ngIf="!recipe.variantOf && authService.currentUser"
+              (click)="createVariant()"
+              color="accent" mat-raised-button>
+        Créer variante
+        <mat-icon>file_copy</mat-icon>
+      </button>
+      <a *ngIf="authService.currentUser?.name === recipe.authorUserName"
+         [routerLink]="['/recipe/edit', recipe.slug]"
+         color="accent" mat-raised-button>
         Modifier
         <mat-icon>edit</mat-icon>
       </a>
     </app-web-page-action-menu>
   </app-web-page-header>
   <app-web-page-content>
-    <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
     <div class="image-ingredient">
       <div *ngIf="recipe.recipeImage" class="image-flex-container">
         <div class="item-shape">
@@ -53,7 +60,21 @@
       <h1>Instructions</h1>
       <div [innerHTML]="sanitizer.bypassSecurityTrustHtml(recipe.instructions)" class="ck-content"></div>
     </div>
+    <div class="auteur">
+      <h2>Rédacteur : </h2>
+      <span>{{recipe.authorFullName}}</span>
+    </div>
     <mat-divider></mat-divider>
+    <div *ngIf="(variantList && variantList.length > 0) " class="variant">
+      <h2>Variantes : </h2>
+      <div class="variant_list">
+        <a *ngFor="let variant of variantList" mat-button [routerLink]="['/recipe/details', variant.slug]">{{variant.title}} </a>
+      </div>
+    </div>
+    <div *ngIf="variantOf" class="variant">
+      <h2>Recette d'origine :</h2>
+      <a mat-button color="accent" [routerLink]="['/recipe/details', variantOf.slug]">{{variantOf.title}} </a>
+    </div>
     <div class="categories">
       <mat-chip-list aria-label="Categories" multiple>
         <h2>Categories :</h2>

@@ -54,6 +54,13 @@ class Recipe(models.Model):
     null=True,
     help_text="Author of the recipe",
   )
+  variant_of = models.ForeignKey(
+    'self',
+    on_delete=models.SET_NULL,
+    null=True,
+    related_name="variant",
+    help_text="Variant of the recipe",
+  )
   creation_date = models.DateTimeField(
     "creation date",
     auto_now_add=True,
@@ -152,14 +159,13 @@ class RecipeImage(models.Model):
      resize the image
     """
     # Resize and crop the image if needed
-    self.image = resize_and_crop(self.image, (512, 512), 'middle')
-    self.image.name = '{0}.jpg'.format(uuid4().hex)
+    self.image = resize_and_crop(self.image, (350, 350), 'middle')
+    self.image.name = '{0}.webp'.format(uuid4().hex)
 
     # Save the image
     super(RecipeImage, self).save(*args, **kwargs)
     # Set user permissions
-    if getattr(self, 'author', None) is not None:
-      assign_all_perm(self, self.recipe.author)
+    assign_all_perm(self, self.recipe.author)
 
   def delete(self, using=None, keep_parents=False):
     """
@@ -359,6 +365,15 @@ class IngredientQuantity(models.Model):
 
   def __str__(self):
     return str(self.quantity) + " " + self.measurement_unit.name + " of " + self.ingredient.name + " for the " + self.recipe.title
+
+  def save(self, *args, **kwargs):
+    """
+    Override the save method to assign the permission
+    """
+    super().save(*args, **kwargs)
+    # Set user permissions
+    assign_all_perm(self, self.recipe.author)
+
 
 class Category(models.Model):
   """

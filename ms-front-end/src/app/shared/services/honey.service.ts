@@ -1,5 +1,12 @@
 import {Injectable} from '@angular/core';
-import {Position} from '../../recipe/recipe-list/recipe-list.component';
+
+export enum Position {
+  Middle,
+  Left,
+  Right,
+  All,
+  LastRowLeft
+}
 
 @Injectable({
   providedIn: 'root',

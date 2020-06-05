@@ -1,0 +1,15 @@
+<h1 mat-dialog-title>Nouvelle variante</h1>
+<div mat-dialog-content>
+  <form (ngSubmit)="this.createVariant()" [formGroup]="recipeForm">
+    <mat-form-field>
+      <mat-label>Titre</mat-label>
+      <input #titleInput formControlName="title" matInput maxlength="50" type="text">
+      <mat-hint align="end">{{titleInput.value?.length || 0}}/50</mat-hint>
+      <mat-error>Entrez un titre pour votre variante</mat-error>
+    </mat-form-field>
+  </form>
+</div>
+<div class="mushfood" mat-dialog-actions>
+  <button (click)="this.createVariant()" cdkFocusInitial color="primary" mat-raised-button>Créer</button>
+  <button [mat-dialog-close]="" mat-stroked-button>Annuler</button>
+</div>

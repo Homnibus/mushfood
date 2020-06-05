@@ -1,4 +1,8 @@
+@import '../../../sass/theme/theme-small';
+
 h1 {
-  padding: 1em;
+  font-size: 2em;
+  color: $mat-primary-900;
   text-align: center;
+  margin: 11rem 0 2rem 0;
 }

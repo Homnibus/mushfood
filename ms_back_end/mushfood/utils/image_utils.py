@@ -62,10 +62,10 @@ def resize_and_crop(in_memory_uploaded_file, size, crop_type='top'):
 
   # after modifications, save it to the output
   output = BytesIO()
-  img.save(output, format='JPEG', quality=100)
+  img.save(output, format='WEBP', quality=100)
   output.seek(0)
 
-  return InMemoryUploadedFile(output, 'ImageField', "%s.jpg" % in_memory_uploaded_file.name.split('.')[0], 'image/jpeg',
+  return InMemoryUploadedFile(output, 'ImageField', "%s.webp" % in_memory_uploaded_file.name.split('.')[0], 'image/jpeg',
                                     sys.getsizeof(output), None)
 
 

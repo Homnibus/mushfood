@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Ingredient, IngredientQuantity, MeasurementUnit, Recipe} from '../../app.models';
+import {Ingredient, IngredientQuantity, MeasurementUnit, ModelState, Recipe} from '../../app.models';
 import {FormBuilder, Validators} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
@@ -45,6 +45,7 @@ export class IngredientQuantityAddComponent implements OnInit {
       // Initialise a new ingredientQuantity and the set the form values
       const ingredientQuantity = new IngredientQuantity();
       ingredientQuantity.tempId = Date.now();
+      ingredientQuantity.state = ModelState.NotSaved;
       ingredientQuantity.recipe = this.recipe.id;
       ingredientQuantity.quantity = this.ingredientForm.get('quantity').value;
       ingredientQuantity.measurementUnit = this.ingredientForm.get('measurementUnit').value;

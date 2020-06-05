@@ -1,6 +1,5 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {RecipeService} from '../services/recipe.service';
-import {Observable, Subscription} from 'rxjs';
 import {Category, Recipe} from '../../app.models';
 import {AuthService} from '../../core/services/auth.service';
 import {ResizedEvent} from 'angular-resize-event';
@@ -8,17 +7,10 @@ import {MatDialog} from '@angular/material/dialog';
 import {RecipeAddDialogComponent} from '../recipe-add-dialog/recipe-add-dialog.component';
 import {environment} from '../../../environments/environment';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {HoneyService} from '../../shared/services/honey.service';
-import {map, tap} from 'rxjs/operators';
-import {FormBuilder, Validators} from '@angular/forms';
-
-export enum Position {
-  Middle,
-  Left,
-  Right,
-  All,
-  LastRowLeft
-}
+import {HoneyService, Position} from '../../shared/services/honey.service';
+import {FormBuilder} from '@angular/forms';
+import {RecipePaginationService} from '../services/recipe-pagination.service';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-recipe-list',
@@ -32,6 +24,7 @@ export class RecipeListComponent implements OnInit {
   readonly breakPoint = [380, 570, 760]
   readonly addRecipeImgUrl = `url(${environment.staticUrl}img/add-recipe.png)`;
   readonly modalWidth = '250px'
+  readonly lastRecipeSize = 10;
 
   recipeList: Recipe[];
   recipeListHexagon: Position[];
@@ -45,6 +38,7 @@ export class RecipeListComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private recipeService: RecipeService,
+    private recipePaginationService: RecipePaginationService,
     private route: ActivatedRoute,
     private router: Router,
     public dialog: MatDialog,
@@ -70,8 +64,10 @@ export class RecipeListComponent implements OnInit {
     if(searchWords) {
       this.searchForm.get('searchWords').setValue(searchWords);
     }
-    this.recipeService.filteredList(this.getFilterString(searchWords))
-      .subscribe(recipeList => {
+    const numberOfRecipeToFetch = this.authService.currentUser ? this.lastRecipeSize - 1 : this.lastRecipeSize;
+    this.recipePaginationService.filteredList(this.getFilterString(searchWords),1,numberOfRecipeToFetch).pipe(
+      map( paginationContainer => paginationContainer.results)
+    ).subscribe(recipeList => {
         this.recipeList = recipeList;
         // Format the margin of the honey like shape containing the recipes
         this.initHoneyComb();
@@ -128,7 +124,7 @@ export class RecipeListComponent implements OnInit {
 
   private getFilterString(searchWords:string): string{
     const queryParams: Params = {};
-    let filterString = `logical_delete=false`;
+    let filterString = `logical_delete=false&no_variant=true`;
     if (searchWords){
       filterString = `${filterString}&search=${searchWords}`;
       queryParams.search=searchWords;
@@ -141,7 +137,7 @@ export class RecipeListComponent implements OnInit {
     }
     this.router.navigate(
       [],
-      {relativeTo: this.route,queryParams: queryParams}
+      {relativeTo: this.route,queryParams}
     );
     return filterString;
   }

@@ -5,6 +5,7 @@ export enum ModelState {
   Created = 'CREATED',
   Modified = 'MODIFIED',
   Deleted = 'DELETED',
+  NotSaved = 'NOT_SAVED'
 }
 
 export abstract class Model {
@@ -13,6 +14,8 @@ export abstract class Model {
 
   public static lookupField: string;
   public state: ModelState;
+  public id: number;
+
 }
 
 export class User {
@@ -28,6 +31,7 @@ export class User {
 export class BaseModel {
   public static lookupField = 'id';
   public state: ModelState;
+  public id: number;
 }
 
 
@@ -35,7 +39,6 @@ export class RecipeImage extends BaseModel implements Model {
   static modelName = 'recipe-images';
   static modelPlural = 'recipe-images';
 
-  id: number;
   recipe: number;
   imageUrl: string;
   imageFile: File;
@@ -48,15 +51,17 @@ export class Recipe extends BaseModel implements Model {
   static modelPlural = 'recipes';
 
   static lookupField = 'slug';
-  id: number;
   title: string;
   slug: string;
   portions: number;
   instructions: string;
   inspiration: string;
-  author: string;
+  authorFullName: string;
+  authorUserName : string;
   recipeImage: RecipeImage;
   categories: Category[];
+  variantOf: number;
+  variant: number[];
   creationDate: Date;
   updateDate: Date;
   logicalDelete: boolean;
@@ -66,7 +71,6 @@ export class Ingredient extends BaseModel implements Model {
   static modelName = 'ingredients';
   static modelPlural = 'ingredients';
 
-  id: number;
   name: string;
   author: string;
   creationDate: Date;
@@ -78,7 +82,6 @@ export class IngredientImage extends BaseModel implements Model {
   static modelName = 'ingredient-images';
   static modelPlural = 'ingredient-images';
 
-  id: number;
   ingredient: number;
   image: any;
   creationDate: Date;
@@ -90,7 +93,6 @@ export class MeasurementUnit extends BaseModel implements Model {
   static modelName = 'measurement-units';
   static modelPlural = 'measurement-units';
 
-  id: number;
   name: string;
   shortName: string;
   isIgnorable: boolean;
@@ -103,7 +105,6 @@ export class IngredientQuantity extends BaseModel implements Model {
   static modelName = 'ingredient-quantities';
   static modelPlural = 'ingredient-quantities';
 
-  id: number;
   tempId: number;
   quantity: number;
   measurementUnit: MeasurementUnit;
@@ -118,6 +119,5 @@ export class Category extends BaseModel implements Model {
   static modelName = 'category';
   static modelPlural = 'categories';
 
-  id: number;
   name: string;
 }

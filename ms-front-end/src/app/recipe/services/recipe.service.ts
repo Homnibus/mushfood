@@ -1,10 +1,10 @@
 import {ModelService} from '../../core/services/model.service';
-import {Category, Recipe} from '../../app.models';
+import {Category, ModelState, Recipe, RecipeImage} from '../../app.models';
 import {AuthService} from '../../core/services/auth.service';
 import {RecipeSerializer} from '../../app.serializers';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -69,7 +69,12 @@ export class RecipeService extends ModelService<Recipe> {
 
   saveRecipe(): Observable<Recipe> {
     if (this.toUpdateRecipe) {
-      return this.update(this.activeRecipe);
+      return this.update(this.activeRecipe).pipe(
+        tap((recipe) =>{
+          this.activeRecipe = recipe;
+          this.activeRecipeSubject.next(recipe);
+        }),
+      );
     } else {
       return of(this.activeRecipe);
     }
@@ -81,8 +86,26 @@ export class RecipeService extends ModelService<Recipe> {
     return this.update(this.activeRecipe);
   }
 
-  removeActiveRecipe(): void {
-    this.activeRecipeSubject.next(undefined);
+  updateRecipeImage(recipeImage: RecipeImage):void {
+    if(recipeImage){
+      this.activeRecipe.recipeImage = recipeImage;
+      this.activeRecipeSubject.next(this.activeRecipe);
+    }
   }
 
+  createVariant(variantTitle: string,toCopyRecipe: Recipe): Observable<Recipe> {
+    const recipe = new Recipe();
+    recipe.variantOf = toCopyRecipe.id;
+    recipe.state = ModelState.NotSaved;
+    recipe.title = variantTitle;
+    recipe.categories = toCopyRecipe.categories;
+    recipe.inspiration = toCopyRecipe.inspiration;
+    recipe.instructions = toCopyRecipe.instructions;
+    recipe.portions = toCopyRecipe.portions;
+    return this.create(recipe);
+  }
+
+  resetModification() {
+    this.toUpdateRecipe = false;
+  }
 }

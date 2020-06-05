@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {Position} from '../recipe-list/recipe-list.component';
+import {Position} from '../../shared/services/honey.service';
 
 @Component({
   selector: 'app-recipe-hexagon',
@@ -18,6 +18,8 @@ export class RecipeHexagonComponent {
   hexagonTitle: string;
   @Input()
   recipeListHexagon: Position[];
+  @Input()
+  variant: number[];
   positionEnum = Position;
 
   constructor() { }

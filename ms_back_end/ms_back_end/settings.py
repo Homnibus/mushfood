@@ -92,13 +92,8 @@ WSGI_APPLICATION = 'ms_back_end.wsgi.application'
 
 DATABASES = {
   'default': {
-    "ENGINE": "django.db.backends.postgresql_psycopg2",
-    "OPTIONS": {"options": "-c search_path=public"},
-    "NAME": "mushfoodpg",
-    "USER": "mushfoodadm",
-    "PASSWORD": "admin",
-    "HOST": "localhost",
-    "PORT": "12200",
+    "ENGINE": "django.db.backends.sqlite3",
+    "NAME": os.path.join(BASE_DIR,"MushfoodSQLiteDB")
   }
 }
 

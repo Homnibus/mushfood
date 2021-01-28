@@ -86,6 +86,8 @@ export class RecipeImageService extends ModelService<RecipeImage> {
   }
 
   resetModification() {
-    this.activeRecipeImage.imageFile = undefined;
+    if (this.activeRecipeImage?.imageFile) {
+      this.activeRecipeImage.imageFile = undefined;
+    }
   }
 }

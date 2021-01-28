@@ -4,4 +4,5 @@ export const environment = {
   apiUrl: '/api/',
   authUrl: '/api-auth/',
   staticUrl: '/public/static/',
+  fontUrl: '/public/static/',
 };

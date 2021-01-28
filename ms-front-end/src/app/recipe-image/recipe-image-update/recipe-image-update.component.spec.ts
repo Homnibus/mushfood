@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import {RecipeImageUpdateComponent} from './recipe-image-update.component';
 
@@ -6,7 +6,7 @@ describe('RecipeImageUpdateComponent', () => {
   let component: RecipeImageUpdateComponent;
   let fixture: ComponentFixture<RecipeImageUpdateComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [RecipeImageUpdateComponent]
     })

@@ -11,12 +11,12 @@
             <mat-form-field>
               <mat-label>Nom d'utilisateur</mat-label>
               <input formControlName="userName" matInput name="username" type="text">
-              <mat-error>Veuillez entré votre nom d'utilisateur</mat-error>
+              <mat-error>Veuillez entrer votre nom d'utilisateur</mat-error>
             </mat-form-field>
             <mat-form-field>
               <mat-label>Mot de passe</mat-label>
               <input formControlName="password" matInput name="password" type="password">
-              <mat-error>Veuillez entré votre mot de passe</mat-error>
+              <mat-error>Veuillez entrer votre mot de passe</mat-error>
             </mat-form-field>
             <div class="formGroupError">
               <mat-error *ngIf="loginForm.hasError('invalidUserOrPassword')">Nom de d'utilisateur ou mot de passe invalide</mat-error>

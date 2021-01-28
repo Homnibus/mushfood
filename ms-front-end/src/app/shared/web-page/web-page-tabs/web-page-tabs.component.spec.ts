@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import {WebPageTabsComponent} from './web-page-tabs.component';
 
@@ -6,7 +6,7 @@ describe('WebPageTabsComponent', () => {
   let component: WebPageTabsComponent;
   let fixture: ComponentFixture<WebPageTabsComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [WebPageTabsComponent]
     })

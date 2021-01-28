@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Position} from '../../shared/services/honey.service';
 
 @Component({
@@ -11,7 +11,7 @@ export class RecipeHexagonComponent {
   @Input()
   index: number;
   @Input()
-  routerLink: any[] | string;
+  recipeRouterLink: any[] | string;
   @Input()
   backgroundImageLink: string;
   @Input()
@@ -20,6 +20,10 @@ export class RecipeHexagonComponent {
   recipeListHexagon: Position[];
   @Input()
   variant: number[];
+  @Input()
+  flashOn = false;
+  @Output()
+  hexagonClick = new EventEmitter();
   positionEnum = Position;
 
   constructor() { }

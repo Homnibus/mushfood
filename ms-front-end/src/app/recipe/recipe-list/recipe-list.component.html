@@ -3,7 +3,7 @@
     <h1>
       <span class="mush">MUSH</span><span class="food">FOOD</span>
     </h1>
-    <form (ngSubmit)="onSearch()" [formGroup]="searchForm" class="search">
+    <form (ngSubmit)="onSearch()" [formGroup]="searchForm" class="search" #recipeListDiv>
       <mat-form-field appearance="outline">
         <mat-label> </mat-label>
         <input matInput placeholder="Recherche" formControlName="searchWords">
@@ -33,20 +33,22 @@
       <app-recipe-hexagon
         *ngIf="authService.currentUser$ | async"
         [index]="0"
-        [routerLink]=""
+        [recipeRouterLink]=""
         [backgroundImageLink]="addRecipeImgUrl"
         [hexagonTitle]="'Nouvelle recette'"
         [recipeListHexagon]="this.recipeListHexagon"
-        (click)="createRecipe()"
+        (hexagonClick)="createRecipe()"
+        [flashOn]="this.flashOn"
       ></app-recipe-hexagon>
       <app-recipe-hexagon
         *ngFor="let recipe of recipeList; let index = index"
         [index]="this.getIndexForRecipeList(index)"
-        [routerLink]="['/recipe/details', recipe.slug]"
+        [recipeRouterLink]="['/recipe/details', recipe.slug]"
         [backgroundImageLink]="'url('+(recipe.recipeImage ? recipe.recipeImage.imageUrl : '') + ') '"
         [hexagonTitle]="recipe.title"
         [recipeListHexagon]="this.recipeListHexagon"
         [variant]="this.recipe.variant"
+        [flashOn]="this.flashOn"
       ></app-recipe-hexagon>
     </div>
     </ng-container>

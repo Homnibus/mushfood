@@ -2,7 +2,7 @@
      [class.left]="this.recipeListHexagon[index]===positionEnum.Left || this.recipeListHexagon[index]===positionEnum.All"
      [class.right]="this.recipeListHexagon[index]===positionEnum.Right || this.recipeListHexagon[index]===positionEnum.All"
      class="recipe-item">
-  <a [routerLink]="routerLink" class="item-shape" mat-ripple>
+  <a [routerLink]="recipeRouterLink" class="item-shape"  [class.flash]="flashOn" mat-ripple (click)="this.hexagonClick.emit()">
     <div [ngStyle]="{'background-image': backgroundImageLink}"
          class="image-mask">
       <div *ngIf="variant && variant.length > 0" class="variant">

@@ -70,7 +70,7 @@ export class RecipeService extends ModelService<Recipe> {
   saveRecipe(): Observable<Recipe> {
     if (this.toUpdateRecipe) {
       return this.update(this.activeRecipe).pipe(
-        tap((recipe) =>{
+        tap((recipe) => {
           this.activeRecipe = recipe;
           this.activeRecipeSubject.next(recipe);
         }),
@@ -86,14 +86,14 @@ export class RecipeService extends ModelService<Recipe> {
     return this.update(this.activeRecipe);
   }
 
-  updateRecipeImage(recipeImage: RecipeImage):void {
-    if(recipeImage){
+  updateRecipeImage(recipeImage: RecipeImage): void {
+    if (recipeImage) {
       this.activeRecipe.recipeImage = recipeImage;
       this.activeRecipeSubject.next(this.activeRecipe);
     }
   }
 
-  createVariant(variantTitle: string,toCopyRecipe: Recipe): Observable<Recipe> {
+  createVariant(variantTitle: string, toCopyRecipe: Recipe): Observable<Recipe> {
     const recipe = new Recipe();
     recipe.variantOf = toCopyRecipe.id;
     recipe.state = ModelState.NotSaved;

@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import {WebPageHeaderComponent} from './web-page-header.component';
 
@@ -6,7 +6,7 @@ describe('WebPageHeaderComponent', () => {
   let component: WebPageHeaderComponent;
   let fixture: ComponentFixture<WebPageHeaderComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [WebPageHeaderComponent]
     })

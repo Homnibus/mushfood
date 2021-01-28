@@ -6,6 +6,7 @@ import {ErrorModule} from './error/error.module';
 import {RouterModule} from '@angular/router';
 import {HttpClientModule} from '@angular/common/http';
 import {NavigationComponent} from './navigation/navigation.component';
+import { FontComponent } from './font/font.component';
 
 
 @NgModule({
@@ -13,6 +14,7 @@ import {NavigationComponent} from './navigation/navigation.component';
     LoginComponent,
     LogoutComponent,
     NavigationComponent,
+    FontComponent,
   ],
   imports: [
     SharedModule,
@@ -22,6 +24,7 @@ import {NavigationComponent} from './navigation/navigation.component';
   ],
   exports: [
     NavigationComponent,
+    FontComponent,
   ],
 })
 export class CoreModule {

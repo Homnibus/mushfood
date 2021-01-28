@@ -35,7 +35,7 @@ export class RecipeUpdateTabsComponent implements OnInit, OnDestroy {
               private ingredientQuantityService: IngredientQuantityService,
               private measurementUnitService: MeasurementUnitService,
               private ingredientService: IngredientService,
-              private ingredientQuantityMentionService: IngredientQuantityMentionService,) {
+              private ingredientQuantityMentionService: IngredientQuantityMentionService, ) {
   }
 
   ngOnInit() {
@@ -77,7 +77,7 @@ export class RecipeUpdateTabsComponent implements OnInit, OnDestroy {
     return this.recipeImageService.saveRecipeImage().pipe(
       // Update the active recipe with the new RecipeImage
       tap(recipeImage => {
-        this.recipeService.updateRecipeImage(recipeImage);
+          this.recipeService.updateRecipeImage(recipeImage);
       }),
       switchMap(() => this.ingredientQuantityService.saveIngredientQuantity(
         this.ingredientService.saveIngredient(
@@ -86,9 +86,12 @@ export class RecipeUpdateTabsComponent implements OnInit, OnDestroy {
       ).pipe(
         // Update the mentions for all the newly created ingredientQuantity
         tap(ingredientQuantityList => {
-          const createdIngredientQuantityList = ingredientQuantityList.filter(ingredientQuantity => ingredientQuantity.state === ModelState.Created)
-          for (const createdIngredientQuantity of createdIngredientQuantityList)
-            this.ingredientQuantityMentionService.updateMention(createdIngredientQuantity, this.recipe)
+          const createdIngredientQuantityList = ingredientQuantityList.filter(
+              ingredientQuantity => ingredientQuantity.state === ModelState.Created
+          );
+          for (const createdIngredientQuantity of createdIngredientQuantityList){
+            this.ingredientQuantityMentionService.updateMention(createdIngredientQuantity, this.recipe);
+          }
         }),
         switchMap(() => this.recipeService.saveRecipe()),
       )),

@@ -25,6 +25,7 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatButtonModule} from '@angular/material/button';
 import {CKEditorModule} from '@ckeditor/ckeditor5-angular';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatMenu, MatMenuModule} from "@angular/material/menu";
 
 @NgModule({
   declarations: [NoDecimalPipe],
@@ -54,6 +55,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
     MatSelectModule,
     MatAutocompleteModule,
     MatProgressBarModule,
+    MatMenuModule,
     WebPageModule,
     NoDecimalPipe,
     CKEditorModule,

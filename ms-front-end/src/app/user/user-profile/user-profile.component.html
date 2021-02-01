@@ -1,0 +1,94 @@
+<app-web-page>
+    <app-web-page-header>
+        <app-web-page-title>Paramètres</app-web-page-title>
+    </app-web-page-header>
+    <app-web-page-content>
+
+        <h1>Paramètres du profil</h1>
+        <h2>Modifiez les informations d’identification de votre compte</h2>
+
+        <mat-card>
+            <mat-card-content>
+                <form (ngSubmit)="this.updateUserProfile()" [formGroup]="userProfileForm">
+                    <div class="form-row">
+                        <div class="form-field-label">Nom du compte</div>
+                        <mat-form-field appearance="outline">
+                            <input matInput type="text" disabled [value]=this.authService.currentUser.name >
+                        </mat-form-field>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div class="form-row">
+                        <div class="form-field-label">Prénom</div>
+                        <mat-form-field appearance="outline">
+                            <input #firstName formControlName="firstName" matInput type="text">
+                        </mat-form-field>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div class="form-row">
+                        <div class="form-field-label">Nom</div>
+                        <mat-form-field appearance="outline">
+                            <input #lastName formControlName="lastName" matInput type="text">
+                        </mat-form-field>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div class="form-row">
+                        <div class="form-field-label">Email</div>
+                        <mat-form-field appearance="outline">
+                            <input #email formControlName="email" matInput type="email" email>
+                            <mat-error>Veuillez indiquer une adresse email valide.</mat-error>
+                        </mat-form-field>
+                    </div>
+                </form>
+            </mat-card-content>
+            <mat-card-actions>
+                <button (click)="this.updateUserProfile()" color="primary" mat-raised-button [disabled]="!this.userProfileForm.dirty || !this.userProfileForm.valid">
+                    Enregister les modifications
+                </button>
+            </mat-card-actions>
+        </mat-card>
+
+        <h1>Mot de passe</h1>
+        <h2>Gardez votre compte en sécurité.</h2>
+
+        <mat-card>
+            <mat-card-content>
+                <form (ngSubmit)="this.updatePassword()" [formGroup]="passwordForm">
+                    <div class="form-row">
+                        <div class="form-field-label">Mot de passe actuel</div>
+                        <mat-form-field appearance="outline">
+                            <input  formControlName="oldPassword" matInput type="password">
+                            <mat-error *ngIf="this.passwordForm.get('oldPassword')?.errors?.required">Veuillez entrez votre mot de passe actuel</mat-error>
+                            <mat-error *ngIf="this.passwordForm.get('oldPassword')?.errors?.invalidPassword">Votre mot de passe est incorrect.</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div class="form-row">
+                        <div class="form-field-label">Nouveau mot de passe</div>
+                        <mat-form-field appearance="outline">
+                            <input formControlName="password" minlength="8" matInput type="password">
+                            <mat-error *ngIf="this.passwordForm.get('password').hasError('minlength') || this.passwordForm.get('password').hasError('required')">Veuillez entrer au moins 8 caratères</mat-error>
+                            <mat-error *ngIf="this.passwordForm.get('password')?.errors?.allNumeric">Votre mot de passe ne peut pas contenir que des chiffres</mat-error>
+                            <mat-error *ngIf="this.passwordForm.get('password')?.errors?.tooCommon">Votre mot de passe est trop commun</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div class="form-row">
+                        <div class="form-field-label">Retaper votre mot de passe</div>
+                        <mat-form-field appearance="outline">
+                            <input formControlName="password2" matInput minlength="8" type="password">
+                            <mat-error *ngIf="this.passwordForm.get('password2')?.errors?.minlength || this.passwordForm.get('password2').hasError('required')">Veuillez entrer au moins 8 caratères</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <mat-error class="global-error" *ngIf="this.passwordForm.errors?.passwordDifferent">Vous n'avez pas entré le même mot de passe.</mat-error>
+                </form>
+            </mat-card-content>
+            <mat-card-actions>
+                <button (click)="this.updatePassword()" color="primary" mat-raised-button [disabled]="!this.passwordForm.dirty || !this.passwordForm.valid">
+                    Changer votre mot de passe
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    </app-web-page-content>
+</app-web-page>
+
+

@@ -12,6 +12,18 @@
     padding-bottom: 0;
   }
 
+  .mat-form-field-subscript-wrapper{
+    padding: 1.5em 1em;
+  }
+
+  .mat-form-field-outline:not(.mat-form-field-outline-thick) > * {
+    background: #fafafa;
+  }
+  .mat-form-field-outline-thick{
+    background: white;
+  }
+
+
   &.mat-form-field-appearance-outline .mat-form-field-infix {
     padding: 0.7em 0 0.7em 0;
     border-top: 0.24em solid transparent;

@@ -5,9 +5,13 @@
       MushFood
     </a>
     <div class="menu__filler"></div>
-    <a *ngIf="(authService.currentUser$ | async)" mat-button routerLink="/logout">
-      Déconnexion
-    </a>
+    <button *ngIf="authService.currentUser$ | async as user" mat-icon-button [matMenuTriggerFor]="beforeMenu">
+      <mat-icon color="white">account_circle</mat-icon>
+    </button>
+    <mat-menu #beforeMenu="matMenu" xPosition="before">
+      <button mat-menu-item routerLink="/profile" ><mat-icon color="white">settings</mat-icon>Paramètres</button>
+      <button mat-menu-item routerLink="/logout"><mat-icon color="white">logout</mat-icon>Deconnexion</button>
+    </mat-menu>
     <a *ngIf="!(authService.currentUser$ | async)" mat-button routerLink="/login">
       Connexion
     </a>

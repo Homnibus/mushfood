@@ -7,7 +7,7 @@ import {
   Model,
   ModelState,
   Recipe,
-  RecipeImage
+  RecipeImage, UserPassword, UserProfile
 } from './app.models';
 
 export abstract class ModelSerializer<T extends Model> {
@@ -18,6 +18,62 @@ export abstract class ModelSerializer<T extends Model> {
   abstract toUpdateJson(instance: T): any;
 }
 
+
+export class UserProfileSerializer implements ModelSerializer<UserProfile> {
+  fromJson(json: any, state: ModelState): UserProfile {
+    const userProfile = new UserProfile();
+    userProfile.userName = json.username;
+    userProfile.firstName = json.first_name;
+    userProfile.lastName = json.last_name;
+    userProfile.email = json.email;
+    userProfile.dateJoined = new Date(json.date_joined);
+    return userProfile;
+  }
+
+  toJson(userProfile: UserProfile): any {
+    const formData = new FormData();
+    formData.append('first_name', userProfile.firstName);
+    formData.append('last_name', userProfile.lastName);
+    formData.append('email', userProfile.email);
+    return formData;
+  }
+
+  toCreateJson(userProfile: UserProfile): any {
+    return this.toJson(userProfile);
+  }
+
+  toUpdateJson(userProfile: UserProfile): any {
+    return this.toJson(userProfile);
+  }
+}
+
+
+export class UserPasswordSerializer implements ModelSerializer<UserPassword> {
+  fromJson(json: any, state: ModelState): UserPassword {
+    const userPassword = new UserPassword();
+    userPassword.userName = json.username;
+    userPassword.password = json.password;
+    userPassword.password2 = json.password2;
+    userPassword.oldPassword = json.old_password;
+    return userPassword;
+  }
+
+  toJson(userPassword: UserPassword): any {
+    const formData = new FormData();
+    formData.append('password', userPassword.password);
+    formData.append('password2', userPassword.password2);
+    formData.append('old_password', userPassword.oldPassword);
+    return formData;
+  }
+
+  toCreateJson(userPassword: UserPassword): any {
+    return this.toJson(userPassword);
+  }
+
+  toUpdateJson(userPassword: UserPassword): any {
+    return this.toJson(userPassword);
+  }
+}
 
 
 export class RecipeImageSerializer implements ModelSerializer<RecipeImage> {

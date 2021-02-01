@@ -29,6 +29,7 @@ export class AuthService {
     return this.http.post<TokenData>(environment.authUrl, {username, password})
       .pipe(map(
         data => {
+            console.log(data);
           const user = new User(username, data.token);
           localStorage.setItem('currentUser', JSON.stringify(user));
           this.currentUserSubject.next(user);

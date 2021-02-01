@@ -34,6 +34,28 @@ export class BaseModel {
   public id: number;
 }
 
+export class UserProfile extends BaseModel implements Model {
+  static modelName = 'user';
+  static modelPlural = 'user';
+  static lookupField = 'userName';
+
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  dateJoined: Date;
+}
+
+export class UserPassword extends BaseModel implements Model {
+  static modelName = 'password';
+  static modelPlural = 'password';
+  static lookupField = 'userName';
+
+  userName: string;
+  password: string;
+  password2: string;
+  oldPassword: string;
+}
 
 export class RecipeImage extends BaseModel implements Model {
   static modelName = 'recipe-images';

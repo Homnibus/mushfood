@@ -10,6 +10,7 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {AuthInterceptor} from './core/interceptor/auth.interceptor';
 import {AppRoutingModule} from './app-routing.module';
 import {RecipeModule} from './recipe/recipe.module';
+import {UserModule} from './user/user.module';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import {RecipeModule} from './recipe/recipe.module';
     AppRoutingModule,
     BrowserAnimationsModule,
     RecipeModule,
+    UserModule,
     ErrorRoutingModule,
   ],
   providers: [

@@ -1,5 +1,4 @@
 from rest_framework import viewsets
-
 from mushfood.models import Category
 from mushfood.serializers import CategorySerializer
 

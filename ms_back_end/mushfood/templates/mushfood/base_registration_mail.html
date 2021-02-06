@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body style="margin: 0; font-size: 18px">
+<table style="width: 100%; margin: auto;border-spacing: 0">
+    <tbody>
+    <tr>
+        <td style="text-align: center;font-size: 100px;font-family: Impacto,Impact,sans-serif;background: #fafafa;border-bottom-color:#e6e6e6; border-bottom-width: 1px; border-bottom-style: solid;padding: 23px;" >
+            <span>MUSH</span><span style="color: #65346c;">FOOD</span>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+            <table style="width: 500px; font-family: arial,helvetica,sans-serif;line-height: 1.7em;padding: 85px 0">
+            <tr><td>
+                <p style="padding-bottom: 30px;" >
+                    Bonjour,<br><br>
+                    Le {{ registration_date | date:"d/m/Y" }}, vous avez demandé à devenir rédacteur sur le site de recette <a href="https://www.mushfood.fr">www.mushfood.fr</a>.
+                </p>
+                <p style="padding-bottom: 30px;">
+                    {% block registration_result %}{% endblock %}
+                </p>
+                <p>
+                    Bien à vous,<br>
+                    Emmanuel Seunes.
+                </p>
+            </td></tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align: center;font-size: 14px;line-height: 30px;font-family: arial,helvetica,sans-serif;color: white;background: #4a1052;padding: 17px 0;">
+            <p>
+                www.<img src="" width="0" height="0">mushfood<img src="" width="0" height="0">.fr<br>
+               conctact<img src="" width="0" height="0">@mushfood<img src="" width="0" height="0">.fr<br>
+                Veuillez noter que ce message vous a été envoyé d'une adresse qui ne peut recevoir de réponse.
+
+            </p>
+        </td>
+    </tr>
+    </tbody>
+
+</table>
+
+
+</body>
+</html>

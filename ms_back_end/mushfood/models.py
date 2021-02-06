@@ -390,3 +390,56 @@ class Category(models.Model):
 
   def __str__(self):
     return self.name
+
+class Registration(models.Model):
+  """
+  A registration request
+  """
+  username = models.CharField(
+    "user name", max_length=50, blank=False, null=False, help_text="Name of the account"
+  )
+  first_name = models.CharField(
+    "first name", max_length=50, blank=True, null=True, help_text="First name of the user"
+  )
+  last_name = models.CharField(
+    "last name", max_length=50, blank=True, null=True, help_text="Last name of the user"
+  )
+  email = models.CharField(
+    "email", max_length=50, blank=False, null=False, help_text="Email of the user"
+  )
+  reason = models.TextField(
+    "reason", blank=False, null=False, help_text="The registration request reason",
+  )
+  is_rejected = models.BooleanField(
+    "is rejected",
+    null=False,
+    default=False,
+    help_text="True if the registration request is rejected",
+  )
+  logical_delete = models.BooleanField(
+    "logical delete",
+    null=False,
+    default=False,
+    help_text="True if the registration request is closed",
+  )
+  creation_date = models.DateTimeField(
+    "creation date",
+    auto_now_add=True,
+    editable=False,
+    null=False,
+    help_text="Date of creation of the registration request",
+  )
+  update_date = models.DateTimeField(
+    "update date",
+    auto_now=True,
+    editable=False,
+    null=False,
+    help_text="Date of last modification of the registration request",
+  )
+
+  class Meta:
+    verbose_name = "registration"
+    verbose_name_plural = "registrations"
+
+  def __str__(self):
+    return self.username

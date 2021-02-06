@@ -1,0 +1,61 @@
+table {
+  width: 100%;
+  margin: 2rem auto;
+}
+
+tr.registration-detail-row {
+  height: 0;
+}
+
+tr.registration-row:not(.expanded-row):hover {
+  background: whitesmoke;
+}
+
+tr.registration-row:not(.expanded-row):active {
+  background: #efefef;
+}
+
+.registration-row td {
+  border-bottom-width: 0;
+}
+
+.registration-detail {
+  overflow: hidden;
+  display: flex;
+}
+
+table .mat-checkbox{
+  display: block;
+}
+
+.registration-reason {
+  padding: 0.5rem 1rem 1rem 1rem;
+}
+
+.registration-reason-label {
+  padding: 0.5rem 1rem 1rem 2rem;
+  color: #430e4b;
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 7em;
+}
+
+h1,h2 {
+  margin: 0 1rem;
+}
+
+h2 {
+  margin-bottom: 1em;
+
+}
+h1 {
+  margin-top: 1.5em;
+}
+
+
+.registration-action{
+  text-align: right;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+}

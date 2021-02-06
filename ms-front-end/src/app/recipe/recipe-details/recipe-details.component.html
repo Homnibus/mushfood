@@ -13,7 +13,7 @@
         Créer variante
         <mat-icon>file_copy</mat-icon>
       </button>
-      <a *ngIf="authService.currentUser?.name === recipe.authorUserName"
+      <a *ngIf="authService.currentUser?.userName === recipe.authorUserName"
          [routerLink]="['/recipe/edit', recipe.slug]"
          color="accent" mat-raised-button>
         Modifier
@@ -62,7 +62,7 @@
     </div>
     <div class="auteur">
       <h2>Rédacteur : </h2>
-      <span>{{recipe.authorFullName}}</span>
+      <span>{{recipe.authorFullName.trim() !== '' ? recipe.authorFullName : recipe.authorUserName | titlecase}}</span>
     </div>
     <mat-divider></mat-divider>
     <div *ngIf="(variantList && variantList.length > 0) " class="variant">

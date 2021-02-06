@@ -1,0 +1,4 @@
+{% extends "mushfood/base_registration_mail.txt" %}
+{% block registration_result %}
+Nous avons décidé de ne pas donner suite à votre demande.
+{% endblock %}

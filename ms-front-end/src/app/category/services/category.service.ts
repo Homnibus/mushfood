@@ -1,10 +1,10 @@
 import {ModelService} from '../../core/services/model.service';
 import {Category} from '../../app.models';
-import {AuthService} from '../../core/services/auth.service';
 import {CategorySerializer} from '../../app.serializers';
 import {Injectable} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -13,9 +13,9 @@ export class CategoryService extends ModelService<Category> {
 
   public categoryList: Category[];
 
-  constructor(authService: AuthService) {
+  constructor(http: HttpClient) {
     super(
-      authService,
+      http,
       Category,
       new CategorySerializer()
     );

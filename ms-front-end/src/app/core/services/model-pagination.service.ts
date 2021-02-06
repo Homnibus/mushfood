@@ -2,9 +2,9 @@ import {BaseModel, Model, ModelState} from '../../app.models';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {ModelSerializer} from '../../app.serializers';
-import {AuthService} from './auth.service';
 import {environment} from '../../../environments/environment';
 import {BaseModelService} from './base-model.service';
+import {HttpClient} from '@angular/common/http';
 
 
 export class PaginationContainer<T extends BaseModel> {
@@ -17,12 +17,12 @@ export class PaginationContainer<T extends BaseModel> {
 export class ModelPaginationService<T extends BaseModel> extends BaseModelService<T> {
 
   constructor(
-    userService: AuthService,
+    http: HttpClient,
     model: typeof Model,
     serializer: ModelSerializer<T>,
   ) {
     super(
-      userService,
+      http,
       model,
       serializer,
     );
@@ -30,18 +30,18 @@ export class ModelPaginationService<T extends BaseModel> extends BaseModelServic
 
   list(pageNumber: number): Observable<PaginationContainer<T>> {
     const sanitizePageNumber = pageNumber > 0 ? pageNumber : 0;
-    return this.userService.http.get(
+    return this.http.get(
       `${environment.apiUrl}${this.model.modelPlural}/?page=${sanitizePageNumber}`
     ).pipe(map((data: any) => this.convertData(data)));
   }
 
   filteredList(filter: string, pageNumber: number, size?: number): Observable<PaginationContainer<T>> {
     const sanitizePageNumber = pageNumber > 0 ? pageNumber : 0;
-    let filterString = `${filter}&page=${sanitizePageNumber}`
+    let filterString = `${filter}&page=${sanitizePageNumber}`;
     if (size){
-      filterString = `${filterString}&size=${size}`
+      filterString = `${filterString}&size=${size}`;
     }
-    return this.userService.http.get(
+    return this.http.get(
       `${environment.apiUrl}${this.model.modelPlural}/?${filterString}`
     ).pipe(map((data: any) => this.convertData(data)));
   }

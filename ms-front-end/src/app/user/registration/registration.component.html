@@ -1,0 +1,69 @@
+<app-web-page>
+    <app-web-page-header>
+        <app-web-page-title>Demande d'inscription</app-web-page-title>
+    </app-web-page-header>
+    <app-web-page-content>
+        <mat-card>
+            <mat-card-content >
+        <form [formGroup]="registrationForm">
+            <div class="form-row">
+                <div class="form-field-label">Nom du compte<span class="required"> *</span></div>
+                <mat-form-field appearance="outline">
+                    <input #userName formControlName="userName" matInput type="text" >
+                    <mat-hint align="end">C'est ce qui vous permetra de vous connecter</mat-hint>
+                    <mat-error *ngIf="this.registrationForm.get('userName')?.errors?.required">Veuillez indiquer un nom de compte.</mat-error>
+                    <mat-error *ngIf="this.registrationForm.get('userName')?.errors?.pattern">Votre nom de compte ne peux contenir que des caractères alphabétiques sans accents.</mat-error>
+                    <mat-error *ngIf="this.registrationForm.get('userName')?.errors?.usernameTaken">Ce nom de comte est déjà pris. Veuillez en choisir un autre.</mat-error>
+                </mat-form-field>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="form-row">
+                <div class="form-field-label">Prénom</div>
+                <mat-form-field appearance="outline">
+                    <input #firstName formControlName="firstName" matInput type="text">
+                </mat-form-field>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="form-row">
+                <div class="form-field-label">Nom</div>
+                <mat-form-field appearance="outline">
+                    <input #lastName formControlName="lastName" matInput type="text">
+                </mat-form-field>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="form-row">
+                <div class="form-field-label">Email<span class="required"> *</span></div>
+                <mat-form-field appearance="outline">
+                    <input #email formControlName="email" matInput type="text">
+                    <mat-error *ngIf="this.registrationForm.get('email')?.errors?.required">Veuillez indiquer une adresse email valide.</mat-error>
+                    <mat-error *ngIf="this.registrationForm.get('email')?.errors?.pattern">Veuillez indiquer une adresse email valide.</mat-error>
+                </mat-form-field>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="form-row">
+                <div class="form-field-label">Pourquoi souhaitez-vous nous rejoindre ?<span class="required"> *</span></div>
+                <mat-form-field appearance="outline">
+                    <textarea matInput
+                              formControlName="registrationReason"
+                              cdkTextareaAutosize
+                              #autosize="cdkTextareaAutosize"
+                              cdkAutosizeMinRows="3"
+                              cdkAutosizeMaxRows="10"></textarea>
+                    <mat-error>Veuillez indiquer pourquoi vous souhaitez nous rejoindre.</mat-error>
+                </mat-form-field>
+            </div>
+        </form>
+
+                <div class="re-captcha-container">
+                    <re-captcha (resolved)="resolved($event)" [siteKey]="this.reCaptchaSiteKey" class="re-captcha"></re-captcha>
+                </div>
+
+            </mat-card-content>
+            <mat-card-actions>
+                <button color="primary" mat-raised-button (click)="this.requestRegistration()" [disabled]="!this.registrationForm.dirty || !this.registrationForm.valid || this.isRequestLoading || !this.captchaResponse?.length > 0">
+                    Envoyer la demande d'inscription
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    </app-web-page-content>
+</app-web-page>

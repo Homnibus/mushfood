@@ -1,10 +1,10 @@
 import {ModelService} from '../../core/services/model.service';
-import {Ingredient, IngredientQuantity, Recipe} from '../../app.models';
-import {AuthService} from '../../core/services/auth.service';
+import {Ingredient, IngredientQuantity} from '../../app.models';
 import {IngredientSerializer} from '../../app.serializers';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, forkJoin, Observable, of} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -15,9 +15,9 @@ export class IngredientService extends ModelService<Ingredient> {
   public activeIngredientList$ = this.activeIngredientListSubject.asObservable();
   private activeIngredientList: Ingredient[];
 
-  constructor(authService: AuthService) {
+  constructor(http: HttpClient) {
     super(
-      authService,
+      http,
       Ingredient,
       new IngredientSerializer()
     );

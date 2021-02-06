@@ -9,8 +9,9 @@
       <mat-icon color="white">account_circle</mat-icon>
     </button>
     <mat-menu #beforeMenu="matMenu" xPosition="before">
-      <button mat-menu-item routerLink="/profile" ><mat-icon color="white">settings</mat-icon>Paramètres</button>
-      <button mat-menu-item routerLink="/logout"><mat-icon color="white">logout</mat-icon>Deconnexion</button>
+      <a mat-menu-item routerLink="/profile" ><mat-icon color="white">settings</mat-icon>Paramètres</a>
+      <a *ngIf="(authService.currentUser$ | async)?.isAdmin" mat-menu-item routerLink="/registration-validation"><mat-icon color="white">assignment_ind</mat-icon>Administration</a>
+      <a mat-menu-item routerLink="/logout"><mat-icon color="white">logout</mat-icon>Deconnexion</a>
     </mat-menu>
     <a *ngIf="!(authService.currentUser$ | async)" mat-button routerLink="/login">
       Connexion

@@ -1,8 +1,8 @@
 <app-web-page>
   <app-web-page-content>
     <h1>Connexion</h1>
-    <ng-container *ngIf="(authService.currentUser$ | async) as curentUser">
-      <h1><span class="user-name">{{ curentUser.name | titlecase }}</span>, vous êtes déjà connecté.</h1>
+    <ng-container *ngIf="(authService.currentUser$ | async) as currentUser">
+      <h1><span class="user-name">{{ currentUser.userName | titlecase }}</span>, vous êtes déjà connecté.</h1>
     </ng-container>
     <mat-card *ngIf="!(authService.currentUser$ | async)">
       <mat-card-content>
@@ -27,6 +27,9 @@
               </button>
             </div>
           </form>
+          <a routerLink="/registration" class="registration-link">
+            Vous souhaitez nous rejoindre ?
+          </a>
         </ng-container>
       </mat-card-content>
     </mat-card>

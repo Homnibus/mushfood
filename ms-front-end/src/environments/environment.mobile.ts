@@ -9,6 +9,7 @@ export const environment = {
   authUrl: 'http://10.0.2.2:8000/api-auth/',
   staticUrl: 'http://10.0.2.2:8000/static/',
   fontUrl: '/assets/',
+  reCaptchaSiteKey: '6Lc4IEoaAAAAAP0Q6sTuyDuPZ7QHGTsSZW75pFMk',
 };
 
 /*

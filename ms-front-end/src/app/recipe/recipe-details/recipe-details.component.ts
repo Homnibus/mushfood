@@ -19,7 +19,7 @@ import {MatDialog} from '@angular/material/dialog';
 })
 export class RecipeDetailsComponent implements OnInit {
 
-  readonly modalWidth = '250px'
+  readonly modalWidth = '250px';
 
   recipe: Recipe;
   ingredientQuantityList: IngredientQuantity[];
@@ -73,12 +73,12 @@ export class RecipeDetailsComponent implements OnInit {
       width: this.modalWidth,
     });
     dialogRef.afterClosed().subscribe(variantTitle => {
-      if(variantTitle){
+      if (variantTitle){
         // Create a recipe object that copy the ActiveRecipe
         // But don't copy the image
-        this.recipeService.createVariant(variantTitle,this.recipe).pipe(
+        this.recipeService.createVariant(variantTitle, this.recipe).pipe(
           // Loop over the ingredient quantity to create them
-          switchMap(recipe => this.ingredientQuantityService.createVariant(recipe,this.ingredientQuantityList)),
+          switchMap(recipe => this.ingredientQuantityService.createVariant(recipe, this.ingredientQuantityList)),
           // Update the recipe mentions with the right ingredientQuantity id
           switchMap(resultTuple => {
               const ingredientQuantityList = resultTuple[0];
@@ -96,7 +96,7 @@ export class RecipeDetailsComponent implements OnInit {
     });
   }
 
-  private getVariant():void {
+  private getVariant(): void {
     if (this.recipe.variant.length > 0){
       forkJoin(this.recipe.variant.map(id =>
         this.recipeService.filteredList(`id=${id}`).pipe(
@@ -110,12 +110,12 @@ export class RecipeDetailsComponent implements OnInit {
     }
   }
 
-  private getVariantOf():void {
+  private getVariantOf(): void {
     if (this.recipe.variantOf){
       this.recipeService.filteredList(`id=${this.recipe.variantOf}`).pipe(
         map(resultRecipeList =>
           resultRecipeList.length > 0 ? resultRecipeList[0] : undefined
-        )).subscribe(recipe => this.variantOf = recipe)
+        )).subscribe(recipe => this.variantOf = recipe);
     } else {
       this.variantOf = undefined;
     }

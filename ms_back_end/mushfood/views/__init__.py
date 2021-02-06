@@ -7,3 +7,4 @@ from .api_ingredient_quantity_view import IngredientQuantityViewSet
 from .api_category_view import CategoryViewSet
 from .api_user_view import UserViewSet
 from .api_change_password_view import ChangePasswordViewSet
+from. api_registration_view import RegistrationViewSet

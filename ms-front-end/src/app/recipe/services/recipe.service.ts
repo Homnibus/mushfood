@@ -1,10 +1,10 @@
 import {ModelService} from '../../core/services/model.service';
 import {Category, ModelState, Recipe, RecipeImage} from '../../app.models';
-import {AuthService} from '../../core/services/auth.service';
 import {RecipeSerializer} from '../../app.serializers';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -16,9 +16,9 @@ export class RecipeService extends ModelService<Recipe> {
   public activeRecipe$ = this.activeRecipeSubject.asObservable();
   private activeRecipe: Recipe;
 
-  constructor(authService: AuthService) {
+  constructor(http: HttpClient) {
     super(
-      authService,
+      http,
       Recipe,
       new RecipeSerializer()
     );

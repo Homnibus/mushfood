@@ -30,6 +30,7 @@
     "angular-resize-event": "^1.2.2",
     "ckeditor5-build-rescodex": "^1.0.10",
     "github-markdown-css": "^4.0.0",
+    "ng-recaptcha": "^7.0.1",
     "rxjs": "^6.6.3",
     "tslib": "^2.0.0",
     "zone.js": "^0.10.3"

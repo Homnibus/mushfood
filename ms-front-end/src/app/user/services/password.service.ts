@@ -1,17 +1,17 @@
 import {ModelService} from '../../core/services/model.service';
 import {UserPassword} from '../../app.models';
-import {AuthService} from '../../core/services/auth.service';
 import {UserPasswordSerializer} from '../../app.serializers';
 import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PasswordService extends ModelService<UserPassword> {
 
-  constructor(authService: AuthService) {
+  constructor(http: HttpClient) {
     super(
-      authService,
+      http,
       UserPassword,
       new UserPasswordSerializer()
     );

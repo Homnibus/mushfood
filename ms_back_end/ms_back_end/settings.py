@@ -159,6 +159,17 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = 'no-reply@XXX.fr'
+SERVER_EMAIL = 'no-reply@XXX.fr'
+EMAIL_HOST = 'mail.XXX.fr'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'no-reply@XXX.fr'
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_SSL = True
+
+RE_CAPTCHA_V2_SECRET = ''
+
 LOGGING = {
   "version": 1,
   "disable_existing_loggers": True,

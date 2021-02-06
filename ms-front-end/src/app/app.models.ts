@@ -18,31 +18,24 @@ export abstract class Model {
 
 }
 
-export class User {
-  public name: string;
-  public token: string;
-
-  constructor(name: string, token: string) {
-    this.token = token;
-    this.name = name;
-  }
-}
-
 export class BaseModel {
   public static lookupField = 'id';
   public state: ModelState;
   public id: number;
 }
 
-export class UserProfile extends BaseModel implements Model {
+export class User extends BaseModel implements Model {
   static modelName = 'user';
   static modelPlural = 'user';
   static lookupField = 'userName';
 
+  token: string;
   userName: string;
   firstName: string;
   lastName: string;
   email: string;
+  isAdmin: boolean;
+  registrationDate: Date;
   dateJoined: Date;
 }
 
@@ -79,7 +72,7 @@ export class Recipe extends BaseModel implements Model {
   instructions: string;
   inspiration: string;
   authorFullName: string;
-  authorUserName : string;
+  authorUserName: string;
   recipeImage: RecipeImage;
   categories: Category[];
   variantOf: number;
@@ -142,4 +135,20 @@ export class Category extends BaseModel implements Model {
   static modelPlural = 'categories';
 
   name: string;
+}
+
+export class Registration extends BaseModel implements Model {
+  static modelName = 'registration';
+  static modelPlural = 'registrations';
+
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  reason: string;
+  isRejected: boolean;
+  logicalDelete: boolean;
+  reCaptchaToken: string;
+  creationDate: Date;
+  updateDate: Date;
 }

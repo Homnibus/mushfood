@@ -19,17 +19,9 @@ export class LoginComponent {
   constructor(public authService: AuthService, private router: Router, private route: ActivatedRoute, private fb: FormBuilder) {
   }
 
-  get userName() {
-    return this.loginForm.get('userName');
-  }
-
-  get password() {
-    return this.loginForm.get('password');
-  }
-
   tryLogin(): void {
     if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.get('userName').value, this.loginForm.get('password').value).subscribe(
+      this.authService.login(this.loginForm.get('userName').value.toLowerCase(), this.loginForm.get('password').value).subscribe(
         user => {
           const nextUrl = this.route.snapshot.queryParamMap.get('next');
           this.router.navigateByUrl(nextUrl);

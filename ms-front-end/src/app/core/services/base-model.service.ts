@@ -2,14 +2,14 @@ import {BaseModel, Model, ModelState} from '../../app.models';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {ModelSerializer} from '../../app.serializers';
-import {AuthService} from './auth.service';
 import {environment} from '../../../environments/environment';
+import {HttpClient} from '@angular/common/http';
 
 
 export abstract class BaseModelService<T extends BaseModel> {
 
   constructor(
-    protected userService: AuthService,
+    protected http: HttpClient,
     protected model: typeof Model,
     protected serializer: ModelSerializer<T>,
   ) {
@@ -35,14 +35,14 @@ export abstract class BaseModelService<T extends BaseModel> {
   }
 
   get(id: number | string): Observable<T[]> {
-    return this.userService.http.get(
+    return this.http.get(
       `${environment.apiUrl}${this.model.modelName}/${id}/`
     ).pipe(map(data => [this.serializer.fromJson(data, ModelState.Retrieved)]));
   }
 
 
   create(item: T): Observable<T> {
-    return this.userService.http.post(
+    return this.http.post(
       `${environment.apiUrl}${this.model.modelPlural}/`,
       this.serializer.toCreateJson(item)
     ).pipe(
@@ -51,7 +51,7 @@ export abstract class BaseModelService<T extends BaseModel> {
   }
 
   update(item: T): Observable<T> {
-    return this.userService.http.put(
+    return this.http.put(
       `${environment.apiUrl}${this.model.modelPlural}/${item[this.model.lookupField]}/`,
       this.serializer.toUpdateJson(item)
     ).pipe(
@@ -60,7 +60,7 @@ export abstract class BaseModelService<T extends BaseModel> {
   }
 
   delete(item: T): Observable<T> {
-    return this.userService.http.delete(
+    return this.http.delete(
       `${environment.apiUrl}${this.model.modelPlural}/${item[this.model.lookupField]}/`
     ).pipe(
       map(() => undefined)

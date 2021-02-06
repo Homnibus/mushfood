@@ -5,4 +5,5 @@ export const environment = {
   authUrl: '/api-auth/',
   staticUrl: '/public/static/',
   fontUrl: '/public/static/',
+  reCaptchaSiteKey: '',
 };

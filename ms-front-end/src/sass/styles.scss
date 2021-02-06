@@ -4,6 +4,7 @@
 @import "ckeditor/content";
 
 .mushfood {
+  @import "mat-components/mat-table";
   @import "mat-components/mat-list";
   @import "mat-components/mat-checkbox";
   @import "mat-components/mat-card";

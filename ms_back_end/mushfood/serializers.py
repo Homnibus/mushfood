@@ -1,13 +1,17 @@
 import os
 
+import requests
+from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
+from django.core.mail import EmailMultiAlternatives
 from django.db.models import Q
+from django.template.loader import render_to_string
 from django.utils.translation import gettext
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 
 from mushfood.models import (Recipe, RecipeImage, Ingredient, IngredientImage, MeasurementUnit, IngredientQuantity,
-                             Category)
+                             Category, Registration)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -178,6 +182,33 @@ class UserSerializer(serializers.ModelSerializer):
     fields = ["first_name","last_name","date_joined","email","username","is_admin"]
     read_only_fields = ["date_joined", "username"]
 
+class UserCreateSerializer(serializers.ModelSerializer):
+
+  registration_date = serializers.DateField(required=True, write_only=True)
+
+  class Meta:
+    model = User
+    fields = ["first_name","last_name","email","username","registration_date"]
+
+  def create(self, validated_data):
+    registration_date = validated_data.pop("registration_date")
+    password = User.objects.make_random_password(length=14)
+    user = User(**validated_data)
+    user.set_password(password)
+    user.save()
+    codesnames = ('add_ingredient','change_ingredient', 'view_ingredient','add_ingredientquantity',
+                  'change_ingredientquantity','delete_ingredientquantity','view_ingredientquantity','add_recipe',
+                  'change_recipe','view_recipe','add_recipeimage','change_recipeimage','view_recipeimage')
+    perms = Permission.objects.filter(codename__in=codesnames)
+    user.user_permissions.add(*perms)
+    template_data = {'registration_date': registration_date,'username': user.username, 'password': password}
+    html_body = render_to_string("mushfood/registration_accepted.html", template_data)
+    text_body = render_to_string("mushfood/registration_accepted.txt", template_data)
+    msg = EmailMultiAlternatives('Inscription à Mushfood.fr', text_body, 'no-reply@mushfood.fr', [user.email])
+    msg.attach_alternative(html_body, 'text/html')
+    msg.send()
+    return user
+
 class ChangePasswordSerializer(serializers.ModelSerializer):
   password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
   password2 = serializers.CharField(write_only=True, required=True)
@@ -200,8 +231,56 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
     return value
 
   def update(self, instance, validated_data):
-
     instance.set_password(validated_data['password'])
     instance.save()
-
     return instance
+
+
+class RegistrationSerializer(serializers.ModelSerializer):
+
+  class Meta:
+    model = Registration
+    fields = "__all__"
+
+  def update(self, instance, validated_data):
+    logical_delete_before_update = instance.logical_delete
+    updated_registration = super().update(instance, validated_data)
+    if(updated_registration.logical_delete and updated_registration.is_rejected and not logical_delete_before_update):
+      template_data = {'registration_date': instance.creation_date}
+      html_body = render_to_string("mushfood/registration_rejected.html", template_data)
+      text_body = render_to_string("mushfood/registration_rejected.txt", template_data)
+      msg = EmailMultiAlternatives('Inscription à Mushfood.fr', text_body, 'no-reply@mushfood.fr', [instance.email])
+      msg.attach_alternative(html_body, 'text/html')
+      msg.send()
+
+    return updated_registration
+
+
+class RegistrationCreateSerializer(serializers.ModelSerializer):
+
+  re_captcha_token = serializers.CharField(required=True, allow_blank=False, write_only=True)
+
+  def validate_re_captcha_token(self, value):
+    response = requests.post('https://www.google.com/recaptcha/api/siteverify', data={
+      'secret' : settings.RE_CAPTCHA_V2_SECRET,
+      'response': value
+    })
+    if response.status_code != 200:
+      raise serializers.ValidationError({"re_captcha_token": "Error with reCaptcha validation request"})
+    if not response.json()['success']:
+      raise serializers.ValidationError({"re_captcha_token": "Are you human"})
+    return value
+
+  def validate_username(self, value):
+    value = value.lower()
+    if User.objects.filter(username=value) or Registration.objects.filter(username=value).exclude(logical_delete=True):
+      raise serializers.ValidationError({"username": "Username already taken"})
+    return value
+
+  def create(self, validated_data):
+    validated_data.pop('re_captcha_token', None)
+    return super().create(validated_data)
+
+  class Meta:
+    model = Registration
+    fields = ("username", "first_name", "last_name", "email", "reason","re_captcha_token")

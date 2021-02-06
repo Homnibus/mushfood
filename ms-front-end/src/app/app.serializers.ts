@@ -7,7 +7,7 @@ import {
   Model,
   ModelState,
   Recipe,
-  RecipeImage, UserPassword, UserProfile
+  RecipeImage, UserPassword, User, Registration
 } from './app.models';
 
 export abstract class ModelSerializer<T extends Model> {
@@ -19,31 +19,44 @@ export abstract class ModelSerializer<T extends Model> {
 }
 
 
-export class UserProfileSerializer implements ModelSerializer<UserProfile> {
-  fromJson(json: any, state: ModelState): UserProfile {
-    const userProfile = new UserProfile();
-    userProfile.userName = json.username;
-    userProfile.firstName = json.first_name;
-    userProfile.lastName = json.last_name;
-    userProfile.email = json.email;
-    userProfile.dateJoined = new Date(json.date_joined);
-    return userProfile;
+export class UserSerializer implements ModelSerializer<User> {
+  fromJson(json: any, state: ModelState): User {
+    const user = new User();
+    user.userName = json.username;
+    user.firstName = json.first_name;
+    user.lastName = json.last_name;
+    user.email = json.email;
+    user.isAdmin = json.is_admin;
+    user.dateJoined = new Date(json.date_joined);
+    return user;
   }
 
-  toJson(userProfile: UserProfile): any {
+  toJson(user: User): any {
     const formData = new FormData();
-    formData.append('first_name', userProfile.firstName);
-    formData.append('last_name', userProfile.lastName);
-    formData.append('email', userProfile.email);
+    formData.append('first_name', user.firstName);
+    formData.append('last_name', user.lastName);
+    formData.append('email', user.email);
     return formData;
   }
 
-  toCreateJson(userProfile: UserProfile): any {
-    return this.toJson(userProfile);
+  toCreateJson(user: User): any {
+    const formData = new FormData();
+    formData.append('username', user.userName);
+    formData.append('first_name', user.firstName);
+    formData.append('last_name', user.lastName);
+    formData.append('email', user.email);
+    // adjust 0 before single digit date
+    const date = ("0" + user.registrationDate.getDate()).slice(-2);
+    // current month
+    const month = ("0" + (user.registrationDate.getMonth() + 1)).slice(-2);
+    // current year
+    const year = user.registrationDate.getFullYear();
+    formData.append('registration_date', year + "-" + month + "-" + date);
+    return formData;
   }
 
-  toUpdateJson(userProfile: UserProfile): any {
-    return this.toJson(userProfile);
+  toUpdateJson(user: User): any {
+    return this.toJson(user);
   }
 }
 
@@ -311,5 +324,50 @@ export class CategorySerializer implements ModelSerializer<Category> {
 
   toUpdateJson(category: Category): any {
     return this.toJson(category);
+  }
+}
+
+
+export class RegistrationSerializer implements ModelSerializer<Registration> {
+  fromJson(json: any, state: ModelState): Registration {
+    const registration = new Registration();
+    registration.id = parseInt(json.id, 10);
+    registration.userName = json.username;
+    registration.firstName = json.first_name;
+    registration.lastName = json.last_name;
+    registration.email = json.email;
+    registration.reason = json.reason;
+    registration.isRejected = json.is_rejected;
+    registration.logicalDelete = json.logical_delete;
+    registration.creationDate = new Date(json.creation_date);
+    registration.updateDate = new Date(json.update_date);
+    return registration;
+  }
+
+  toJson(registration: Registration): any {
+    return {
+      username : registration.userName,
+      first_name : registration.firstName,
+      last_name : registration.lastName,
+      email : registration.email,
+      reason: registration.reason,
+      is_rejected : registration.isRejected,
+      logical_delete : registration.logicalDelete,
+    };
+  }
+
+  toCreateJson(registration: Registration): any {
+    return {
+      username: registration.userName,
+      first_name: registration.firstName,
+      last_name: registration.lastName,
+      email: registration.email,
+      reason: registration.reason,
+      re_captcha_token: registration.reCaptchaToken,
+    };
+  }
+
+  toUpdateJson(registration: Registration): any {
+    return this.toJson(registration);
   }
 }

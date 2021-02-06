@@ -1,11 +1,11 @@
 import {ModelService} from '../../core/services/model.service';
 import {Recipe, RecipeImage} from '../../app.models';
-import {AuthService} from '../../core/services/auth.service';
 import {RecipeImageSerializer} from '../../app.serializers';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 import {FormControl} from '@angular/forms';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -17,9 +17,9 @@ export class RecipeImageService extends ModelService<RecipeImage> {
   private activeRecipeImage: RecipeImage;
   private activeRecipe: Recipe;
 
-  constructor(authService: AuthService) {
+  constructor(http: HttpClient) {
     super(
-      authService,
+      http,
       RecipeImage,
       new RecipeImageSerializer()
     );

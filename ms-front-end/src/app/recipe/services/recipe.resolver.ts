@@ -20,7 +20,7 @@ export class RecipeResolver implements Resolve<Recipe> {
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Recipe> {
     return this.recipeService.setActiveRecipe(route.paramMap.get('slug')).pipe(
       map( recipe => {
-        if(this.authService.currentUser.name && recipe.authorUserName !== this.authService.currentUser.name){
+        if(this.authService.currentUser.userName && recipe.authorUserName !== this.authService.currentUser.userName){
           this.router.navigateByUrl('/error/forbidden');
         }
         return recipe;

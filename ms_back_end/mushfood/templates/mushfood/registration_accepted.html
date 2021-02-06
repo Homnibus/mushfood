@@ -1,0 +1,7 @@
+{% extends "mushfood/base_registration_mail.html" %}
+{% block registration_result %}
+    Nous avons décidé d'accepter votre demande d'inscription.<br><br>
+    Votre nom d'utilisateur est : <b>{{ username }}</b><br>
+    Votre mot de passe temporaire est :  <b>{{ password }}</b><br>
+    Nous vous conseillons de modifier votre mot de passe dès maintenant via la page de gestion de votre compte: <a href="https://www.mushfood.fr/profile">ici</a><br>
+{% endblock %}

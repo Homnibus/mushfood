@@ -7,13 +7,13 @@
         <h1>Paramètres du profil</h1>
         <h2>Modifiez les informations d’identification de votre compte</h2>
 
-        <mat-card>
-            <mat-card-content>
+        <mat-card class="mat-elevation-z5">
+            <mat-card-content >
                 <form (ngSubmit)="this.updateUserProfile()" [formGroup]="userProfileForm">
                     <div class="form-row">
                         <div class="form-field-label">Nom du compte</div>
                         <mat-form-field appearance="outline">
-                            <input matInput type="text" disabled [value]=this.authService.currentUser.name >
+                            <input matInput type="text" disabled [value]=this.authService.currentUser.userName >
                         </mat-form-field>
                     </div>
                     <mat-divider></mat-divider>
@@ -50,7 +50,7 @@
         <h1>Mot de passe</h1>
         <h2>Gardez votre compte en sécurité.</h2>
 
-        <mat-card>
+        <mat-card class="mat-elevation-z5">
             <mat-card-content>
                 <form (ngSubmit)="this.updatePassword()" [formGroup]="passwordForm">
                     <div class="form-row">

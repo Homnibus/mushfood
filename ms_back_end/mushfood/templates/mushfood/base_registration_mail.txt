@@ -1,0 +1,9 @@
+Bonjour,
+
+Le {{ registration_date | date:"d/m/Y" }}, vous avez demandé à devenir rédacteur sur le site de recette www.mushfood.fr.
+
+{% block registration_result %}{% endblock %}
+
+Bien à vous,
+
+Emmanuel Seunes.

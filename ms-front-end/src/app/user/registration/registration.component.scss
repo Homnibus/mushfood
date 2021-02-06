@@ -1,0 +1,42 @@
+@import "../../../sass/theme/theme-small";
+
+.mat-card > .mat-card-actions:last-child{
+  padding: 1.4em;
+  margin: 0;
+  background: $mat-primary-200;
+  text-align: right;
+  padding-bottom: 1em;
+  border-radius: 0 0 4px 4px;
+}
+
+.form-row{
+    display: flex;
+    flex-direction: row;
+
+&>*{
+     padding: 1.4em 1.8em;
+ }
+
+&>mat-form-field {
+     flex: 1;
+ }
+
+&>.form-field-label{
+     width: 10rem;
+     min-width: 4em;
+     font-weight: bold;
+ }
+}
+
+.required {
+  color: #c20000;
+}
+
+.re-captcha-container {
+  text-align: center;
+  margin-top: 1.5rem;
+  margin-bottom: 3rem !important;
+  re-captcha{
+    display: inline-block;
+  }
+}

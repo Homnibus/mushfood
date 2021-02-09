@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "start-mobile": "ng serve --configuration=mobile",
-    "build": "ng build --prod --outputHashing=none --deploy-url=public/static/angular/",
+    "build": "ng build --prod --outputHashing=none --deploy-url=public/static/angular/ --aot=true --buildOptimizer=true",
     "build:stats": "ng build --prod --stats-json",
     "analyze": "npx webpack-bundle-analyzer dist/ms-front-end/stats-es2015.json",
     "dev": "ng build --extractCss=true --vendorChunk=false --outputHashing=none --outputPath=../ms_back_end/static/angular --deploy-url=http://localhost:8000/static/angular/",

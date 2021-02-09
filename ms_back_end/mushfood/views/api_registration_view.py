@@ -13,4 +13,3 @@ class RegistrationViewSet(ModelViewSet, CreationModelViewSet):
   create_serializer_class = RegistrationCreateSerializer
   update_serializer_class = RegistrationSerializer
   filterset_fields = ['logical_delete']
-

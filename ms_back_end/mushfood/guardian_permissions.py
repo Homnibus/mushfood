@@ -1,10 +1,12 @@
 from rest_framework import permissions
 
+
 class ObjectPermissionsOrReadOnly(permissions.DjangoObjectPermissions):
     """
     Similar to `DjangoObjectPermissions`, but adding read only permissions.
     """
     authenticated_users_only = False
+
 
 class MyUserPermissions(permissions.BasePermission):
     """
@@ -15,7 +17,6 @@ class MyUserPermissions(permissions.BasePermission):
      """
 
     def has_permission(self, request, view):
-
         # Only admin can create users
         if request.method == "POST":
             return request.user.is_superuser
@@ -23,9 +24,9 @@ class MyUserPermissions(permissions.BasePermission):
         return True
 
     def has_object_permission(self, request, view, obj):
-
         # check if requesting user is the user requested
         return request.user == obj
+
 
 class RegistrationPermissions(permissions.BasePermission):
     """
@@ -36,7 +37,6 @@ class RegistrationPermissions(permissions.BasePermission):
      """
 
     def has_permission(self, request, view):
-
         if request.method == "POST":
             return True
 

@@ -7,9 +7,7 @@ from mushfood.serializers import ChangePasswordSerializer
 
 
 class ChangePasswordViewSet(UpdateModelMixin, GenericViewSet):
-
   queryset = User.objects.all()
   lookup_field = 'username'
   serializer_class = ChangePasswordSerializer
   permission_classes = (MyUserPermissions,)
-

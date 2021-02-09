@@ -1,10 +1,10 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {IngredientQuantity, ModelState, Recipe, RecipeImage} from '../../app.models';
+import {ModelState, Recipe} from '../../app.models';
 import {TabLink} from '../../shared/web-page/web-page-tabs/web-page-tabs.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {forkJoin, Observable, Subscription} from 'rxjs';
-import {map, switchMap, tap} from 'rxjs/operators';
+import {Observable, Subscription} from 'rxjs';
+import {switchMap, tap} from 'rxjs/operators';
 import {RecipeService} from '../../recipe/services/recipe.service';
 import {RecipeImageService} from '../../recipe-image/services/recipe-image.service';
 import {IngredientQuantityService} from '../../ingredient/services/ingredient-quantity.service';
@@ -35,7 +35,7 @@ export class RecipeUpdateTabsComponent implements OnInit, OnDestroy {
               private ingredientQuantityService: IngredientQuantityService,
               private measurementUnitService: MeasurementUnitService,
               private ingredientService: IngredientService,
-              private ingredientQuantityMentionService: IngredientQuantityMentionService, ) {
+              private ingredientQuantityMentionService: IngredientQuantityMentionService,) {
   }
 
   ngOnInit() {
@@ -77,7 +77,7 @@ export class RecipeUpdateTabsComponent implements OnInit, OnDestroy {
     return this.recipeImageService.saveRecipeImage().pipe(
       // Update the active recipe with the new RecipeImage
       tap(recipeImage => {
-          this.recipeService.updateRecipeImage(recipeImage);
+        this.recipeService.updateRecipeImage(recipeImage);
       }),
       switchMap(() => this.ingredientQuantityService.saveIngredientQuantity(
         this.ingredientService.saveIngredient(
@@ -87,9 +87,9 @@ export class RecipeUpdateTabsComponent implements OnInit, OnDestroy {
         // Update the mentions for all the newly created ingredientQuantity
         tap(ingredientQuantityList => {
           const createdIngredientQuantityList = ingredientQuantityList.filter(
-              ingredientQuantity => ingredientQuantity.state === ModelState.Created
+            ingredientQuantity => ingredientQuantity.state === ModelState.Created
           );
-          for (const createdIngredientQuantity of createdIngredientQuantityList){
+          for (const createdIngredientQuantity of createdIngredientQuantityList) {
             this.ingredientQuantityMentionService.updateMention(createdIngredientQuantity, this.recipe);
           }
         }),

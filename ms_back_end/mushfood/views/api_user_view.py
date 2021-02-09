@@ -7,11 +7,9 @@ from mushfood.serializers import UserSerializer, UserCreateSerializer
 
 
 class UserViewSet(ModelViewSet, CreationModelViewSet):
-
   queryset = User.objects.all()
   serializer_class = UserSerializer
   lookup_field = 'username'
   permission_classes = (MyUserPermissions,)
   create_serializer_class = UserCreateSerializer
   update_serializer_class = UserSerializer
-

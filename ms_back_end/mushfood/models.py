@@ -248,6 +248,7 @@ class IngredientImage(models.Model):
     null=False,
     help_text="Date of last modification one of the picture",
   )
+
   class Meta:
     verbose_name = "ingredient-image"
     verbose_name_plural = "ingredient-images"
@@ -364,7 +365,8 @@ class IngredientQuantity(models.Model):
     verbose_name_plural = "ingredient-quantities"
 
   def __str__(self):
-    return str(self.quantity) + " " + self.measurement_unit.name + " of " + self.ingredient.name + " for the " + self.recipe.title
+    return str(
+      self.quantity) + " " + self.measurement_unit.name + " of " + self.ingredient.name + " for the " + self.recipe.title
 
   def save(self, *args, **kwargs):
     """
@@ -390,6 +392,7 @@ class Category(models.Model):
 
   def __str__(self):
     return self.name
+
 
 class Registration(models.Model):
   """

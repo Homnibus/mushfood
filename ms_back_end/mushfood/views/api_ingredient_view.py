@@ -1,5 +1,5 @@
-from rest_framework import viewsets
 from rest_framework import permissions
+from rest_framework import viewsets
 
 from mushfood.models import Ingredient
 from mushfood.serializers import IngredientSerializer

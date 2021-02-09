@@ -19,7 +19,7 @@ export class IngredientQuantityMentionService {
 
   ingredientQuantityToFeedId(ingredientQuantity: IngredientQuantity, quantity = parseFloat(ingredientQuantity.quantity.toFixed(2))): string {
     let feedId: string;
-    feedId = `#${ingredientQuantity.ingredient.name}`;
+    feedId = `#${ingredientQuantity.ingredient.name.toLowerCase()}`;
     // tslint:disable-next-line:triple-equals
     if (!ingredientQuantity.measurementUnit.isIgnorable || quantity != 1) {
       feedId = feedId.concat(` (${quantity.toString()}`);
@@ -41,7 +41,7 @@ export class IngredientQuantityMentionService {
     resultFeedItem.ingredientQuantityId = ingredientQuantity.id ? ingredientQuantity.id : ingredientQuantity.tempId;
     resultFeedItem.quantity = ingredientQuantity.quantity;
     resultFeedItem.measurementUnit = ingredientQuantity.measurementUnit.name;
-    resultFeedItem.ingredient = ingredientQuantity.ingredient.name;
+    resultFeedItem.ingredient = ingredientQuantity.ingredient.name.toLowerCase();
     return resultFeedItem;
   }
 
@@ -53,7 +53,7 @@ export class IngredientQuantityMentionService {
     let currentMentionList: Element[];
     switch (ingredientQuantity.state) {
       case ModelState.Created:
-        currentMentionList = Array.from(dom.querySelectorAll(`span.mention[data-ingredient="${ingredientQuantity.ingredient.name}"]`));
+        currentMentionList = Array.from(dom.querySelectorAll(`span.mention[data-ingredient="${ingredientQuantity.ingredient.name.toLowerCase()}"]`));
         break;
       case ModelState.NotSaved:
         currentMentionList = Array.from(dom.querySelectorAll(`span.mention[data-ingredient-quantity-id="${ingredientQuantity.tempId}"]`));
@@ -69,7 +69,7 @@ export class IngredientQuantityMentionService {
       // Change the measurement unit attribute
       currentMention.setAttribute('data-measurement-unit', ingredientQuantity.measurementUnit.name);
       // Change the measurement unit attribute
-      currentMention.setAttribute('data-ingredient', ingredientQuantity.ingredient.name);
+      currentMention.setAttribute('data-ingredient', ingredientQuantity.ingredient.name.toLowerCase());
       // Change the mention id
       const mentionId = ingredientQuantity.id ? ingredientQuantity.id : ingredientQuantity.tempId;
       currentMention.setAttribute('data-ingredient-quantity-id', mentionId.toString());
@@ -80,7 +80,7 @@ export class IngredientQuantityMentionService {
     return result;
   }
 
-  updateAllMentionPortions(ingredientQuantityList: IngredientQuantity[], recipe: Recipe, updatedPortions= recipe.portions) {
+  updateAllMentionPortions(ingredientQuantityList: IngredientQuantity[], recipe: Recipe, updatedPortions = recipe.portions) {
     ingredientQuantityList.forEach(ingredientQuantity => this.updateMention(ingredientQuantity, recipe, updatedPortions));
   }
 }

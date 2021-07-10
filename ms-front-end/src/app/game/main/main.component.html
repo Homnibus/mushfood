@@ -1,0 +1,66 @@
+<app-web-page>
+    <app-web-page-header>
+        <app-web-page-title>Le jeux !</app-web-page-title>
+    </app-web-page-header>
+    <app-web-page-content>
+        <div class="first-line-container">
+            <div class="left-button-container">
+                <button mat-fab class="cook"
+                        (click)="this.stationService.activeCookStation()">
+                    Cuire
+                </button>
+                <br>
+                <br>
+                <br>
+                <br>
+                <button mat-fab class="plate-up"
+                        (click)="this.stationService.activePlateUpStation()">
+                    Dresser
+                </button>
+            </div>
+            <img *ngIf="this.stationService.activeStationType === 'weigh' && (this.stationService.activeStation.stateObservable | async) === 'RUNNING'" class="ingredient" src="https://www.elitefruits.com/wp-content/uploads/2018/09/CAROTTE_TITRE-1.png">
+            <img *ngIf="this.stationService.activeStationType === 'weigh'" class="front-bowl" [src]="this.frontBowlUrl">
+            <div class="recipe-item">
+                <div class="item-shape" [class]="this.stationService.activeStationType">
+                    <div class="image-mask">
+                        <div *ngIf="this.stationService.activeStationType === 'weigh'" class="weigh-hexa">
+                            <img class="scale" src="https://www.mancelboutique.net/Files/27717/Img/11/bar120mm-balance-de-precision.png">
+                            <img class="bowl" src="https://www.lautrethe.com/1252-large_default/bol-a-matcha-bleu-fonce.jpg">
+                            <div class="weigh-text">{{this.stationService.activeStation.goalText}} g</div>
+                        </div>
+                        <div *ngIf="this.stationService.activeStationType === 'cut'">
+                            {{this.stationService.activeStation.goalText}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="right-button-container">
+                <button mat-fab class="cut"
+                        [disabled]="this.stationService.activeStationType === 'cut'"
+                        (click)="this.stationService.activeCutStation()">
+                    Découper
+                </button>
+                <br>
+                <br>
+                <br>
+                <br>
+                <button mat-fab class="weigh"
+                        [disabled]="this.stationService.activeStationType === 'weigh'"
+                        (click)="this.stationService.activeWeighStation()">
+                    Peser
+                </button>
+            </div>
+        </div>
+        <div class="bottom-button-container">
+            <button color="accent" mat-raised-button type="submit" class="clique"
+                    (mousedown)="onMouseDown()"
+                    (mouseup)="onMouseUp()"
+                    (mouseleave)="onMouseLeave()">
+                Clique
+            </button>
+        </div>
+        <div class="score">
+            Score : {{this.stationService.score}}
+        </div>
+    </app-web-page-content>
+</app-web-page>

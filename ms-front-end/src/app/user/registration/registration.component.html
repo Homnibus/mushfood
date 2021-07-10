@@ -60,7 +60,7 @@
 
             </mat-card-content>
             <mat-card-actions>
-                <button color="primary" mat-raised-button (click)="this.requestRegistration()" [disabled]="!this.registrationForm.dirty || !this.registrationForm.valid || this.isRequestLoading || !this.captchaResponse?.length > 0">
+                <button color="primary" mat-raised-button (click)="this.requestRegistration()" [disabled]="!this.registrationForm.dirty || !this.registrationForm.valid || this.isRequestLoading || !(this.captchaResponse?.length > 0)">
                     Envoyer la demande d'inscription
                 </button>
             </mat-card-actions>

@@ -3,12 +3,12 @@
   display: flex;
   flex-wrap: wrap;
 
-  .button-container,
+  .bottom-button-container,
   .form-field {
     flex: 1;
   }
 
-  .button-container {
+  .bottom-button-container {
     text-align: center;
     margin: 0.5em;
     display: flex;

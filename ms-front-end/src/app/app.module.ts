@@ -11,6 +11,7 @@ import {AuthInterceptor} from './core/interceptor/auth.interceptor';
 import {AppRoutingModule} from './app-routing.module';
 import {RecipeModule} from './recipe/recipe.module';
 import {UserModule} from './user/user.module';
+import {GameModule} from "./game/game.module";
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import {UserModule} from './user/user.module';
     BrowserAnimationsModule,
     RecipeModule,
     UserModule,
+    GameModule,
     ErrorRoutingModule,
   ],
   providers: [

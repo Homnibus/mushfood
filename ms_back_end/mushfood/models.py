@@ -15,6 +15,7 @@ class Recipe(models.Model):
   A recipe of something good to cook.
   """
 
+  id = models.AutoField(primary_key=True)
   title = models.CharField(
     "title", max_length=50, blank=False, null=False, help_text="Title of the recipe"
   )
@@ -116,6 +117,8 @@ class RecipeImage(models.Model):
   """
   A picture of the recipe.
   """
+
+  id = models.AutoField(primary_key=True)
   recipe = models.OneToOneField(
     Recipe,
     on_delete=models.CASCADE,
@@ -183,6 +186,8 @@ class Ingredient(models.Model):
   """
   Some food used in a Recipe
   """
+
+  id = models.AutoField(primary_key=True)
   name = models.CharField(
     "name", max_length=50, blank=False, null=False, help_text="Name of the ingredient"
   )
@@ -221,6 +226,8 @@ class IngredientImage(models.Model):
   """
   A picture of the ingredient.
   """
+
+  id = models.AutoField(primary_key=True)
   ingredient = models.OneToOneField(
     Ingredient,
     on_delete=models.CASCADE,
@@ -285,6 +292,8 @@ class MeasurementUnit(models.Model):
   """
   Measurement unit of a Ingredient
   """
+
+  id = models.AutoField(primary_key=True)
   name = models.CharField(
     "name", max_length=50, blank=False, null=False, help_text="Name of the measurement unit"
   )
@@ -321,6 +330,8 @@ class IngredientQuantity(models.Model):
   """
   Quantity of a Ingredient in a Recipe
   """
+
+  id = models.AutoField(primary_key=True)
   quantity = models.DecimalField(
     decimal_places=2,
     max_digits=6,
@@ -381,6 +392,8 @@ class Category(models.Model):
   """
   A specific type of recipe
   """
+
+  id = models.AutoField(primary_key=True)
   name = models.CharField(
     "name", max_length=50, blank=False, null=False, help_text="Name of the category"
   )
@@ -398,6 +411,8 @@ class Registration(models.Model):
   """
   A registration request
   """
+
+  id = models.AutoField(primary_key=True)
   username = models.CharField(
     "user name", max_length=50, blank=False, null=False, help_text="Name of the account"
   )

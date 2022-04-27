@@ -93,10 +93,10 @@ export class RecipeListComponent implements OnInit {
     }
 
     onResized(event: ResizedEvent) {
-        if (!RecipeListComponent.isInSameInterval(this.honeyCombDivWidth, event.newWidth, this.breakPoint)) {
-            this.recipeListHexagon = this.honeyService.makeHoney(this.recipeListHexagon, this.itemSize, event.newWidth);
+        if (!RecipeListComponent.isInSameInterval(this.honeyCombDivWidth, event.newRect.width, this.breakPoint)) {
+            this.recipeListHexagon = this.honeyService.makeHoney(this.recipeListHexagon, this.itemSize, event.newRect.width);
         }
-        this.honeyCombDivWidth = event.newWidth;
+        this.honeyCombDivWidth = event.newRect.width;
     }
 
     onSearch(): void {

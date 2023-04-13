@@ -1,11 +1,11 @@
 // List of models used by the application
 
 export enum ModelState {
-  Retrieved = 'RETRIEVED',
-  Created = 'CREATED',
-  Modified = 'MODIFIED',
-  Deleted = 'DELETED',
-  NotSaved = 'NOT_SAVED'
+  Retrieved = "RETRIEVED",
+  Created = "CREATED",
+  Modified = "MODIFIED",
+  Deleted = "DELETED",
+  NotSaved = "NOT_SAVED",
 }
 
 export abstract class Model {
@@ -15,19 +15,18 @@ export abstract class Model {
   public static lookupField: string;
   public state: ModelState;
   public id: number;
-
 }
 
 export class BaseModel {
-  public static lookupField = 'id';
+  public static lookupField = "id";
   public state: ModelState;
   public id: number;
 }
 
 export class User extends BaseModel implements Model {
-  static modelName = 'user';
-  static modelPlural = 'user';
-  static lookupField = 'userName';
+  static modelName = "user";
+  static modelPlural = "user";
+  static lookupField = "userName";
 
   token: string;
   userName: string;
@@ -40,9 +39,9 @@ export class User extends BaseModel implements Model {
 }
 
 export class UserPassword extends BaseModel implements Model {
-  static modelName = 'password';
-  static modelPlural = 'password';
-  static lookupField = 'userName';
+  static modelName = "password";
+  static modelPlural = "password";
+  static lookupField = "userName";
 
   userName: string;
   password: string;
@@ -51,8 +50,8 @@ export class UserPassword extends BaseModel implements Model {
 }
 
 export class RecipeImage extends BaseModel implements Model {
-  static modelName = 'recipe-images';
-  static modelPlural = 'recipe-images';
+  static modelName = "recipe-images";
+  static modelPlural = "recipe-images";
 
   recipe: number;
   imageUrl: string;
@@ -60,12 +59,11 @@ export class RecipeImage extends BaseModel implements Model {
   creationDate: Date;
 }
 
-
 export class Recipe extends BaseModel implements Model {
-  static modelName = 'recipes';
-  static modelPlural = 'recipes';
+  static modelName = "recipes";
+  static modelPlural = "recipes";
 
-  static lookupField = 'slug';
+  static lookupField = "slug";
   title: string;
   slug: string;
   portions: number;
@@ -83,8 +81,8 @@ export class Recipe extends BaseModel implements Model {
 }
 
 export class Ingredient extends BaseModel implements Model {
-  static modelName = 'ingredients';
-  static modelPlural = 'ingredients';
+  static modelName = "ingredients";
+  static modelPlural = "ingredients";
 
   name: string;
   author: string;
@@ -92,10 +90,9 @@ export class Ingredient extends BaseModel implements Model {
   updateDate: Date;
 }
 
-
 export class IngredientImage extends BaseModel implements Model {
-  static modelName = 'ingredient-images';
-  static modelPlural = 'ingredient-images';
+  static modelName = "ingredient-images";
+  static modelPlural = "ingredient-images";
 
   ingredient: number;
   image: any;
@@ -103,10 +100,9 @@ export class IngredientImage extends BaseModel implements Model {
   updateDate: Date;
 }
 
-
 export class MeasurementUnit extends BaseModel implements Model {
-  static modelName = 'measurement-units';
-  static modelPlural = 'measurement-units';
+  static modelName = "measurement-units";
+  static modelPlural = "measurement-units";
 
   name: string;
   shortName: string;
@@ -115,31 +111,42 @@ export class MeasurementUnit extends BaseModel implements Model {
   updateDate: Date;
 }
 
+export class IngredientGroup extends BaseModel implements Model {
+  static modelName = "ingredient-group";
+  static modelPlural = "ingredient-groups";
+
+  tempId: number;
+  title: string;
+  recipe: number;
+  rank: number;
+  creationDate: Date;
+  updateDate: Date;
+}
 
 export class IngredientQuantity extends BaseModel implements Model {
-  static modelName = 'ingredient-quantities';
-  static modelPlural = 'ingredient-quantities';
+  static modelName = "ingredient-quantities";
+  static modelPlural = "ingredient-quantities";
 
   tempId: number;
   quantity: number;
   measurementUnit: MeasurementUnit;
   ingredient: Ingredient;
-  recipe: number;
+  ingredientGroup: number;
+  rank: number;
   creationDate: Date;
   updateDate: Date;
 }
 
-
 export class Category extends BaseModel implements Model {
-  static modelName = 'category';
-  static modelPlural = 'categories';
+  static modelName = "category";
+  static modelPlural = "categories";
 
   name: string;
 }
 
 export class Registration extends BaseModel implements Model {
-  static modelName = 'registration';
-  static modelPlural = 'registrations';
+  static modelName = "registration";
+  static modelPlural = "registrations";
 
   userName: string;
   firstName: string;

@@ -1,6 +1,12 @@
+<app-recipe-update-ingredient></app-recipe-update-ingredient>
+<br />
+<br />
 <form [formGroup]="recipeForm" class="recipe-form">
-  <ckeditor [editor]="Editor"
-            [config]="option"
-            formControlName="instructions"
+  <ckeditor
+    [editor]="Editor"
+    [config]="option"
+    formControlName="instructions"
+    (blur)="onCkeditorBlur()"
+    (focus)="onCkeditorFocus()"
   ></ckeditor>
 </form>

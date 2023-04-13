@@ -8,3 +8,4 @@ from .api_recipe_image_view import RecipeImageViewSet
 from .api_recipe_view import RecipeViewSet
 from .api_registration_view import RegistrationViewSet
 from .api_user_view import UserViewSet
+from .api_ingredient_group_view import IngredientGroupViewSet

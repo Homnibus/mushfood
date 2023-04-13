@@ -1,23 +1,313 @@
-<div *ngIf="recipe && ingredientQuantityList && ingredientList" class="ingredient-form">
-  <ng-container *ngIf="this.measurementUnitService.measurementUnitList as measurementUnitList">
-    <h1>Ajouter un ingrédient</h1>
-    <app-ingredient-quantity-add (created)="addIngredientQuantity($event)"
-                                 [ingredientList]="ingredientList"
-                                 [measurementUnitList]="measurementUnitList"
-                                 [recipe]="recipe">
-    </app-ingredient-quantity-add>
-    <h1>Liste des ingrédients</h1>
-    <mat-list>
-      <ng-container *ngFor="let ingredientQuantity of ingredientQuantityList">
-        <app-ingredient-quantity-details (deleted)="deleteIngredientQuantity(ingredientQuantity)"
-                                         (updated)="updateIngredientQuantity($event)"
-                                         *ngIf="ingredientList"
-                                         [ingredientList]="ingredientList"
-                                         [ingredientQuantity]="ingredientQuantity"
-                                         [measurementUnitList]="measurementUnitList"
-                                         class="mat-list-item-content">
-        </app-ingredient-quantity-details>
-      </ng-container>
-    </mat-list>
+<div
+  *ngIf="recipe && ingredientList && isLoaded"
+  class="ingredient-form"
+  cdkDropListGroup
+  cdkDropList
+  (cdkDropListDropped)="onGroupListDrop($event)"
+>
+  <ng-container
+    *ngIf="
+      this.measurementUnitService.measurementUnitList as measurementUnitList
+    "
+  >
+    <div *ngFor="let groupData of groupDataList" cdkDrag>
+      <div class="ingredient-group" cdkDragHandle>
+        <div class="ingredient-group-title">
+          Groupe:
+          <mat-form-field
+            class="small"
+            floatLabel="never"
+            hideRequiredMarker="true"
+          >
+            <input
+              matInput
+              type="text"
+              [formControl]="groupData.updateIngredientGroupNameForm"
+              placeholder="Nom du groupe"
+            />
+          </mat-form-field>
+        </div>
+        <div class="ingredient-group-delete-button">
+          <button
+            color="accent"
+            mat-flat-button
+            [disabled]="groupData.ingredientQuantityList.length !== 0"
+            matTooltip="Le groupe doit être vide pour pouvoir être supprimé"
+            matTooltipPosition="above"
+            [matTooltipDisabled]="groupData.ingredientQuantityList.length === 0"
+            (click)="this.deleteIngredientGroup(groupData)"
+          >
+            Supprimer le groupe <mat-icon>remove_circle_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+      <form
+        [formGroup]="groupData.form"
+        (submit)="addIngredientQuantity(groupData)"
+      >
+        <table
+          mat-table
+          [dataSource]="groupData.ingredientQuantityList"
+          formArrayName="ingredientQuantity"
+          cdkDropList
+          [cdkDropListData]="groupData"
+          (cdkDropListDropped)="onListDrop($event)"
+        >
+          <!-- Draggable indicator Column -->
+          <ng-container matColumnDef="draggable">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let ingredientQuantity">
+              <mat-icon class="material-icons" color="primary"
+                >drag_indicator</mat-icon
+              >
+            </td>
+            <td mat-footer-cell *matFooterCellDef></td>
+          </ng-container>
+
+          <!-- Used in instruction Column -->
+          <ng-container matColumnDef="used">
+            <th mat-header-cell *matHeaderCellDef>Utilisée</th>
+            <td mat-cell *matCellDef="let ingredientQuantity">
+              <ng-container
+                *ngIf="
+                  this.ingredientQuantityMentionService.isIngredientQuantityUsedAsMention(
+                    ingredientQuantity,
+                    this.recipe
+                  );
+                  else notUsedBlock
+                "
+              >
+                <mat-icon class="material-icons color_green">done</mat-icon>
+              </ng-container>
+              <ng-template #notUsedBlock>
+                <mat-icon class="material-icons color_red">close</mat-icon>
+              </ng-template>
+            </td>
+            <td mat-footer-cell *matFooterCellDef></td>
+          </ng-container>
+
+          <!-- Quantity Column -->
+          <ng-container matColumnDef="quantity">
+            <th mat-header-cell *matHeaderCellDef>Quantité</th>
+            <td
+              mat-cell
+              *matCellDef="let ingredientQuantity; let rowIndex = index"
+              [formGroupName]="rowIndex + 1"
+            >
+              <mat-form-field class="small number" floatLabel="never">
+                <input
+                  formControlName="quantity"
+                  matInput
+                  type="text"
+                  placeholder="Quantité"
+                />
+              </mat-form-field>
+            </td>
+            <td mat-footer-cell *matFooterCellDef [formGroupName]="0">
+              <mat-form-field
+                class="small number"
+                floatLabel="never"
+                hideRequiredMarker="true"
+              >
+                <input
+                  matInput
+                  type="text"
+                  formControlName="quantity"
+                  #addQuantityInputField
+                  placeholder="Quantité"
+                />
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <!-- Unit Column -->
+          <ng-container matColumnDef="unit">
+            <th mat-header-cell *matHeaderCellDef>Unitée</th>
+            <td
+              mat-cell
+              *matCellDef="let ingredientQuantity; let rowIndex = index"
+              [formGroupName]="rowIndex + 1"
+            >
+              <mat-form-field class="medium" floatLabel="never">
+                <mat-select
+                  formControlName="measurementUnit"
+                  [compareWith]="compareFn"
+                  placeholder="Unitée"
+                >
+                  <mat-option
+                    *ngFor="let measurementUnit of measurementUnitList"
+                    [value]="measurementUnit"
+                  >
+                    {{ measurementUnit.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </td>
+            <td mat-footer-cell *matFooterCellDef [formGroupName]="0">
+              <mat-form-field
+                class="medium"
+                floatLabel="never"
+                hideRequiredMarker="true"
+              >
+                <mat-select
+                  formControlName="measurementUnit"
+                  [compareWith]="compareFn"
+                  placeholder="Unitée"
+                >
+                  <mat-option
+                    *ngFor="let measurementUnit of measurementUnitList"
+                    [value]="measurementUnit"
+                  >
+                    {{ measurementUnit.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <!-- Of Column -->
+          <ng-container matColumnDef="of">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let ingredientQuantity"><div>de</div></td>
+            <td mat-footer-cell *matFooterCellDef><div>de</div></td>
+          </ng-container>
+
+          <!-- Ingredient Column -->
+          <ng-container matColumnDef="ingredient">
+            <th mat-header-cell *matHeaderCellDef>Ingredient</th>
+            <td
+              mat-cell
+              *matCellDef="let ingredientQuantity; let rowIndex = index"
+              [formGroupName]="rowIndex + 1"
+            >
+              <mat-form-field floatLabel="never">
+                <input
+                  [matAutocomplete]="auto"
+                  formControlName="ingredient"
+                  matInput
+                  maxlength="50"
+                  type="text"
+                  placeholder="Ingredient"
+                />
+                <mat-autocomplete
+                  #auto="matAutocomplete"
+                  autoActiveFirstOption
+                  [displayWith]="
+                    this.ingredientQuantityService.displayIngredient
+                  "
+                >
+                  <mat-option
+                    *ngFor="
+                      let ingredient of groupData
+                        .filteredIngredientListObservableList[rowIndex] | async
+                    "
+                    [value]="ingredient"
+                    >{{ ingredient.name }}</mat-option
+                  >
+                </mat-autocomplete>
+              </mat-form-field>
+            </td>
+            <td mat-footer-cell *matFooterCellDef [formGroupName]="0">
+              <mat-form-field floatLabel="never" hideRequiredMarker="true">
+                <input
+                  matInput
+                  type="text"
+                  [matAutocomplete]="autoNew"
+                  formControlName="ingredient"
+                  placeholder="Ingredient"
+                />
+                <mat-autocomplete
+                  #autoNew="matAutocomplete"
+                  autoActiveFirstOption
+                  [displayWith]="
+                    this.ingredientQuantityService.displayIngredient
+                  "
+                >
+                  <mat-option
+                    *ngFor="
+                      let ingredient of groupData.addIngredientFilteredIngredientList$
+                        | async
+                    "
+                    [value]="ingredient"
+                    >{{ ingredient.name }}</mat-option
+                  >
+                </mat-autocomplete>
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <!-- Action button Column -->
+          <ng-container matColumnDef="deleteIngredient">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td
+              mat-cell
+              *matCellDef="let ingredientQuantity; let rowIndex = index"
+              [formGroupName]="rowIndex + 1"
+            >
+              <button
+                color="warn"
+                mat-stroked-button
+                (click)="
+                  deleteIngredientQuantity(
+                    ingredientQuantity,
+                    rowIndex + 1,
+                    groupData
+                  )
+                "
+                type="button"
+              >
+                Retirer
+                <mat-icon>remove_circle_outline</mat-icon>
+              </button>
+            </td>
+            <td mat-footer-cell *matFooterCellDef [formGroupName]="0">
+              <button color="primary" mat-flat-button type="submit">
+                Ajouter
+                <mat-icon>add_circle_outline</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns"
+            cdkDrag
+          ></tr>
+          <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+        </table>
+      </form>
+      <mat-error
+        *ngIf="hasRequiredError(groupData) || hasPatternError(groupData)"
+        [@flyInOutTransition]
+      >
+        <div *ngIf="hasRequiredError(groupData)">
+          L'ensemble des champs doivent être remplis.
+        </div>
+        <div *ngIf="hasPatternError(groupData)">
+          Les quantités doivent avoir au plus 2 décimales, 6 chiffres (décimales
+          comprises) et utiliser un point comme séparateur.
+        </div>
+      </mat-error>
+    </div>
+
+    <form
+      class="add-ingredient-group"
+      [formGroup]="addIngredientGroupForm"
+      (submit)="addIngredientGroup()"
+    >
+      <mat-form-field floatLabel="never">
+        <input
+          formControlName="title"
+          matInput
+          type="text"
+          placeholder="Nom du groupe"
+        />
+      </mat-form-field>
+      <button color="primary" mat-raised-button type="submit">
+        Créer un nouveau groupe
+        <mat-icon>add_circle_outline</mat-icon>
+      </button>
+    </form>
   </ng-container>
 </div>

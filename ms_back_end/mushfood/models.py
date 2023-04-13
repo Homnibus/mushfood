@@ -326,6 +326,60 @@ class MeasurementUnit(models.Model):
     return self.name
 
 
+class IngredientGroup(models.Model):
+  """
+  Group of Ingredient Quantity of a Recipe
+  """
+
+  id = models.AutoField(primary_key=True)
+  title = models.CharField(
+    "title",default="", max_length=30, blank=True, null=False, help_text="Title of the ingredient group"
+  )
+  recipe = models.ForeignKey(
+    Recipe,
+    on_delete=models.CASCADE,
+    null=False,
+    related_name="recipe_group",
+  )
+  rank = models.PositiveIntegerField(
+    "rank",
+    default=0,
+    null=False,
+    blank=False,
+    help_text="Rank of the ingredient group in the recipe",
+  )
+  creation_date = models.DateTimeField(
+    "creation date",
+    auto_now_add=True,
+    editable=False,
+    null=False,
+    help_text="Date of creation of the ingredient group",
+  )
+  update_date = models.DateTimeField(
+    "update date",
+    auto_now=True,
+    editable=False,
+    null=False,
+    help_text="Date of last modification one of the ingredient group",
+  )
+
+  class Meta:
+    verbose_name = "ingredient-group"
+    verbose_name_plural = "ingredient-groups"
+
+  def __str__(self):
+    return str(
+      self.title) + " group for the " + self.recipe.title
+
+  def save(self, *args, **kwargs):
+    """
+    Override the save method to assign the permission
+    """
+    super().save(*args, **kwargs)
+    # Set user permissions
+    assign_all_perm(self, self.recipe.author)
+
+
 class IngredientQuantity(models.Model):
   """
   Quantity of a Ingredient in a Recipe
@@ -350,11 +404,18 @@ class IngredientQuantity(models.Model):
     null=False,
     related_name="quantity",
   )
-  recipe = models.ForeignKey(
-    Recipe,
+  ingredient_group = models.ForeignKey(
+    IngredientGroup,
     on_delete=models.CASCADE,
     null=False,
-    related_name="recipe_quantity",
+    related_name="group_quantity",
+  )
+  rank = models.PositiveIntegerField(
+    "rank",
+    default=0,
+    null=False,
+    blank=False,
+    help_text="Rank of the Ingredient in the recipe",
   )
   creation_date = models.DateTimeField(
     "creation date",
@@ -385,7 +446,7 @@ class IngredientQuantity(models.Model):
     """
     super().save(*args, **kwargs)
     # Set user permissions
-    assign_all_perm(self, self.recipe.author)
+    assign_all_perm(self, self.ingredient_group.recipe.author)
 
 
 class Category(models.Model):

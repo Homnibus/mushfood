@@ -1,39 +1,40 @@
-import {ModelService} from '../../core/services/model.service';
-import {Recipe, RecipeImage} from '../../app.models';
-import {RecipeImageSerializer} from '../../app.serializers';
-import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable, of} from 'rxjs';
-import {map, tap} from 'rxjs/operators';
-import {FormControl} from '@angular/forms';
-import {HttpClient} from '@angular/common/http';
+import { ModelService } from "../../core/services/model.service";
+import { Recipe, RecipeImage } from "../../app.models";
+import { RecipeImageSerializer } from "../../app.serializers";
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, Observable, of } from "rxjs";
+import { map, tap } from "rxjs/operators";
+import { UntypedFormControl } from "@angular/forms";
+import { HttpClient } from "@angular/common/http";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class RecipeImageService extends ModelService<RecipeImage> {
-
-  private activeRecipeImageSubject = new BehaviorSubject<RecipeImage>(undefined);
+  private activeRecipeImageSubject = new BehaviorSubject<RecipeImage>(
+    undefined
+  );
   public activeRecipeImage$ = this.activeRecipeImageSubject.asObservable();
   private activeRecipeImage: RecipeImage;
   private activeRecipe: Recipe;
 
   constructor(http: HttpClient) {
-    super(
-      http,
-      RecipeImage,
-      new RecipeImageSerializer()
-    );
+    super(http, RecipeImage, new RecipeImageSerializer());
   }
 
   getRecipeImage(recipeId: number): Observable<RecipeImage> {
     return this.filteredList(`recipe__id=${recipeId}`).pipe(
-      map(recipeImageList => recipeImageList.length ? recipeImageList[0] : undefined)
+      map((recipeImageList) =>
+        recipeImageList.length ? recipeImageList[0] : undefined
+      )
     );
   }
 
-  emailDomainValidator(control: FormControl) {
+  emailDomainValidator(control: UntypedFormControl) {
     const mimeType = control.value?.type;
-    return (mimeType && mimeType.match(/image\/*/) == null) ? {forbiddenFileType: {value: mimeType}} : null;
+    return mimeType && mimeType.match(/image\/*/) == null
+      ? { forbiddenFileType: { value: mimeType } }
+      : null;
   }
 
   setActiveRecipeImage(recipe: Recipe): Observable<RecipeImage> {
@@ -41,7 +42,7 @@ export class RecipeImageService extends ModelService<RecipeImage> {
     if (this.activeRecipe !== recipe) {
       this.activeRecipe = recipe;
       return this.getRecipeImage(recipe.id).pipe(
-        tap(recipeImage => {
+        tap((recipeImage) => {
           this.activeRecipeImage = recipeImage;
           this.activeRecipeImageSubject.next(recipeImage);
         })
@@ -75,7 +76,8 @@ export class RecipeImageService extends ModelService<RecipeImage> {
       } else {
         saveRecipeImageObservable = this.create(this.activeRecipeImage);
       }
-      return saveRecipeImageObservable.pipe(tap(recipeImage => {
+      return saveRecipeImageObservable.pipe(
+        tap((recipeImage) => {
           this.activeRecipeImage = recipeImage;
           this.activeRecipeImageSubject.next(recipeImage);
         })

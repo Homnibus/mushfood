@@ -7,9 +7,9 @@ from mushfood.serializers import IngredientQuantitySerializer, IngredientQuantit
 
 
 class IngredientQuantityViewSet(viewsets.ModelViewSet, CreationModelViewSet):
-  queryset = IngredientQuantity.objects.all().order_by('-creation_date')
+  queryset = IngredientQuantity.objects.all().order_by('rank','-creation_date')
   serializer_class = IngredientQuantitySerializer
   permission_classes = (ObjectPermissionsOrReadOnly,)
   create_serializer_class = IngredientQuantityCreateSerializer
   update_serializer_class = IngredientQuantityCreateSerializer
-  filterset_fields = ['recipe__id']
+  filterset_fields = ['ingredient_group__recipe__id']

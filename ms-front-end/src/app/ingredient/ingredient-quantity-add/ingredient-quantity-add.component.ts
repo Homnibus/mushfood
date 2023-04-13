@@ -1,17 +1,22 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Ingredient, IngredientQuantity, MeasurementUnit, ModelState, Recipe} from '../../app.models';
-import {FormBuilder, Validators} from '@angular/forms';
-import {Observable} from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
-import {IngredientQuantityService} from '../services/ingredient-quantity.service';
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+  Ingredient,
+  IngredientQuantity,
+  MeasurementUnit,
+  ModelState,
+  Recipe,
+} from "../../app.models";
+import { UntypedFormBuilder, Validators } from "@angular/forms";
+import { Observable } from "rxjs";
+import { map, startWith } from "rxjs/operators";
+import { IngredientQuantityService } from "../services/ingredient-quantity.service";
 
 @Component({
-  selector: 'app-ingredient-quantity-add',
-  templateUrl: './ingredient-quantity-add.component.html',
-  styleUrls: ['./ingredient-quantity-add.component.scss']
+  selector: "app-ingredient-quantity-add",
+  templateUrl: "./ingredient-quantity-add.component.html",
+  styleUrls: ["./ingredient-quantity-add.component.scss"],
 })
 export class IngredientQuantityAddComponent implements OnInit {
-
   @Input() measurementUnitList: MeasurementUnit[];
   @Input() ingredientList: Ingredient[];
   @Input() recipe: Recipe;
@@ -20,23 +25,28 @@ export class IngredientQuantityAddComponent implements OnInit {
   filteredIngredientList$: Observable<Ingredient[]>;
 
   ingredientForm = this.fb.group({
-    quantity: ['', Validators.required],
-    measurementUnit: ['', Validators.required],
-    ingredient: ['', Validators.required]
+    quantity: ["", Validators.required],
+    measurementUnit: ["", Validators.required],
+    ingredient: ["", Validators.required],
   });
 
-
   constructor(
-    private fb: FormBuilder,
-    public ingredientQuantityService: IngredientQuantityService,
-  ) {
-  }
+    private fb: UntypedFormBuilder,
+    public ingredientQuantityService: IngredientQuantityService
+  ) {}
 
   ngOnInit(): void {
-    this.filteredIngredientList$ = this.ingredientForm.get('ingredient').valueChanges.pipe(
-      startWith(''), // Needed to create the ingredient filtered list before the user start using the input.
-      map(ingredient => this.ingredientQuantityService.filterIngredientList(ingredient, this.ingredientList))
-    );
+    this.filteredIngredientList$ = this.ingredientForm
+      .get("ingredient")
+      .valueChanges.pipe(
+        startWith(""), // Needed to create the ingredient filtered list before the user start using the input.
+        map((ingredient) =>
+          this.ingredientQuantityService.filterIngredientList(
+            ingredient,
+            this.ingredientList
+          )
+        )
+      );
   }
 
   addIngredientQuantity(): void {
@@ -46,18 +56,22 @@ export class IngredientQuantityAddComponent implements OnInit {
       const ingredientQuantity = new IngredientQuantity();
       ingredientQuantity.tempId = Date.now();
       ingredientQuantity.state = ModelState.NotSaved;
-      ingredientQuantity.recipe = this.recipe.id;
-      ingredientQuantity.quantity = this.ingredientForm.get('quantity').value;
-      ingredientQuantity.measurementUnit = this.ingredientForm.get('measurementUnit').value;
+      //TODO : Change to account the new ingredient Group
+      //ingredientQuantity.recipe = this.recipe.id;
+      ingredientQuantity.quantity = this.ingredientForm.get("quantity").value;
+      ingredientQuantity.measurementUnit =
+        this.ingredientForm.get("measurementUnit").value;
       // Set the ingredient and add id to the list of ingredient to create if it does not exist.
-      const formIngredient = this.ingredientForm.get('ingredient').value;
+      const formIngredient = this.ingredientForm.get("ingredient").value;
       // If the user select a existing ingredient
       if (formIngredient instanceof Ingredient) {
         ingredientQuantity.ingredient = formIngredient;
       } else {
         // check if the ingredient already exist
-        let ingredient = this.ingredientList.find(listIngredient =>
-          listIngredient.name.trim().toLowerCase() === formIngredient.trim().toLowerCase()
+        let ingredient = this.ingredientList.find(
+          (listIngredient) =>
+            listIngredient.name.trim().toLowerCase() ===
+            formIngredient.trim().toLowerCase()
         );
         if (ingredient) {
           ingredientQuantity.ingredient = ingredient;
@@ -76,6 +90,4 @@ export class IngredientQuantityAddComponent implements OnInit {
       // this.ingredientQuantityList.push(ingredientQuantity);
     }
   }
-
 }
-

@@ -93,7 +93,7 @@ WSGI_APPLICATION = 'ms_back_end.wsgi.application'
 DATABASES = {
   'default': {
     "ENGINE": "django.db.backends.sqlite3",
-    "NAME": os.path.join(BASE_DIR,"MushfoodSQLiteDB")
+    "NAME": os.path.join(BASE_DIR,"MushfoodSQLiteDB.sqlite3")
   }
 }
 

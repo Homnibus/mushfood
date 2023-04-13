@@ -1,15 +1,18 @@
+// Fonts
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500&display=swap");
 @import "base/reset";
 @import "theme/mushfood-theme";
 @import "base/base";
 @import "ckeditor/content";
 
+@import "mat-components/mat-table";
+@import "ckeditor/theme";
 .mushfood {
-  @import "mat-components/mat-table";
   @import "mat-components/mat-list";
   @import "mat-components/mat-checkbox";
   @import "mat-components/mat-card";
   @import "mat-components/mat-button";
   @import "mat-components/mat-textarea";
   @import "mat-components/mat-snack-bar";
-  @import "ckeditor/theme";
 }

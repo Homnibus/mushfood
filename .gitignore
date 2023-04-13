@@ -1,0 +1,13 @@
+ms-front-end/.angular
+ms-front-end/.vscode
+ms-front-end/node_modules
+
+ms_back_end/.venv
+ms_back_end/.vscode
+ms_back_end/MushfoodSQLiteDB.sqlite3
+ms_back_end/logs
+ms_back_end/media
+__pycache__/
+*.py[cod]
+*.log
+*.sqlite3

@@ -10,7 +10,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import gettext
 from rest_framework import serializers
 
-from mushfood.models import (Recipe, RecipeImage, Ingredient, IngredientImage, MeasurementUnit, IngredientQuantity,
+from mushfood.models import (IngredientGroup, Recipe, RecipeImage, Ingredient, IngredientImage, MeasurementUnit, IngredientQuantity,
                              Category, Registration)
 
 
@@ -151,10 +151,16 @@ class MeasurementUnitSerializer(serializers.ModelSerializer):
     fields = "__all__"
 
 
+class IngredientGroupSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = IngredientGroup
+    fields = "__all__"
+
+
 class IngredientQuantitySerializer(serializers.ModelSerializer):
   measurement_unit = MeasurementUnitSerializer(many=False)
   ingredient = IngredientSerializer(many=False)
-  recipe = serializers.PrimaryKeyRelatedField(many=False, queryset=Recipe.objects.all())
+  ingredient_group = serializers.PrimaryKeyRelatedField(many=False, queryset=IngredientGroup.objects.all())
 
   class Meta:
     model = IngredientQuantity
@@ -164,7 +170,7 @@ class IngredientQuantitySerializer(serializers.ModelSerializer):
 class IngredientQuantityCreateSerializer(serializers.ModelSerializer):
   measurement_unit = serializers.PrimaryKeyRelatedField(many=False, queryset=MeasurementUnit.objects.all())
   ingredient = serializers.PrimaryKeyRelatedField(many=False, queryset=Ingredient.objects.all())
-  recipe = serializers.PrimaryKeyRelatedField(many=False, queryset=Recipe.objects.all())
+  ingredient_group = serializers.PrimaryKeyRelatedField(many=False, queryset=IngredientGroup.objects.all())
 
   class Meta:
     model = IngredientQuantity

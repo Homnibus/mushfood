@@ -2,168 +2,170 @@
 * Generated theme by Material Theme Generator
 * https://material-theme-generator.travetto.io
 */
-
-@import '~@angular/material/theming';
+@import "~@angular/material/theming";
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
 
 @include mat-core();
 
-// Fonts
-@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500');
-
 // Theme Config
 /* For use in src/lib/core/theming/_palette.scss */
 $mat-primary: (
-  50 : #e9e2ea,
-  100 : #c9b7cb,
-  200 : #a588a9,
-  300 : #805886,
-  400 : #65346c,
-  500 : #4a1052,
-  600 : #430e4b,
-  700 : #3a0c41,
-  800 : #320938,
-  900 : #220528,
-  A100 : #e064ff,
-  A200 : #d531ff,
-  A400 : #ca00fd,
-  A700 : #b500e3,
+  50: #e9e2ea,
+  100: #c9b7cb,
+  200: #a588a9,
+  300: #805886,
+  400: #65346c,
+  500: #4a1052,
+  600: #430e4b,
+  700: #3a0c41,
+  800: #320938,
+  900: #220528,
+  A100: #e064ff,
+  A200: #d531ff,
+  A400: #ca00fd,
+  A700: #b500e3,
   contrast: (
-    50 : #000000,
-    100 : #000000,
-    200 : #000000,
-    300 : #ffffff,
-    400 : #ffffff,
-    500 : #ffffff,
-    600 : #ffffff,
-    700 : #ffffff,
-    800 : #ffffff,
-    900 : #ffffff,
-    A100 : #000000,
-    A200 : #ffffff,
-    A400 : #ffffff,
-    A700 : #ffffff,
-  )
+    50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #ffffff,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+    A100: #000000,
+    A200: #ffffff,
+    A400: #ffffff,
+    A700: #ffffff,
+  ),
 );
 
 $mat-accent: (
-  50 : #f4ebea,
-  100 : #e4cecb,
-  200 : #d3ada9,
-  300 : #c18c87,
-  400 : #b3736d,
-  500 : #a65a53,
-  600 : #9e524c,
-  700 : #954842,
-  800 : #8b3f39,
-  900 : #7b2e29,
-  A100 : #ffc2bf,
-  A200 : #ff928c,
-  A400 : #ff6159,
-  A700 : #ff4940,
+  50: #f4ebea,
+  100: #e4cecb,
+  200: #d3ada9,
+  300: #c18c87,
+  400: #b3736d,
+  500: #a65a53,
+  600: #9e524c,
+  700: #954842,
+  800: #8b3f39,
+  900: #7b2e29,
+  A100: #ffc2bf,
+  A200: #ff928c,
+  A400: #ff6159,
+  A700: #ff4940,
   contrast: (
-    50 : #000000,
-    100 : #000000,
-    200 : #000000,
-    300 : #000000,
-    400 : #000000,
-    500 : #ffffff,
-    600 : #ffffff,
-    700 : #ffffff,
-    800 : #ffffff,
-    900 : #ffffff,
-    A100 : #000000,
-    A200 : #000000,
-    A400 : #000000,
-    A700 : #ffffff,
-  )
+    50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #000000,
+    400: #000000,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+    A100: #000000,
+    A200: #000000,
+    A400: #000000,
+    A700: #ffffff,
+  ),
 );
 
 $mat-secondary: (
-  50 : #f2f0f4,
-  100 : #dfd9e4,
-  200 : #cac0d2,
-  300 : #b5a6bf,
-  400 : #a593b2,
-  500 : #9580a4,
-  600 : #8d789c,
-  700 : #826d92,
-  800 : #786389,
-  900 : #675078,
-  A100 : #f0dcff,
-  A200 : #d9a9ff,
-  A400 : #c376ff,
-  A700 : #b85dff,
+  50: #f2f0f4,
+  100: #dfd9e4,
+  200: #cac0d2,
+  300: #b5a6bf,
+  400: #a593b2,
+  500: #9580a4,
+  600: #8d789c,
+  700: #826d92,
+  800: #786389,
+  900: #675078,
+  A100: #f0dcff,
+  A200: #d9a9ff,
+  A400: #c376ff,
+  A700: #b85dff,
   contrast: (
-    50 : #000000,
-    100 : #000000,
-    200 : #000000,
-    300 : #000000,
-    400 : #000000,
-    500 : #000000,
-    600 : #000000,
-    700 : #ffffff,
-    800 : #ffffff,
-    900 : #ffffff,
-    A100 : #000000,
-    A200 : #000000,
-    A400 : #000000,
-    A700 : #000000,
-  )
+    50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #000000,
+    400: #000000,
+    500: #000000,
+    600: #000000,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+    A100: #000000,
+    A200: #000000,
+    A400: #000000,
+    A700: #000000,
+  ),
 );
 
 $mat-warn: (
-  50 : #f8e0e0,
-  100 : #edb3b3,
-  200 : #e18080,
-  300 : #d44d4d,
-  400 : #cb2626,
-  500 : #c20000,
-  600 : #bc0000,
-  700 : #b40000,
-  800 : #ac0000,
-  900 : #9f0000,
-  A100 : #ffc9c9,
-  A200 : #ff9696,
-  A400 : #ff6363,
-  A700 : #ff4a4a,
+  50: #f8e0e0,
+  100: #edb3b3,
+  200: #e18080,
+  300: #d44d4d,
+  400: #cb2626,
+  500: #c20000,
+  600: #bc0000,
+  700: #b40000,
+  800: #ac0000,
+  900: #9f0000,
+  A100: #ffc9c9,
+  A200: #ff9696,
+  A400: #ff6363,
+  A700: #ff4a4a,
   contrast: (
-    50 : #000000,
-    100 : #000000,
-    200 : #000000,
-    300 : #ffffff,
-    400 : #ffffff,
-    500 : #ffffff,
-    600 : #ffffff,
-    700 : #ffffff,
-    800 : #ffffff,
-    900 : #ffffff,
-    A100 : #000000,
-    A200 : #000000,
-    A400 : #000000,
-    A700 : #000000,
-  )
+    50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #ffffff,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+    A100: #000000,
+    A200: #000000,
+    A400: #000000,
+    A700: #000000,
+  ),
 );
 
 $mushfood-light-primary: mat-palette($mat-primary);
 $mushfood-light-accent: mat-palette($mat-accent);
 $mushfood-light-warn: mat-palette($mat-warn);
 
-$theme: mat-light-theme($mushfood-light-primary, $mushfood-light-accent, $mushfood-light-warn);
+$theme: mat-light-theme(
+  $mushfood-light-primary,
+  $mushfood-light-accent,
+  $mushfood-light-warn
+);
 
 // Theme Init
 @include angular-material-theme($theme);
 
 // Handle buttons appropriately, with respect to line-height
-.mat-raised-button, .mat-stroked-button, .mat-flat-button {
+.mat-raised-button,
+.mat-stroked-button,
+.mat-flat-button {
   padding: 0 1.15em;
-  margin: 0 .65em;
+  margin: 0 0.65em;
   min-width: 3em;
-  line-height: 36.4px
+  line-height: 36.4px;
 }
 
 .mat-standard-chip {
-  padding: .5em .85em;
+  padding: 0.5em 0.85em;
   min-height: 2.5em;
 }

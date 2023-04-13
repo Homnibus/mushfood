@@ -7,8 +7,12 @@ import {
   Model,
   ModelState,
   Recipe,
-  RecipeImage, UserPassword, User, Registration
-} from './app.models';
+  RecipeImage,
+  UserPassword,
+  User,
+  Registration,
+  IngredientGroup,
+} from "./app.models";
 
 export abstract class ModelSerializer<T extends Model> {
   abstract fromJson(json: any, state: ModelState): T;
@@ -17,7 +21,6 @@ export abstract class ModelSerializer<T extends Model> {
 
   abstract toUpdateJson(instance: T): any;
 }
-
 
 export class UserSerializer implements ModelSerializer<User> {
   fromJson(json: any, state: ModelState): User {
@@ -33,25 +36,25 @@ export class UserSerializer implements ModelSerializer<User> {
 
   toJson(user: User): any {
     const formData = new FormData();
-    formData.append('first_name', user.firstName);
-    formData.append('last_name', user.lastName);
-    formData.append('email', user.email);
+    formData.append("first_name", user.firstName);
+    formData.append("last_name", user.lastName);
+    formData.append("email", user.email);
     return formData;
   }
 
   toCreateJson(user: User): any {
     const formData = new FormData();
-    formData.append('username', user.userName);
-    formData.append('first_name', user.firstName);
-    formData.append('last_name', user.lastName);
-    formData.append('email', user.email);
+    formData.append("username", user.userName);
+    formData.append("first_name", user.firstName);
+    formData.append("last_name", user.lastName);
+    formData.append("email", user.email);
     // adjust 0 before single digit date
     const date = ("0" + user.registrationDate.getDate()).slice(-2);
     // current month
     const month = ("0" + (user.registrationDate.getMonth() + 1)).slice(-2);
     // current year
     const year = user.registrationDate.getFullYear();
-    formData.append('registration_date', year + "-" + month + "-" + date);
+    formData.append("registration_date", year + "-" + month + "-" + date);
     return formData;
   }
 
@@ -59,7 +62,6 @@ export class UserSerializer implements ModelSerializer<User> {
     return this.toJson(user);
   }
 }
-
 
 export class UserPasswordSerializer implements ModelSerializer<UserPassword> {
   fromJson(json: any, state: ModelState): UserPassword {
@@ -73,9 +75,9 @@ export class UserPasswordSerializer implements ModelSerializer<UserPassword> {
 
   toJson(userPassword: UserPassword): any {
     const formData = new FormData();
-    formData.append('password', userPassword.password);
-    formData.append('password2', userPassword.password2);
-    formData.append('old_password', userPassword.oldPassword);
+    formData.append("password", userPassword.password);
+    formData.append("password2", userPassword.password2);
+    formData.append("old_password", userPassword.oldPassword);
     return formData;
   }
 
@@ -87,7 +89,6 @@ export class UserPasswordSerializer implements ModelSerializer<UserPassword> {
     return this.toJson(userPassword);
   }
 }
-
 
 export class RecipeImageSerializer implements ModelSerializer<RecipeImage> {
   fromJson(json: any, state: ModelState): RecipeImage {
@@ -103,8 +104,8 @@ export class RecipeImageSerializer implements ModelSerializer<RecipeImage> {
 
   toJson(recipeImage: RecipeImage): any {
     const formData = new FormData();
-    formData.append('image', recipeImage.imageFile);
-    formData.append('recipe', recipeImage.recipe.toString());
+    formData.append("image", recipeImage.imageFile);
+    formData.append("recipe", recipeImage.recipe.toString());
     return formData;
   }
 
@@ -117,7 +118,6 @@ export class RecipeImageSerializer implements ModelSerializer<RecipeImage> {
   }
 }
 
-
 export class RecipeSerializer implements ModelSerializer<Recipe> {
   fromJson(json: any, state: ModelState): Recipe {
     const recipeImageSerializer = new RecipeImageSerializer();
@@ -129,10 +129,16 @@ export class RecipeSerializer implements ModelSerializer<Recipe> {
     recipe.portions = json.portions;
     recipe.instructions = json.instructions;
     recipe.inspiration = json.inspiration;
-    recipe.recipeImage = json.recipe_image ? recipeImageSerializer.fromJson(json.recipe_image, ModelState.Retrieved) : undefined;
+    recipe.recipeImage = json.recipe_image
+      ? recipeImageSerializer.fromJson(json.recipe_image, ModelState.Retrieved)
+      : undefined;
     recipe.authorUserName = json.author_username;
     recipe.authorFullName = json.author_full_name;
-    recipe.categories = json.category_set ? json.category_set.map(jsonCategory => categorySerializer.fromJson(jsonCategory, ModelState.Retrieved)) : [];
+    recipe.categories = json.category_set
+      ? json.category_set.map((jsonCategory) =>
+          categorySerializer.fromJson(jsonCategory, ModelState.Retrieved)
+        )
+      : [];
     recipe.variantOf = json.variant_of;
     recipe.variant = json.variant;
     recipe.creationDate = new Date(json.creation_date);
@@ -151,7 +157,9 @@ export class RecipeSerializer implements ModelSerializer<Recipe> {
       portions: recipe.portions,
       inspiration: recipe.inspiration,
       logical_delete: recipe.logicalDelete,
-      category_set: recipe.categories.map(category => categorySerializer.toJson(category)),
+      category_set: recipe.categories.map((category) =>
+        categorySerializer.toJson(category)
+      ),
       variant_of: recipe.variantOf,
     };
   }
@@ -163,7 +171,11 @@ export class RecipeSerializer implements ModelSerializer<Recipe> {
       instructions: recipe.instructions,
       portions: recipe.portions,
       inspiration: recipe.inspiration,
-      category_set: recipe.categories ? recipe.categories.map(category => categorySerializer.toJson(category)) : [],
+      category_set: recipe.categories
+        ? recipe.categories.map((category) =>
+            categorySerializer.toJson(category)
+          )
+        : [],
       variant_of: recipe.variantOf,
     };
   }
@@ -172,7 +184,6 @@ export class RecipeSerializer implements ModelSerializer<Recipe> {
     return this.toJson(recipe);
   }
 }
-
 
 export class IngredientSerializer implements ModelSerializer<Ingredient> {
   fromJson(json: any, state: ModelState): Ingredient {
@@ -202,8 +213,9 @@ export class IngredientSerializer implements ModelSerializer<Ingredient> {
   }
 }
 
-
-export class IngredientImageSerializer implements ModelSerializer<IngredientImage> {
+export class IngredientImageSerializer
+  implements ModelSerializer<IngredientImage>
+{
   fromJson(json: any, state: ModelState): IngredientImage {
     const ingredientImage = new IngredientImage();
     ingredientImage.id = parseInt(json.id, 10);
@@ -218,28 +230,28 @@ export class IngredientImageSerializer implements ModelSerializer<IngredientImag
   toJson(ingredientImage: IngredientImage): any {
     return {
       recipe: ingredientImage.ingredient,
-      image: ingredientImage.image
+      image: ingredientImage.image,
     };
   }
 
   toCreateJson(ingredientImage: IngredientImage): any {
     const formData = new FormData();
-    formData.append('image', ingredientImage.image);
-    formData.append('recipe', ingredientImage.ingredient.toString());
+    formData.append("image", ingredientImage.image);
+    formData.append("recipe", ingredientImage.ingredient.toString());
     return formData;
   }
 
   toUpdateJson(ingredientImage: IngredientImage): any {
     const formData = new FormData();
-    formData.append('image', ingredientImage.image);
-    formData.append('recipe', ingredientImage.ingredient.toString());
+    formData.append("image", ingredientImage.image);
+    formData.append("recipe", ingredientImage.ingredient.toString());
     return formData;
   }
 }
 
-
-
-export class MeasurementUnitSerializer implements ModelSerializer<MeasurementUnit> {
+export class MeasurementUnitSerializer
+  implements ModelSerializer<MeasurementUnit>
+{
   fromJson(json: any, state: ModelState): MeasurementUnit {
     const measurementUnit = new MeasurementUnit();
     measurementUnit.id = parseInt(json.id, 10);
@@ -268,16 +280,71 @@ export class MeasurementUnitSerializer implements ModelSerializer<MeasurementUni
   }
 }
 
-export class IngredientQuantitySerializer implements ModelSerializer<IngredientQuantity> {
+
+export class IngredientGroupSerializer
+  implements ModelSerializer<IngredientGroup>
+{
+  fromJson(json: any, state: ModelState): IngredientGroup {
+    // const measurementUnitSerializer = new MeasurementUnitSerializer();
+    // const ingredientSerializer = new IngredientSerializer();
+    const ingredientGroup = new IngredientGroup();
+    ingredientGroup.id = parseInt(json.id, 10);
+    // ingredientGroup.Group = +json.Group;
+    // ingredientGroup.measurementUnit = measurementUnitSerializer.fromJson(
+    //   json.measurement_unit,
+    //   ModelState.Retrieved
+    // );
+    // ingredientGroup.ingredient = ingredientSerializer.fromJson(
+    //   json.ingredient,
+    //   ModelState.Retrieved
+    // );
+    ingredientGroup.title = json.title;
+    ingredientGroup.recipe = parseInt(json.recipe, 10);
+    ingredientGroup.rank = parseInt(json.rank, 10);
+    ingredientGroup.creationDate = new Date(json.creation_date);
+    ingredientGroup.updateDate = new Date(json.update_date);
+    ingredientGroup.state = state;
+
+    return ingredientGroup;
+  }
+
+  toJson(ingredientGroup: IngredientGroup): any {
+    return {
+      title: ingredientGroup.title,
+      recipe: ingredientGroup.recipe,
+      rank: ingredientGroup.rank,
+    };
+  }
+
+  toCreateJson(ingredientGroup: IngredientGroup): any {
+    return this.toJson(ingredientGroup);
+  }
+
+  toUpdateJson(ingredientGroup: IngredientGroup): any {
+    return this.toJson(ingredientGroup);
+  }
+}
+
+
+export class IngredientQuantitySerializer
+  implements ModelSerializer<IngredientQuantity>
+{
   fromJson(json: any, state: ModelState): IngredientQuantity {
     const measurementUnitSerializer = new MeasurementUnitSerializer();
     const ingredientSerializer = new IngredientSerializer();
     const ingredientQuantity = new IngredientQuantity();
     ingredientQuantity.id = parseInt(json.id, 10);
     ingredientQuantity.quantity = +json.quantity;
-    ingredientQuantity.measurementUnit = measurementUnitSerializer.fromJson(json.measurement_unit, ModelState.Retrieved);
-    ingredientQuantity.ingredient = ingredientSerializer.fromJson(json.ingredient, ModelState.Retrieved);
-    ingredientQuantity.recipe = parseInt(json.recipe, 10);
+    ingredientQuantity.measurementUnit = measurementUnitSerializer.fromJson(
+      json.measurement_unit,
+      ModelState.Retrieved
+    );
+    ingredientQuantity.ingredient = ingredientSerializer.fromJson(
+      json.ingredient,
+      ModelState.Retrieved
+    );
+    ingredientQuantity.ingredientGroup = parseInt(json.ingredient_group, 10);
+    ingredientQuantity.rank = parseInt(json.rank, 10);
     ingredientQuantity.creationDate = new Date(json.creation_date);
     ingredientQuantity.updateDate = new Date(json.update_date);
     ingredientQuantity.state = state;
@@ -290,7 +357,8 @@ export class IngredientQuantitySerializer implements ModelSerializer<IngredientQ
       quantity: ingredientQuantity.quantity,
       measurement_unit: ingredientQuantity.measurementUnit.id,
       ingredient: ingredientQuantity.ingredient.id,
-      recipe: ingredientQuantity.recipe,
+      ingredient_group: ingredientQuantity.ingredientGroup,
+      rank: ingredientQuantity.rank,
     };
   }
 
@@ -327,7 +395,6 @@ export class CategorySerializer implements ModelSerializer<Category> {
   }
 }
 
-
 export class RegistrationSerializer implements ModelSerializer<Registration> {
   fromJson(json: any, state: ModelState): Registration {
     const registration = new Registration();
@@ -346,13 +413,13 @@ export class RegistrationSerializer implements ModelSerializer<Registration> {
 
   toJson(registration: Registration): any {
     return {
-      username : registration.userName,
-      first_name : registration.firstName,
-      last_name : registration.lastName,
-      email : registration.email,
+      username: registration.userName,
+      first_name: registration.firstName,
+      last_name: registration.lastName,
+      email: registration.email,
       reason: registration.reason,
-      is_rejected : registration.isRejected,
-      logical_delete : registration.logicalDelete,
+      is_rejected: registration.isRejected,
+      logical_delete: registration.logicalDelete,
     };
   }
 

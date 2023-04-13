@@ -2,22 +2,41 @@
   <h1>Informations générales</h1>
   <mat-form-field appearance="outline">
     <mat-label>Titre</mat-label>
-    <input #titleInput formControlName="title" matInput maxlength="50" type="text">
-    <mat-hint align="end">{{titleInput.value?.length || 0}}/50</mat-hint>
+    <input
+      #titleInput
+      formControlName="title"
+      matInput
+      maxlength="50"
+      type="text"
+    />
+    <mat-hint align="end">{{ titleInput.value?.length || 0 }}/50</mat-hint>
     <mat-error>Entrez un titre pour votre recette</mat-error>
   </mat-form-field>
   <mat-form-field appearance="outline">
     <mat-label>Inspiration</mat-label>
-    <input #inspirationInput formControlName="inspiration" matInput maxlength="100" type="text">
-    <mat-hint align="end">{{inspirationInput.value?.length || 0}}/100</mat-hint>
+    <input
+      #inspirationInput
+      formControlName="inspiration"
+      matInput
+      maxlength="100"
+      type="text"
+    />
+    <mat-hint align="end"
+      >{{ inspirationInput.value?.length || 0 }}/100</mat-hint
+    >
   </mat-form-field>
   <mat-form-field appearance="outline">
     <mat-label>Nombre de parts</mat-label>
-    <input formControlName="portions" matInput type="number">
+    <input formControlName="portions" matInput type="number" />
     <mat-error>Entrez un titre un nombre de part pour votre recette</mat-error>
   </mat-form-field>
   <div class="button">
-    <button (click)="deleteRecipe()" color="warn" mat-raised-button type="button">
+    <button
+      (click)="deleteRecipe()"
+      color="warn"
+      mat-raised-button
+      type="button"
+    >
       Delete Recipe
       <mat-icon>delete</mat-icon>
     </button>
@@ -25,8 +44,13 @@
 </form>
 <div>
   <h1>Image d'illustration</h1>
-  <app-recipe-image-update (recipeImageCreated)="recipeImageService.createActiveRecipeImage($event)"
-                           (recipeImageFileChanged)="recipeImageService.updateActiveRecipeImage($event)"
-                           [recipeImage]="recipeImageService.activeRecipeImage$ | async"></app-recipe-image-update>
+  <app-recipe-image-update
+    (recipeImageCreated)="recipeImageService.createActiveRecipeImage($event)"
+    (recipeImageFileChanged)="
+      recipeImageService.updateActiveRecipeImage($event)
+    "
+    [recipeImage]="recipeImageService.activeRecipeImage$ | async"
+  ></app-recipe-image-update>
 </div>
 
+<app-recipe-update-categories></app-recipe-update-categories>

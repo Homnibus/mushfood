@@ -1,21 +1,27 @@
 <app-web-page *ngIf="recipe">
   <app-web-page-header [type]="'recipe'">
     <app-web-page-title [type]="'recipe'">
-      {{recipe.title}}
+      {{ recipe.title }}
     </app-web-page-title>
     <app-web-page-subtitle [type]="'recipe'">
-      {{recipe.inspiration}}
+      {{ recipe.inspiration }}
     </app-web-page-subtitle>
     <app-web-page-action-menu>
-      <button *ngIf="!recipe.variantOf && authService.currentUser"
-              (click)="createVariant()"
-              color="accent" mat-raised-button>
+      <button
+        *ngIf="!recipe.variantOf && authService.currentUser"
+        (click)="createVariant()"
+        color="accent"
+        mat-raised-button
+      >
         Créer variante
         <mat-icon>file_copy</mat-icon>
       </button>
-      <a *ngIf="authService.currentUser?.userName === recipe.authorUserName"
-         [routerLink]="['/recipe/edit', recipe.slug]"
-         color="accent" mat-raised-button>
+      <a
+        *ngIf="authService.currentUser?.userName === recipe.authorUserName"
+        [routerLink]="['/recipe/edit', recipe.slug]"
+        color="accent"
+        mat-raised-button
+      >
         Modifier
         <mat-icon>edit</mat-icon>
       </a>
@@ -25,55 +31,104 @@
     <div class="image-ingredient">
       <div *ngIf="recipe.recipeImage" class="image-flex-container">
         <div class="item-shape">
-          <div [ngStyle]="{'background-image': 'url('+recipe.recipeImage.imageUrl+') '}" class="image-mask"></div>
+          <div
+            [ngStyle]="{
+              'background-image': 'url(' + recipe.recipeImage.imageUrl + ') '
+            }"
+            class="image-mask"
+          ></div>
         </div>
       </div>
       <div class="ingredient">
         <div class="portion-picker">
-          <h2>Pour {{updatedPortions}} parts</h2>
-          <button (click)="removePortions()" [disabled]="updatedPortions <= 1"
-                  aria-label="Example icon-button with a heart icon" color="primary"
-                  mat-icon-button>
+          <h2>Pour {{ updatedPortions }} parts</h2>
+          <button
+            (click)="removePortions()"
+            [disabled]="updatedPortions <= 1"
+            aria-label="Example icon-button with a heart icon"
+            color="primary"
+            mat-icon-button
+          >
             <mat-icon>remove_circle</mat-icon>
           </button>
-          <button (click)="addPortions()" aria-label="Example icon-button with a heart icon" color="primary"
-                  mat-icon-button>
+          <button
+            (click)="addPortions()"
+            aria-label="Example icon-button with a heart icon"
+            color="primary"
+            mat-icon-button
+          >
             <mat-icon>add_circle</mat-icon>
           </button>
         </div>
         <h1>Ingrédient</h1>
-        <ng-container *ngIf="ingredientQuantityList">
-          <mat-list>
-            <mat-list-item *ngFor="let ingredientQuantity of ingredientQuantityList">
-              <mat-icon color="accent" matListIcon>local_dining</mat-icon>
-              <h4 *ngIf="!ingredientQuantity.measurementUnit.isIgnorable"
-                  mat-line>{{quantityToString(ingredientQuantity.quantity)}} {{ingredientQuantity.measurementUnit.name}}
-                de {{ingredientQuantity.ingredient.name}}</h4>
-              <h4 *ngIf="ingredientQuantity.measurementUnit.isIgnorable"
-                  mat-line>{{quantityToString(ingredientQuantity.quantity)}} {{ingredientQuantity.ingredient.name}}</h4>
-            </mat-list-item>
-          </mat-list>
+        <ng-container *ngIf="ingredientQuantityList && ingredientGroupList">
+          <div *ngFor="let ingredientGroup of ingredientGroupList">
+            <h1>{{ ingredientGroup.title }}</h1>
+            <mat-list>
+              <mat-list-item
+                *ngFor="
+                  let ingredientQuantity of ingredientQuantityOfIngredientGroup(
+                    ingredientGroup
+                  )
+                "
+              >
+                <mat-icon color="accent" matListIcon>local_dining</mat-icon>
+                <h4
+                  *ngIf="!ingredientQuantity.measurementUnit.isIgnorable"
+                  mat-line
+                >
+                  {{ quantityToString(ingredientQuantity.quantity) }}
+                  {{ ingredientQuantity.measurementUnit.name }} de
+                  {{ ingredientQuantity.ingredient.name }}
+                </h4>
+                <h4
+                  *ngIf="ingredientQuantity.measurementUnit.isIgnorable"
+                  mat-line
+                >
+                  {{ quantityToString(ingredientQuantity.quantity) }}
+                  {{ ingredientQuantity.ingredient.name }}
+                </h4>
+              </mat-list-item>
+            </mat-list>
+          </div>
         </ng-container>
       </div>
     </div>
     <div class="instructions">
       <h1>Instructions</h1>
-      <div [innerHTML]="sanitizer.bypassSecurityTrustHtml(recipe.instructions)" class="ck-content"></div>
+      <div
+        [innerHTML]="sanitizer.bypassSecurityTrustHtml(recipe.instructions)"
+        class="ck-content"
+      ></div>
     </div>
     <div class="auteur">
-      <h2>Rédacteur : </h2>
-      <span>{{recipe.authorFullName.trim() !== '' ? recipe.authorFullName : recipe.authorUserName | titlecase}}</span>
+      <h2>Rédacteur :</h2>
+      <span>{{
+        recipe.authorFullName.trim() !== ""
+          ? recipe.authorFullName
+          : (recipe.authorUserName | titlecase)
+      }}</span>
     </div>
     <mat-divider></mat-divider>
-    <div *ngIf="(variantList && variantList.length > 0) " class="variant">
-      <h2>Variantes : </h2>
+    <div *ngIf="variantList && variantList.length > 0" class="variant">
+      <h2>Variantes :</h2>
       <div class="variant_list">
-        <a *ngFor="let variant of variantList" mat-button [routerLink]="['/recipe/details', variant.slug]">{{variant.title}} </a>
+        <a
+          *ngFor="let variant of variantList"
+          mat-button
+          [routerLink]="['/recipe/details', variant.slug]"
+          >{{ variant.title }}
+        </a>
       </div>
     </div>
     <div *ngIf="variantOf" class="variant">
       <h2>Recette d'origine :</h2>
-      <a mat-button color="accent" [routerLink]="['/recipe/details', variantOf.slug]">{{variantOf.title}} </a>
+      <a
+        mat-button
+        color="accent"
+        [routerLink]="['/recipe/details', variantOf.slug]"
+        >{{ variantOf.title }}
+      </a>
     </div>
     <div class="categories">
       <mat-chip-list aria-label="Categories" multiple>
@@ -83,8 +138,9 @@
           color="accent"
           selected
           [routerLink]="['/recipe']"
-          [queryParams]="{category: category.name}"
-        >{{category.name | titlecase}}</mat-chip>
+          [queryParams]="{ category: category.name }"
+          >{{ category.name | titlecase }}</mat-chip
+        >
       </mat-chip-list>
     </div>
   </app-web-page-content>

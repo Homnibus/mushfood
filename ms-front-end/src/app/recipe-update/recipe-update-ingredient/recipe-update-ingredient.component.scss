@@ -1,9 +1,122 @@
-@import '../../../sass/theme/theme-small';
+@import "../../../sass/theme/theme-small";
 
 .ingredient-form {
-  margin: 0 1em;
+  margin: 0 0em;
 }
 
 h1 {
   color: $mat-primary-900;
+}
+
+.ingredient-group {
+  box-sizing: border-box;
+  margin-top: 2em;
+  border: 1px solid #c4c4c4;
+  border-bottom: 0;
+  border-radius: 2px 2px 0 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow-x: hidden;
+  background: #f2f0f4;
+  line-height: 24px;
+  border-collapse: separate;
+  border-spacing: 0px 0px;
+
+  .ingredient-group-title {
+    flex-grow: 1;
+    display: inline-block;
+    padding: 19px 0 19px 2em;
+    color: #430e4b;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    line-height: 18px;
+  }
+
+  .ingredient-group-delete-button {
+    padding-right: 2em;
+  }
+}
+
+form {
+  display: block;
+}
+
+table {
+  width: 100vw;
+  border: 1px solid #c4c4c4;
+  border-collapse: initial;
+  border-radius: 0 0 2px 2px;
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+
+  tr.mat-row:hover {
+    background: #fafafa;
+  }
+
+  td {
+    padding-right: 2em;
+  }
+
+  .mat-column-ingredient {
+    width: 100%;
+  }
+  .mat-column-deleteIngredient {
+    text-align: center;
+  }
+}
+
+tr.mat-row td {
+  &.mat-column-used .mat-icon,
+  &.mat-column-draggable .mat-icon {
+    vertical-align: middle;
+  }
+}
+
+.material-icons.color_green {
+  color: #407a52;
+}
+.material-icons.color_red {
+  color: #8f1d21;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  td {
+    padding-right: 2em;
+  }
+  .mat-column-used {
+    padding-top: 0.4em;
+  }
+
+  .mat-column-ingredient {
+    width: 100%;
+  }
+  .mat-column-deleteIngredient {
+    text-align: center;
+  }
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .mat-row:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.mat-error {
+  padding: 1em 1em 0 1em;
+  transition: opacity 0.5s ease-in-out;
+  position: relative;
+  z-index: -1;
 }

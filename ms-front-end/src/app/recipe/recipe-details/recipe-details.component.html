@@ -60,9 +60,8 @@
             <mat-icon>add_circle</mat-icon>
           </button>
         </div>
-        <h1>Ingrédient</h1>
         <ng-container *ngIf="ingredientQuantityList && ingredientGroupList">
-          <div *ngFor="let ingredientGroup of ingredientGroupList">
+          <ng-container *ngFor="let ingredientGroup of ingredientGroupList">
             <h1>{{ ingredientGroup.title }}</h1>
             <mat-list>
               <mat-list-item
@@ -90,7 +89,7 @@
                 </h4>
               </mat-list-item>
             </mat-list>
-          </div>
+          </ng-container>
         </ng-container>
       </div>
     </div>

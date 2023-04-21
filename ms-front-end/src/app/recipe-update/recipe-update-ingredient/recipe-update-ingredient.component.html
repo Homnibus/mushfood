@@ -10,12 +10,15 @@
       this.measurementUnitService.measurementUnitList as measurementUnitList
     "
   >
-    <div *ngFor="let groupData of groupDataList" cdkDrag>
+    <div
+      *ngFor="let groupData of groupDataList"
+      cdkDrag
+      class="ingredient-group-data"
+    >
       <div class="ingredient-group" cdkDragHandle>
         <div class="ingredient-group-title">
-          Groupe:
           <mat-form-field
-            class="small"
+            class="medium inline-form-field h1-like"
             floatLabel="never"
             hideRequiredMarker="true"
           >
@@ -31,24 +34,22 @@
           <button
             color="accent"
             mat-flat-button
-            [disabled]="groupData.ingredientQuantityList.length !== 0"
+            [disabled]="groupData.ingredientRowDataList.length !== 0"
             matTooltip="Le groupe doit être vide pour pouvoir être supprimé"
             matTooltipPosition="above"
-            [matTooltipDisabled]="groupData.ingredientQuantityList.length === 0"
+            [matTooltipDisabled]="groupData.ingredientRowDataList.length === 0"
             (click)="this.deleteIngredientGroup(groupData)"
           >
             Supprimer le groupe <mat-icon>remove_circle_outline</mat-icon>
           </button>
         </div>
       </div>
-      <form
-        [formGroup]="groupData.form"
-        (submit)="addIngredientQuantity(groupData)"
-      >
+      <!-- Table with all the ingredient quantity of the ingredient group -->
+      <!-- TODO: Change the formGroup -->
+      <form (submit)="addIngredientQuantity(groupData)">
         <table
           mat-table
-          [dataSource]="groupData.ingredientQuantityList"
-          formArrayName="ingredientQuantity"
+          [dataSource]="groupData.ingredientRowDataList"
           cdkDropList
           [cdkDropListData]="groupData"
           (cdkDropListDropped)="onListDrop($event)"
@@ -56,7 +57,7 @@
           <!-- Draggable indicator Column -->
           <ng-container matColumnDef="draggable">
             <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let ingredientQuantity">
+            <td mat-cell *matCellDef="let ingredientRowData">
               <mat-icon class="material-icons" color="primary"
                 >drag_indicator</mat-icon
               >
@@ -67,11 +68,11 @@
           <!-- Used in instruction Column -->
           <ng-container matColumnDef="used">
             <th mat-header-cell *matHeaderCellDef>Utilisée</th>
-            <td mat-cell *matCellDef="let ingredientQuantity">
+            <td mat-cell *matCellDef="let ingredientRowData">
               <ng-container
                 *ngIf="
                   this.ingredientQuantityMentionService.isIngredientQuantityUsedAsMention(
-                    ingredientQuantity,
+                    ingredientRowData.ingredientQuantity,
                     this.recipe
                   );
                   else notUsedBlock
@@ -91,10 +92,13 @@
             <th mat-header-cell *matHeaderCellDef>Quantité</th>
             <td
               mat-cell
-              *matCellDef="let ingredientQuantity; let rowIndex = index"
-              [formGroupName]="rowIndex + 1"
+              *matCellDef="let ingredientRowData"
+              [formGroup]="ingredientRowData.ingredientQuantityForm"
             >
-              <mat-form-field class="small number" floatLabel="never">
+              <mat-form-field
+                class="small number inline-form-field"
+                floatLabel="never"
+              >
                 <input
                   formControlName="quantity"
                   matInput
@@ -103,9 +107,15 @@
                 />
               </mat-form-field>
             </td>
-            <td mat-footer-cell *matFooterCellDef [formGroupName]="0">
+            <td
+              mat-footer-cell
+              *matFooterCellDef
+              [formGroup]="
+                groupData.addIngredientRowData.ingredientQuantityForm
+              "
+            >
               <mat-form-field
-                class="small number"
+                class="small number inline-form-field"
                 floatLabel="never"
                 hideRequiredMarker="true"
               >
@@ -125,10 +135,13 @@
             <th mat-header-cell *matHeaderCellDef>Unitée</th>
             <td
               mat-cell
-              *matCellDef="let ingredientQuantity; let rowIndex = index"
-              [formGroupName]="rowIndex + 1"
+              *matCellDef="let ingredientRowData"
+              [formGroup]="ingredientRowData.ingredientQuantityForm"
             >
-              <mat-form-field class="medium" floatLabel="never">
+              <mat-form-field
+                class="medium inline-form-field"
+                floatLabel="never"
+              >
                 <mat-select
                   formControlName="measurementUnit"
                   [compareWith]="compareFn"
@@ -143,9 +156,15 @@
                 </mat-select>
               </mat-form-field>
             </td>
-            <td mat-footer-cell *matFooterCellDef [formGroupName]="0">
+            <td
+              mat-footer-cell
+              *matFooterCellDef
+              [formGroup]="
+                groupData.addIngredientRowData.ingredientQuantityForm
+              "
+            >
               <mat-form-field
-                class="medium"
+                class="medium inline-form-field"
                 floatLabel="never"
                 hideRequiredMarker="true"
               >
@@ -177,10 +196,10 @@
             <th mat-header-cell *matHeaderCellDef>Ingredient</th>
             <td
               mat-cell
-              *matCellDef="let ingredientQuantity; let rowIndex = index"
-              [formGroupName]="rowIndex + 1"
+              *matCellDef="let ingredientRowData"
+              [formGroup]="ingredientRowData.ingredientQuantityForm"
             >
-              <mat-form-field floatLabel="never">
+              <mat-form-field floatLabel="never" class="inline-form-field">
                 <input
                   [matAutocomplete]="auto"
                   formControlName="ingredient"
@@ -198,8 +217,8 @@
                 >
                   <mat-option
                     *ngFor="
-                      let ingredient of groupData
-                        .filteredIngredientListObservableList[rowIndex] | async
+                      let ingredient of ingredientRowData.filteredIngredientListObservable
+                        | async
                     "
                     [value]="ingredient"
                     >{{ ingredient.name }}</mat-option
@@ -207,8 +226,18 @@
                 </mat-autocomplete>
               </mat-form-field>
             </td>
-            <td mat-footer-cell *matFooterCellDef [formGroupName]="0">
-              <mat-form-field floatLabel="never" hideRequiredMarker="true">
+            <td
+              mat-footer-cell
+              *matFooterCellDef
+              [formGroup]="
+                groupData.addIngredientRowData.ingredientQuantityForm
+              "
+            >
+              <mat-form-field
+                floatLabel="never"
+                hideRequiredMarker="true"
+                class="inline-form-field"
+              >
                 <input
                   matInput
                   type="text"
@@ -225,8 +254,8 @@
                 >
                   <mat-option
                     *ngFor="
-                      let ingredient of groupData.addIngredientFilteredIngredientList$
-                        | async
+                      let ingredient of groupData.addIngredientRowData
+                        .filteredIngredientListObservable | async
                     "
                     [value]="ingredient"
                     >{{ ingredient.name }}</mat-option
@@ -241,26 +270,24 @@
             <th mat-header-cell *matHeaderCellDef></th>
             <td
               mat-cell
-              *matCellDef="let ingredientQuantity; let rowIndex = index"
-              [formGroupName]="rowIndex + 1"
+              *matCellDef="let ingredientRowData"
+              [formGroup]="ingredientRowData.ingredientQuantityForm"
             >
               <button
                 color="warn"
                 mat-stroked-button
-                (click)="
-                  deleteIngredientQuantity(
-                    ingredientQuantity,
-                    rowIndex + 1,
-                    groupData
-                  )
-                "
+                (click)="deleteIngredientQuantity(ingredientRowData)"
                 type="button"
               >
                 Retirer
                 <mat-icon>remove_circle_outline</mat-icon>
               </button>
             </td>
-            <td mat-footer-cell *matFooterCellDef [formGroupName]="0">
+            <td
+              mat-footer-cell
+              *matFooterCellDef
+              [formGroup]="groupData.addIngredientRowData"
+            >
               <button color="primary" mat-flat-button type="submit">
                 Ajouter
                 <mat-icon>add_circle_outline</mat-icon>
@@ -290,24 +317,16 @@
         </div>
       </mat-error>
     </div>
-
-    <form
-      class="add-ingredient-group"
-      [formGroup]="addIngredientGroupForm"
-      (submit)="addIngredientGroup()"
-    >
-      <mat-form-field floatLabel="never">
-        <input
-          formControlName="title"
-          matInput
-          type="text"
-          placeholder="Nom du groupe"
-        />
-      </mat-form-field>
-      <button color="primary" mat-raised-button type="submit">
+    <div class="add-group">
+      <button
+        color="primary"
+        mat-raised-button
+        type="submit"
+        (click)="addIngredientGroup()"
+      >
         Créer un nouveau groupe
         <mat-icon>add_circle_outline</mat-icon>
       </button>
-    </form>
+    </div>
   </ng-container>
 </div>

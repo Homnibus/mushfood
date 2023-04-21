@@ -3,6 +3,7 @@ import {
   Ingredient,
   IngredientGroup as IngredientGroup,
   IngredientQuantity,
+  ModelState,
   Recipe,
 } from "../../app.models";
 import { IngredientGroupSerializer } from "../../app.serializers";
@@ -74,17 +75,32 @@ export class IngredientGroupService extends ModelService<IngredientGroup> {
     }
   }
 
+  /**
+   * Add the given ingredient group to the creationList and to the current ingredient group list
+   * The creation is handle with the backend when the save function is used
+   * @param toCreateIngredientGroup The ingredient group to create
+   * @returns The ingredient group to create, updated with default parameters
+   */
   addIngredientGroupToCreate(
-    ingredientGroup: IngredientGroup
+    toCreateIngredientGroup: IngredientGroup
   ): IngredientGroup {
+    const createdIngredientGroup = Object.assign(
+      new IngredientGroup(),
+      toCreateIngredientGroup
+    );
+    // Set the default values
+    createdIngredientGroup.tempId = Date.now();
+    createdIngredientGroup.state = ModelState.NotSaved;
     // Set rank of ingredientGroup to last
-    ingredientGroup.rank = this.activeIngredientGroupList.length + 1;
-    this.toCreateIngredientGroup.push(ingredientGroup);
-    this.activeIngredientGroupList.push(ingredientGroup);
+    createdIngredientGroup.rank = this.activeIngredientGroupList.length + 1;
+     // Add the ingredient group to the add list
+    this.toCreateIngredientGroup.push(createdIngredientGroup);
+    // Add the ingredient group to the active list and emit the new list
+    this.activeIngredientGroupList.push(createdIngredientGroup);
     this.activeIngredientGroupListSubject.next(
       this.activeIngredientGroupList.slice()
     );
-    return ingredientGroup;
+    return createdIngredientGroup;
   }
 
   addIngredientGroupToUpdate(
@@ -306,7 +322,10 @@ export class IngredientGroupService extends ModelService<IngredientGroup> {
   updateRank(ingredientGroupList: IngredientGroup[]): void {
     for (const [index, ingredientGroup] of ingredientGroupList.entries()) {
       // Retrieve the form values to create the updated entity
-      const updatedIngredientGroup = Object.assign({}, ingredientGroup);
+      const updatedIngredientGroup = Object.assign(
+        new IngredientGroup(),
+        ingredientGroup
+      );
       if (updatedIngredientGroup.rank != index + 1) {
         ingredientGroup.rank = index + 1;
         updatedIngredientGroup.rank = index + 1;

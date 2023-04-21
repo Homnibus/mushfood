@@ -4,14 +4,12 @@ import {
   OnDestroy,
   OnInit,
   QueryList,
-  ViewChild,
   ViewChildren,
 } from "@angular/core";
 import {
   Ingredient,
   IngredientGroup,
   IngredientQuantity,
-  ModelState,
   Recipe,
 } from "../../app.models";
 import {
@@ -21,7 +19,6 @@ import {
   first,
   map,
   Observable,
-  skip,
   startWith,
   Subscription,
 } from "rxjs";
@@ -31,11 +28,9 @@ import { IngredientService } from "../../ingredient/services/ingredient.service"
 import { MeasurementUnitService } from "../../ingredient/services/measurement-unit.service";
 import { IngredientQuantityMentionService } from "../../ingredient/services/ingredient-quantity-mention.service";
 import {
-  FormArray,
   FormControl,
   FormGroup,
   UntypedFormBuilder,
-  UntypedFormGroup,
   Validators,
 } from "@angular/forms";
 import { MatTable } from "@angular/material/table";
@@ -46,16 +41,28 @@ import {
 } from "@angular/cdk/drag-drop";
 import { flyInOutTransition } from "src/app/shared/fly-in-out.animation";
 import { IngredientGroupService } from "src/app/ingredient/services/ingredient-group.service";
+import { MatDialog } from "@angular/material/dialog";
+import { RecipeAddGroupDialogComponent } from "../recipe-add-group-dialog/recipe-add-group-dialog.component";
+
+export class IngredientRowData {
+  ingredientQuantity: IngredientQuantity;
+  ingredientQuantityForm: FormGroup;
+  filteredIngredientListObservable: Observable<Ingredient[]>;
+  ingredientQuantityValueChangesSubscription: Subscription;
+}
 
 export class GroupData {
   ingredientGroup: IngredientGroup;
   updateIngredientGroupNameForm: FormControl;
-  ingredientQuantityList: IngredientQuantity[] = [];
-  form: FormGroup;
-  addIngredientForm: FormGroup;
-  addIngredientFilteredIngredientList$: Observable<Ingredient[]>;
-  filteredIngredientListObservableList: Observable<Ingredient[]>[] = [];
-  ingredientQuantityValueChangesSubscriptionList: Subscription[] = [];
+  ingredientGroupNameValueChangesSubscription: Subscription;
+  ingredientRowDataList: IngredientRowData[] = [];
+  addIngredientRowData: IngredientRowData;
+
+  getIngredientQuantityList(): IngredientQuantity[] {
+    return this.ingredientRowDataList.map(
+      (ingredientRowData) => ingredientRowData.ingredientQuantity
+    );
+  }
 }
 
 @Component({
@@ -66,13 +73,11 @@ export class GroupData {
 })
 export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
   recipe: Recipe;
-  activeRecipeSubscription: Subscription;
   groupDataList: GroupData[] = [];
-  ingredientGroupList: IngredientGroup[] = [];
-  activeIngredientGroupSubscription: Subscription;
-  activeIngredientQuantityListSubscription: Subscription;
   ingredientList: Ingredient[];
   activeIngredientListSubscription: Subscription;
+
+  isLoaded = false;
   displayedColumns: string[] = [
     "draggable",
     "used",
@@ -83,31 +88,9 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
     "deleteIngredient",
   ];
   @ViewChildren(MatTable) table: QueryList<MatTable<any>>;
-  @ViewChild("addQuantityInputField") addQuantityInputField: ElementRef;
-  addIngredientGroupForm = this.fb.group({
-    title: ["", Validators.required],
-  });
-  isLoaded = false;
-  //ingredientQuantityList: IngredientQuantity[] = [];
-  // rows: FormArray = this.fb.array([]);
-  // form: FormGroup = this.fb.group({ ingredientQuantity: this.rows });
-  // tableFormList: FormGroup[] = [];
-  // filteredIngredientListObservableList: Observable<Ingredient[]>[] = [];
-  // ingredientQuantityValueChangesSubscriptionList: Subscription[] = [];
-  // addIngredientFilteredIngredientList$: Observable<Ingredient[]>;
-  // addIngredientForm = this.fb.group({
-  //   quantity: [
-  //     "",
-  //     [
-  //       Validators.required,
-  //       Validators.pattern(
-  //         "^(\\d{1,6}|\\d{1,5}[\\.,]\\d|\\d{1,4}[\\.,]\\d{2})$"
-  //       ),
-  //     ],
-  //   ],
-  //   measurementUnit: ["", Validators.required],
-  //   ingredient: ["", Validators.required],
-  // });
+  @ViewChildren("addQuantityInputField")
+  addQuantityInputField: QueryList<ElementRef>;
+  readonly modalWidth = "250px";
 
   constructor(
     private recipeService: RecipeService,
@@ -116,45 +99,22 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
     public ingredientQuantityService: IngredientQuantityService,
     public measurementUnitService: MeasurementUnitService,
     public ingredientQuantityMentionService: IngredientQuantityMentionService,
-    private fb: UntypedFormBuilder
+    private fb: UntypedFormBuilder,
+    private matDialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-    // Retrieve the active Recipe
-    this.activeRecipeSubscription = this.recipeService.activeRecipe$.subscribe(
-      (data) => {
-        this.recipe = data;
-      }
-    );
-    // Retrieve the ingredient list
+    // Retrieve the active recipe
+    this.recipeService.activeRecipe$.pipe(first()).subscribe((data) => {
+      this.recipe = data;
+    });
+    // Retrieve the active ingredient list
     this.activeIngredientListSubscription =
       this.ingredientService.activeIngredientList$.subscribe((data) => {
         this.ingredientList = data;
       });
-    // Retrieve the active Group
-    // TODO : update information if needed ?
-    this.activeIngredientGroupSubscription =
-      this.ingredientGroupService.activeIngredientGroupList$.subscribe(
-        (data) => {
-          this.ingredientGroupList = data;
-        }
-      );
-    // Retrieve the ingredient Quantity only if the first time and if some are created or deleted
-    this.activeIngredientQuantityListSubscription =
-      this.ingredientQuantityService.activeIngredientQuantityList$
-        .pipe(
-          skip(1)
-          //   filter((data) => data.length != this.ingredientQuantityList.length)
-        )
-        .subscribe((data) => {
-          //          this.ingredientQuantityList = data;
-          this.updateGroupDataIngredient(data);
-        });
-
-    //    this.rows.push(this.addIngredientForm);
 
     // Initialize the GroupDataList
-    // Update of the list will be handled manually
     combineLatest([
       this.ingredientQuantityService.activeIngredientQuantityList$,
       this.ingredientGroupService.activeIngredientGroupList$,
@@ -164,10 +124,11 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
         // Create a GroupData for each ingredient group
         ingredientGroupList.forEach((ingredientGroup) => {
           // Filter the ingredient quantity corresponding to the ingredient group
-          const filteredIngredientQuantityList = ingredientQuantityList.filter(
-            (ingredientQuantity) =>
-              ingredientQuantity.ingredientGroup == ingredientGroup.id
-          );
+          const filteredIngredientQuantityList =
+            this.ingredientQuantityService.getIngredientQuantityOfGroup(
+              ingredientQuantityList,
+              ingredientGroup.getId()
+            );
           // Add the GroupData to the list
           const groupData = this.initGroupData(
             ingredientGroup,
@@ -178,116 +139,74 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
         // State that the tables are initialized and can be show
         this.isLoaded = true;
       });
-
-    // initialize the table formControl with data from activeIngredientQuantityList$
-    // Update of the list will be handled manually
-    // this.ingredientQuantityService.activeIngredientQuantityList$
-    //   .pipe(first())
-    //   .subscribe((ingredientQuantityList) => {
-    //     //    this.ingredientQuantityList = ingredientQuantityList;
-    //     this.addTable();
-    //     (this.tableFormList[0].get("ingredientQuantity") as FormArray).push(
-    //       this.addIngredientForm
-    //     );
-    //     ingredientQuantityList.forEach(
-    //       (ingredientQuantity: IngredientQuantity) =>
-    //         this.addRow(ingredientQuantity, this.tableFormList[0])
-    //     );
-    //     this.isLoaded = true;
-    //   });
-
-    // Initialize the autocomplete list for the add ingredient form
-    // this.addIngredientFilteredIngredientList$ = this.addIngredientForm
-    //   .get("ingredient")
-    //   .valueChanges.pipe(
-    //     startWith(""), // Needed to create the ingredient filtered list before the user start using the input.
-    //     map((ingredient) =>
-    //       this.ingredientQuantityService.filterIngredientList(
-    //         ingredient,
-    //         this.ingredientList
-    //       )
-    //     )
-    //   );
   }
 
   ngOnDestroy(): void {
-    this.activeRecipeSubscription.unsubscribe();
-    this.activeIngredientQuantityListSubscription.unsubscribe();
     this.activeIngredientListSubscription.unsubscribe();
-    this.activeIngredientGroupSubscription.unsubscribe();
+    this.groupDataList.forEach((groupData) => {
+      groupData.ingredientGroupNameValueChangesSubscription.unsubscribe();
+      groupData.ingredientRowDataList.forEach((ingredientRowData) => {
+        this.destroyIngredientRowData(ingredientRowData);
+      });
+    });
   }
 
+  /**
+   * Initialize the GroupData structure which will contain all needed object to manage the forms
+   * @param ingredientGroup The ingredient group link to the GroupData
+   * @param ingredientQuantityList List of the ingredient quantity linked to the ingredient group
+   * @returns The new and initialized GroupData
+   */
   initGroupData(
     ingredientGroup: IngredientGroup,
     ingredientQuantityList: IngredientQuantity[]
   ): GroupData {
+    // Create the group data and add the Ingredient Group
     const groupData = new GroupData();
     groupData.ingredientGroup = ingredientGroup;
-    groupData.ingredientQuantityList = ingredientQuantityList;
 
     // Create and add the update form control
     groupData.updateIngredientGroupNameForm = this.fb.control(
       ingredientGroup.title,
       [Validators.required]
     );
-    // Add the subscription to the changes
-    // TODO: gérer la subscription
-    groupData.updateIngredientGroupNameForm.valueChanges
-      .pipe(debounceTime(500), distinctUntilChanged())
-      .subscribe(() => this.updateIngredientGroup(groupData));
-    // Create and add the add ingredient form
-    groupData.addIngredientForm = this.fb.group({
-      quantity: [
-        "",
-        [
-          Validators.required,
-          Validators.pattern(
-            "^(\\d{1,6}|\\d{1,5}[\\.,]\\d|\\d{1,4}[\\.,]\\d{2})$"
-          ),
-        ],
-      ],
-      measurementUnit: ["", Validators.required],
-      ingredient: ["", Validators.required],
-    });
-    // Initialize the autocomplete list for the add ingredient form
-    groupData.addIngredientFilteredIngredientList$ = groupData.addIngredientForm
-      .get("ingredient")
-      .valueChanges.pipe(
-        startWith(""), // Needed to create the ingredient filtered list before the user start using the input.
-        map((ingredient) =>
-          this.ingredientQuantityService.filterIngredientList(
-            ingredient,
-            this.ingredientList
-          )
-        )
-      );
+    // Add the subscription to the changes on the form value
+    groupData.ingredientGroupNameValueChangesSubscription =
+      groupData.updateIngredientGroupNameForm.valueChanges
+        .pipe(debounceTime(500), distinctUntilChanged())
+        .subscribe(() => this.updateIngredientGroup(groupData));
 
-    // Create and add the formArray
-    const rows = this.fb.array([]);
-    groupData.form = this.fb.group({ ingredientQuantity: rows });
-    // Add the add ingredient form as the first form of the Array
-    rows.push(groupData.addIngredientForm);
-    // Populate the formArray
-    ingredientQuantityList.forEach((ingredientQuantity: IngredientQuantity) =>
-      this.addRow(ingredientQuantity, groupData)
+    // Create and add the add ingredient form
+    groupData.addIngredientRowData = this.initIngredientRowData();
+
+    // Initialize a ingredientRowData and add it to the groupData for each ingredient group
+    groupData.ingredientRowDataList = ingredientQuantityList.map(
+      (ingredientQuantity: IngredientQuantity) =>
+        this.initIngredientRowData(ingredientQuantity)
     );
 
     return groupData;
   }
 
-  // addTable(): void {
-  //   // Create and add the formArray
-  //   const rows = this.fb.array([]);
-  //   const form = this.fb.group({ ingredientQuantity: rows });
-  //   this.tableFormList.push(form);
-  // }
-
-  addRow(ingredientQuantity: IngredientQuantity, groupData: GroupData) {
-    // Create and add the formGroup
-    const row = this.fb.group({
-      ingredient: [ingredientQuantity.ingredient, Validators.required],
+  /**
+   * Initialize the IngredientRowData structure which will contain all needed object to manage the form
+   * the ingredientQuantity can be undefine to init an empty ingredientRowData
+   * @param ingredientQuantity The ingredient quantity link to the IngredientRowData
+   * @returns The new and initialized IngredientRowData
+   */
+  initIngredientRowData(
+    ingredientQuantity?: IngredientQuantity
+  ): IngredientRowData {
+    // Create the ingredient row data and add the ingredient quantity
+    const ingredientRowData = new IngredientRowData();
+    if (ingredientQuantity != undefined) {
+      ingredientRowData.ingredientQuantity = ingredientQuantity;
+    }
+    // Create en add the form group to update the ingredient quantity
+    ingredientRowData.ingredientQuantityForm = this.fb.group({
+      ingredient: [ingredientQuantity?.ingredient, Validators.required],
       quantity: [
-        ingredientQuantity.quantity,
+        ingredientQuantity?.quantity,
         [
           Validators.required,
           Validators.pattern(
@@ -296,161 +215,142 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
         ],
       ],
       measurementUnit: [
-        ingredientQuantity.measurementUnit,
+        ingredientQuantity?.measurementUnit,
         Validators.required,
       ],
     });
-    (groupData.form.get("ingredientQuantity") as FormArray).push(row);
 
-    // Create the subscription to the ingredient change
-    groupData.ingredientQuantityValueChangesSubscriptionList.push(
-      row.valueChanges
-        .pipe(debounceTime(500), distinctUntilChanged())
-        .subscribe(() => {
-          this.changeComaToPoint(row);
-          this.updateIngredientQuantity(ingredientQuantity, row);
-        })
-    );
-    // Create the Observable for the ingredient name autocomplete
-    groupData.filteredIngredientListObservableList.push(
-      row.get("ingredient").valueChanges.pipe(
-        // Needed to create the ingredient filtered list before the user start using the input.
-        startWith(ingredientQuantity.ingredient.name),
-        map((ingredient) =>
-          this.ingredientQuantityService.filterIngredientList(
-            ingredient,
-            this.ingredientList
+    // Create the observable for the ingredient name autocomplete
+    ingredientRowData.filteredIngredientListObservable =
+      ingredientRowData.ingredientQuantityForm
+        .get("ingredient")
+        .valueChanges.pipe(
+          // Needed to create the ingredient filtered list before the user start using the input.
+          startWith(ingredientQuantity?.ingredient?.name),
+          map((ingredient) =>
+            this.ingredientQuantityService.filterIngredientList(
+              ingredient,
+              this.ingredientList
+            )
           )
-        )
-      )
-    );
-  }
-
-  updateGroupDataIngredient(
-    ingredientQuantityList: IngredientQuantity[]
-  ): void {
-    // Loop over the groupData and update the ingredient quantity list if needed
-    this.groupDataList.forEach((groupData) => {
-      // Filter the ingredient quantity corresponding to the ingredient group
-      const filteredIngredientQuantityList = ingredientQuantityList.filter(
-        (ingredientQuantity) =>
-          ingredientQuantity.ingredientGroup === groupData.ingredientGroup.id ||
-          ingredientQuantity.ingredientGroup ===
-            groupData.ingredientGroup.tempId
-      );
-      if (
-        filteredIngredientQuantityList.length !=
-        groupData.ingredientQuantityList.length
-      ) {
-        groupData.ingredientQuantityList = filteredIngredientQuantityList.sort(
-          (a: IngredientQuantity, b: IngredientQuantity) => a.rank - b.rank
         );
-      }
-    });
+
+    // If the ingredient quantity is provided, listen to value change
+    if (ingredientQuantity != undefined) {
+      // Subscribe to the change of value of the form to automatically update the local representation of the ingredient quantity
+      ingredientRowData.ingredientQuantityValueChangesSubscription =
+        ingredientRowData.ingredientQuantityForm.valueChanges
+          .pipe(debounceTime(500), distinctUntilChanged())
+          .subscribe(() => {
+            this.changeComaToPoint(ingredientRowData.ingredientQuantityForm);
+            this.updateIngredientQuantity(ingredientRowData);
+          });
+    }
+    return ingredientRowData;
   }
 
+  /**
+   * Manage the destruction of a ingredientRowData before it can be deleted
+   * @param ingredientRowData The ingredientRowData that need to be deleted
+   */
+  destroyIngredientRowData(ingredientRowData: IngredientRowData): void {
+    ingredientRowData.ingredientQuantityValueChangesSubscription.unsubscribe();
+  }
+
+  /**
+   * Retrieve the information from the creation form of a given GroupData
+   * and send a creation request data to the ingredient quantity service
+   * @param groupData The GroupData in which to create a new ingredient quantity
+   */
   addIngredientQuantity(groupData: GroupData): void {
+    // Retrieve the creation form
+    const addIngredientForm =
+      groupData.addIngredientRowData.ingredientQuantityForm;
     // Only send a creation request if the form is valid.
-    if (
-      !groupData.addIngredientForm.valid ||
-      !groupData.addIngredientForm.dirty
-    ) {
+    if (!addIngredientForm.valid || !addIngredientForm.dirty) {
       return;
     }
     // Change coma to point in the Quantity part of the form
-    this.changeComaToPoint(groupData.addIngredientForm);
+    this.changeComaToPoint(addIngredientForm);
 
     // Initialize a new ingredientQuantity and the set the form values
-    const ingredientQuantity = new IngredientQuantity();
-    ingredientQuantity.tempId = Date.now();
-    ingredientQuantity.state = ModelState.NotSaved;
+    const toCreateIngredientQuantity = new IngredientQuantity();
     // Link the ingredient quantity to the ingredient group and use the temp ID if the ingredient group is not yet created
-    ingredientQuantity.ingredientGroup = groupData.ingredientGroup.id
-      ? groupData.ingredientGroup.id
-      : groupData.ingredientGroup.tempId;
-    ingredientQuantity.quantity =
-      groupData.addIngredientForm.get("quantity").value;
-    ingredientQuantity.measurementUnit =
-      groupData.addIngredientForm.get("measurementUnit").value;
-    // Set the ingredient and add id to the list of ingredient to create if it does not exist.
-    const formIngredient = groupData.addIngredientForm.get("ingredient").value;
-    // If the user select a existing ingredient
-    if (formIngredient instanceof Ingredient) {
-      ingredientQuantity.ingredient = formIngredient;
-    } else {
-      // check if the ingredient already exist
-      let ingredient = this.ingredientList.find(
-        (listIngredient) =>
-          listIngredient.name.trim().toLowerCase() ===
-          formIngredient.trim().toLowerCase()
-      );
-      if (ingredient) {
-        ingredientQuantity.ingredient = ingredient;
-      } else {
-        ingredient = new Ingredient();
-        ingredient.name = formIngredient;
-        ingredientQuantity.ingredient = ingredient;
-      }
-    }
-    // Reset the form and add the created ingredientQuantity to the list of the currents recipe ingredient.
-    this.addQuantityInputField.nativeElement.focus();
-    groupData.addIngredientForm.reset();
+    toCreateIngredientQuantity.ingredientGroup =
+      groupData.ingredientGroup.getId();
+    toCreateIngredientQuantity.quantity =
+      addIngredientForm.get("quantity").value;
+    toCreateIngredientQuantity.measurementUnit =
+      addIngredientForm.get("measurementUnit").value;
 
-    // Add the ingredient Quantity to the list of ingredient to create when saving the recipe
-    const newIngredientQuantity =
+    // Retrieve the ingredient value from the form and create a new one if it don't exist yet
+    const formIngredient = addIngredientForm.get("ingredient").value;
+    toCreateIngredientQuantity.ingredient =
+      this.getOrCreateIngredient(formIngredient);
+
+    // Send the new local ingredient quantity to the ingredient quantity service and let it manage the creation with the backend
+    const createdIngredientQuantity =
       this.ingredientQuantityService.addIngredientQuantityToCreate(
-        ingredientQuantity
+        toCreateIngredientQuantity
       );
-    // Add the formControl for the new ingredientQuantity and the autocomplete observable
-    this.addRow(newIngredientQuantity, groupData);
+    // Initialize and add the new IngredientRowData to the GroupData
+    groupData.ingredientRowDataList.push(
+      this.initIngredientRowData(createdIngredientQuantity)
+    );
+
+    // Reset the form to allow the user to create other ingredient quantity
+    addIngredientForm.reset();
+
+    // Focus on the first field of the form to allows the input of a new ingredient quantity
+    const creationFormIndex = this.groupDataList.findIndex(
+      (toFindGroupData) =>
+        toFindGroupData.ingredientGroup.getId() ===
+        groupData.ingredientGroup.getId()
+    );
+    this.addQuantityInputField.get(creationFormIndex).nativeElement.focus();
+
+    // Redraw the table as the data changed but the array was updated on place
+    this.updateTableRepresentation(groupData);
   }
 
-  updateIngredientQuantity(
-    toUpdateIngredientQuantity: IngredientQuantity,
-    ingredientForm: FormGroup
-  ): void {
+  /**
+   * Retrieve the information from the update form of a given ingredient quantity
+   * and send an update request to the ingredient quantity service
+   * @param ingredientRowData The ingredientRowData containing the ingredient quantity to update and it's update form
+   */
+  updateIngredientQuantity(ingredientRowData: IngredientRowData): void {
+    // Get the ingredient quantity form to work on
+    const ingredientQuantityForm = ingredientRowData.ingredientQuantityForm;
+    // Get the local value of the ingredient quantity to update
+    const toUpdateIngredientQuantity = ingredientRowData.ingredientQuantity;
+
     // Only send a creation request if the form is valid and modified
-    if (!ingredientForm.valid || !ingredientForm.dirty) {
+    if (!ingredientQuantityForm.valid || !ingredientQuantityForm.dirty) {
       return;
     }
 
     // Retrieve the form values to create the updated entity
-    const updatedIngredientQuantity = Object.assign(
-      {},
-      toUpdateIngredientQuantity
-    );
+    ingredientRowData.ingredientQuantity.quantity =
+      ingredientQuantityForm.get("quantity").value;
+    ingredientRowData.ingredientQuantity.measurementUnit =
+      ingredientQuantityForm.get("measurementUnit").value;
 
-    updatedIngredientQuantity.quantity = ingredientForm.get("quantity").value;
-    updatedIngredientQuantity.measurementUnit =
-      ingredientForm.get("measurementUnit").value;
+    // Retrieve the ingredient value from the form and create a new one if it don't exist yet
+    const formIngredient = ingredientQuantityForm.get("ingredient").value;
+    ingredientRowData.ingredientQuantity.ingredient =
+      this.getOrCreateIngredient(formIngredient);
 
-    const formIngredient = ingredientForm.get("ingredient").value;
-    if (formIngredient instanceof Ingredient) {
-      updatedIngredientQuantity.ingredient = formIngredient;
-    } else {
-      // check if the ingredient already exist
-      let ingredient = this.ingredientList.find(
-        (listIngredient) =>
-          listIngredient.name.trim().toLowerCase() ===
-          formIngredient.trim().toLowerCase()
-      );
-      if (ingredient) {
-        updatedIngredientQuantity.ingredient = ingredient;
-      } else {
-        ingredient = new Ingredient();
-        ingredient.name = formIngredient;
-        updatedIngredientQuantity.ingredient = ingredient;
-      }
-    }
-
-    // Add the created ingredientQuantity to the list of the currents recipe ingredient.
+    // Send the ingredientQuantity to the ingredient quantity service to let it manage the backend update
     this.ingredientQuantityService.addIngredientQuantityToUpdate(
-      updatedIngredientQuantity
+      ingredientRowData.ingredientQuantity
     );
+
+    // Update the mentions of the local representation of the recipe if it's needed
     const mentionUpdated = this.ingredientQuantityMentionService.updateMention(
-      updatedIngredientQuantity,
+      ingredientRowData.ingredientQuantity,
       this.recipe
     );
+    // If the mention was updated, send the recipe to the recipe service to let it manage the backend update
     if (mentionUpdated) {
       this.recipe = this.recipeService.updateActiveRecipeInstruction(
         this.recipe.instructions
@@ -458,99 +358,209 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
     }
   }
 
-  deleteIngredientQuantity(
-    toDeleteIngredientQuantity: IngredientQuantity,
-    rowIndex: number,
-    groupData: GroupData
-  ): void {
-    // Delete the ingredient from the recipe by calling the API.
-    this.ingredientQuantityService.addIngredientQuantityToDelete(
-      toDeleteIngredientQuantity
+  /**
+   * Delete a given local ingredient quantity and send a deletion request to the ingredient quantity service
+   * @param toDeleteIngredientRowData The ingredientRowData containing the ingredient quantity to delete
+   */
+  deleteIngredientQuantity(toDeleteIngredientRowData: IngredientRowData): void {
+    // Get the GroupData from the local list
+    const groupData = this.groupDataList.find(
+      (groupData) =>
+        groupData.ingredientGroup.getId() ===
+        toDeleteIngredientRowData.ingredientQuantity.ingredientGroup
     );
-    // Remove the corresponding formControl
-    (groupData.form.get("ingredientQuantity") as FormArray).removeAt(rowIndex);
-    // Remove the observable for the ingredient autocomplete
-    groupData.filteredIngredientListObservableList.splice(rowIndex - 1, 1);
+
+    // Get the position of the ingredientRowData to delete in the groupData
+    const rowDataIndex = groupData.ingredientRowDataList.findIndex(
+      (ingredientRowData) =>
+        ingredientRowData.ingredientQuantity.getId() ===
+        toDeleteIngredientRowData.ingredientQuantity.getId()
+    );
+
+    // Prepare the deletion of the ingredientRowData
+    this.destroyIngredientRowData(toDeleteIngredientRowData);
+
+    // Remove the corresponding ingredientRowData from the groupData
+    groupData.ingredientRowDataList.splice(rowDataIndex, 1);
+
+    // Send the ingredient quantity to the service to let it manage the deletion with the backend
+    this.ingredientQuantityService.addIngredientQuantityToDelete(
+      toDeleteIngredientRowData.ingredientQuantity
+    );
+
+    // Redraw the table as the data changed but the array was updated on place
+    this.updateTableRepresentation(groupData);
   }
 
+  /**
+   * Use the value of the ingredient of a form to return an ingredient from the local list of ingredient
+   * or a new one, that will be created by the ingredient service, if it does not exist.
+   * @param formIngredient The value of an ingredient form
+   * @returns An Ingredient that can be used in a IngredientQuantity
+   */
+  getOrCreateIngredient(formIngredient: Ingredient | string): Ingredient {
+    if (formIngredient instanceof Ingredient) {
+      return formIngredient;
+    } else {
+      // Check if the ingredient already exist in the local list
+      const ingredient = this.ingredientList.find(
+        (listIngredient) =>
+          listIngredient.name.trim().toLowerCase() ===
+          formIngredient.trim().toLowerCase()
+      );
+      // If it exist in the list, use it
+      if (ingredient) {
+        return ingredient;
+        // Otherwise, create a new one which will be manage by the ingredient quantity service when updating the ingredient quantity
+      } else {
+        const newIngredient = new Ingredient();
+        newIngredient.name = formIngredient;
+        return newIngredient;
+      }
+    }
+  }
+
+  /**
+   * Retrieve the information from the group creation form and send a creation request to the ingredient group service
+   */
   addIngredientGroup(): void {
-    // Only send a creation request if the form is valid.
+    // Open a modal to get the new group name
+    const dialogRef = this.matDialog.open(RecipeAddGroupDialogComponent, {
+      width: this.modalWidth,
+    });
+
+    dialogRef.afterClosed().subscribe((groupTitle) => {
+      // Initialize a new ingredientGroup and the set the form values
+      const toCreateIngredientGroup = new IngredientGroup();
+      toCreateIngredientGroup.title = groupTitle;
+      //     this.addIngredientGroupForm.get("title").value;
+      toCreateIngredientGroup.recipe = this.recipe.id;
+
+      // Add the ingredient Group to the list of group to create when saving the recipe
+      const newIngredientGroup =
+        this.ingredientGroupService.addIngredientGroupToCreate(
+          toCreateIngredientGroup
+        );
+
+      // Initialize and add the groupData for the new ingredient group
+      const groupData = this.initGroupData(newIngredientGroup, []);
+      this.groupDataList.push(groupData);
+    });
+  }
+
+  /**
+   * Retrieve the information from the update form of a given ingredient group
+   * and send an update request to the ingredient group service
+   * @param toUpdateGroupData The groupData containing the ingredient group to update and it's update form
+   */
+  updateIngredientGroup(toUpdateGroupData: GroupData): void {
+    // Only send a creation request if the form is valid and modified
     if (
-      !this.addIngredientGroupForm.valid ||
-      !this.addIngredientGroupForm.dirty
+      !toUpdateGroupData.updateIngredientGroupNameForm.valid ||
+      !toUpdateGroupData.updateIngredientGroupNameForm.dirty
     ) {
       return;
     }
 
-    // Initialize a new ingredientGroup and the set the form values
-    const ingredientGroup = new IngredientGroup();
-    ingredientGroup.tempId = Date.now();
-    ingredientGroup.state = ModelState.NotSaved;
-    ingredientGroup.title = this.addIngredientGroupForm.get("title").value;
-    ingredientGroup.recipe = this.recipe.id;
+    // Retrieve the form values to the updated entity
+    toUpdateGroupData.ingredientGroup.title =
+      toUpdateGroupData.updateIngredientGroupNameForm.value;
 
-    // Reset the form and add the created ingredientGroup to the list of the currents recipe ingredient.
-    this.addIngredientGroupForm.reset();
-
-    // Add the ingredient Group to the list of group to create when saving the recipe
-    const newIngredientGroup =
-      this.ingredientGroupService.addIngredientGroupToCreate(ingredientGroup);
-
-    // Initialize and add the groupData for the new ingredient group
-    // this.addRow(newIngredientQuantity, groupData);
-    const groupData = this.initGroupData(newIngredientGroup, []);
-    this.groupDataList.push(groupData);
+    // Add the created ingredientQuantity to the list of the currents recipe ingredient.
+    this.ingredientGroupService.addIngredientGroupToUpdate(
+      toUpdateGroupData.ingredientGroup
+    );
   }
 
+  /**
+   * Delete a given local ingredient group and send a deletion request to the ingredient group service
+   * @param toDeleteGroupData The groupData containing the ingredient group to delete
+   */
   deleteIngredientGroup(toDeleteGroupData: GroupData): void {
     // Check if the group is empty, return if not
-    if (toDeleteGroupData.ingredientQuantityList.length > 0) {
+    if (toDeleteGroupData.getIngredientQuantityList().length > 0) {
       return;
     }
 
+    // Remove the groupData from the list
     this.groupDataList.splice(this.groupDataList.indexOf(toDeleteGroupData), 1);
 
+    // Prepare the deletion of the groupData
+    toDeleteGroupData.ingredientGroupNameValueChangesSubscription.unsubscribe();
+
+    // Send the ingredient group to the service to let it manage the deletion with the backend
     const toDeleteIngredientGroup = toDeleteGroupData.ingredientGroup;
-    // Remove the group by calling the API
     this.ingredientGroupService.addIngredientGroupToDelete(
       toDeleteIngredientGroup
     );
   }
 
-  updateIngredientGroup(groupData: GroupData): void {
-    // Only send a creation request if the form is valid and modified
-    if (
-      !groupData.updateIngredientGroupNameForm.valid ||
-      !groupData.updateIngredientGroupNameForm.dirty
-    ) {
-      return;
+  /**
+   * Place the ingredientRowData of place in the right groupData ingredientRowData List
+   * @param event The event send by the drag and drop cdk containing the current and previous groupData
+   */
+  onListDrop(event: CdkDragDrop<GroupData>) {
+    // Get the groupData in which the ingredientRowData is dropped
+    const currentGroupData = event.container.data;
+
+    // If the ingredientRowData is dropped in the same groupData change it's position in the groupData ingredientRowDatalist
+    if (event.previousContainer === event.container) {
+      //Swap the ingredientRowData around with the build-in function of the angular drag and drop cdk
+      moveItemInArray(
+        currentGroupData.ingredientRowDataList,
+        event.previousIndex,
+        event.currentIndex
+      );
+
+      // Update the rank of each ingredient quantity if needed and push them to be updated
+      this.ingredientQuantityService.updateRank(
+        currentGroupData.getIngredientQuantityList()
+      );
+
+      // Force the render of the table because its representation is only updated
+      // when we push a new data table (ingredientQuantityList) and never if it's modified in place
+      this.updateTableRepresentation(currentGroupData);
+
+      // If the ingredientRowData is dropped in another groupData change it's position in the groupData ingredientRowDatalist
+      // and change it's groupData
+    } else {
+      // Get the groupData from which the ingredientDataRow is picked
+      const previousGroupData = event.previousContainer.data;
+
+      //Swap the ingredientRowData around with the build-in function of the angular drag and drop cdk
+      transferArrayItem(
+        previousGroupData.ingredientRowDataList,
+        currentGroupData.ingredientRowDataList,
+        event.previousIndex,
+        event.currentIndex
+      );
+
+      // Update the group of the dropped ingredient quantity and push it to the ingredient quantity service to be updated
+      this.ingredientQuantityService.updateGroup(
+        currentGroupData.ingredientRowDataList[event.currentIndex]
+          .ingredientQuantity,
+        currentGroupData.ingredientGroup
+      );
+
+      // Update the rank of each ingredient quantity if needed and push them to be updated in both list
+      this.ingredientQuantityService.updateRank(
+        currentGroupData.getIngredientQuantityList()
+      );
+      this.ingredientQuantityService.updateRank(
+        previousGroupData.getIngredientQuantityList()
+      );
+
+      // Force the render of the table because its representation is updated only
+      // when we push a new data table (ingredientQuantityList) and never if it's modified in place
+      this.updateTableRepresentation(currentGroupData);
+      this.updateTableRepresentation(previousGroupData);
     }
-
-    // Retrieve the form values to create the updated entity
-    const updatedIngredientGroup = Object.assign({}, groupData.ingredientGroup);
-
-    updatedIngredientGroup.title =
-      groupData.updateIngredientGroupNameForm.value;
-
-    // Add the created ingredientQuantity to the list of the currents recipe ingredient.
-    this.ingredientGroupService.addIngredientGroupToUpdate(
-      updatedIngredientGroup
-    );
   }
 
-  // getIngredientQuantityOfGroup(
-  //   ingredientGroup: IngredientGroup
-  // ): IngredientQuantity[] {
-  //   return this.ingredientQuantityList.filter(
-  //     (ingredientQuantity) =>
-  //       ingredientQuantity.ingredientGroup == ingredientGroup.id
-  //   );
-  // }
-
-  compareFn(c1: any, c2: any): boolean {
-    return c1 && c2 ? c1.id === c2.id : c1 === c2;
-  }
-
+  /**
+   * Place the ingredientRowData of place in the right groupData ingredientRowData List
+   * @param event The event send by the drag and drop cdk containing the current and previous groupData
+   */
   onGroupListDrop(event: CdkDragDrop<GroupData>) {
     // Swap the group around
     moveItemInArray(
@@ -558,126 +568,50 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
       event.previousIndex,
       event.currentIndex
     );
-    // Update the rank of each ingredient quantity if needed and push them to be updated
+    // Update the rank of each ingredient group if needed and push them to be updated
     this.ingredientGroupService.updateRank(
       this.groupDataList.map((groupData) => groupData.ingredientGroup)
     );
   }
 
-  onListDrop(event: CdkDragDrop<GroupData>) {
-    const currentGroupData = event.container.data;
-    if (event.previousContainer === event.container) {
-      // Swap the formGroup around
-      this.moveItemInFormArray(
-        currentGroupData.form.get("ingredientQuantity") as FormArray,
-        event.previousIndex + 1,
-        event.currentIndex + 1
-      );
-      // Swap the filter observable around
-      moveItemInArray(
-        currentGroupData.filteredIngredientListObservableList,
-        event.previousIndex,
-        event.currentIndex
-      );
-      moveItemInArray(
-        currentGroupData.ingredientQuantityValueChangesSubscriptionList,
-        event.previousIndex,
-        event.currentIndex
-      );
-
-      // Swap the elements around
-      moveItemInArray(
-        currentGroupData.ingredientQuantityList,
-        event.previousIndex,
-        event.currentIndex
-      );
-
-      // Update the rank of each ingredient quantity if needed and push them to be updated
-      this.ingredientQuantityService.updateRank(
-        currentGroupData.ingredientQuantityList
-      );
-
-      // Force the render of the table because its representation is updated only
-      // when we push a new data table (ingredientQuantityList) and never if it's modified in place
-      this.table.forEach((matTable) => {
-        matTable.renderRows();
-      });
-    } else {
-      const previousGroupData = event.previousContainer.data;
-      // Swap the formGroup around
-      this.transferItemBetweenFormArray(
-        previousGroupData.form.get("ingredientQuantity") as FormArray,
-        currentGroupData.form.get("ingredientQuantity") as FormArray,
-        event.previousIndex + 1,
-        event.currentIndex + 1
-      );
-      // Swap the filter observable around
-      transferArrayItem(
-        previousGroupData.filteredIngredientListObservableList,
-        currentGroupData.filteredIngredientListObservableList,
-        event.previousIndex,
-        event.currentIndex
-      );
-      transferArrayItem(
-        previousGroupData.ingredientQuantityValueChangesSubscriptionList,
-        currentGroupData.ingredientQuantityValueChangesSubscriptionList,
-        event.previousIndex,
-        event.currentIndex
-      );
-
-      //Swap the elements from on list to the other
-      transferArrayItem(
-        previousGroupData.ingredientQuantityList,
-        currentGroupData.ingredientQuantityList,
-        event.previousIndex,
-        event.currentIndex
-      );
-
-      // Update the group of each ingredient quantity if needed and push them to be updated in both list
-      this.ingredientQuantityService.updateGroup(
-        currentGroupData.ingredientQuantityList,
-        currentGroupData.ingredientGroup
-      );
-      this.ingredientQuantityService.updateGroup(
-        previousGroupData.ingredientQuantityList,
-        previousGroupData.ingredientGroup
-      );
-
-      // Update the rank of each ingredient quantity if needed and push them to be updated in both list
-      this.ingredientQuantityService.updateRank(
-        currentGroupData.ingredientQuantityList
-      );
-      this.ingredientQuantityService.updateRank(
-        previousGroupData.ingredientQuantityList
-      );
-
-      // Force the render of the table because its representation is updated only
-      // when we push a new data table (ingredientQuantityList) and never if it's modified in place
-      // TODO : Only update the two modified Table
-      this.table.forEach((matTable) => {
-        matTable.renderRows();
-      });
-    }
+  /**
+   * Update the table representation of a given group data
+   * @param groupData the group data linked to the table to redraw
+   */
+  updateTableRepresentation(groupData: GroupData): void {
+    const tableIndex = this.groupDataList.findIndex(
+      (toFindGroupData) =>
+        toFindGroupData.ingredientGroup.getId() ===
+        groupData.ingredientGroup.getId()
+    );
+    this.table.get(tableIndex).renderRows();
   }
 
+  /**
+   * Return true if the group data as any required error in his ingredientRowData
+   * or if the ingredient quantity form need to be completed
+   * @param groupData The group data to check for required error
+   * @returns The value of the check
+   */
   hasRequiredError(groupData: GroupData): boolean {
-    for (const [key, formGroup] of Object.entries(
-      (groupData.form.get("ingredientQuantity") as FormArray).controls
-    )) {
-      if (key == "0") {
-        continue;
-      }
-      for (const value of Object.values((formGroup as FormGroup).controls)) {
-        if (value.errors?.["required"]) {
+    // Loop over the ingredientRowData ingredient quantity form and search for required error
+    for (const ingredientRowData of groupData.ingredientRowDataList) {
+      for (const control of Object.values(
+        ingredientRowData.ingredientQuantityForm.controls
+      )) {
+        if (control.errors?.["required"]) {
           return true;
         }
       }
     }
 
+    // Also check the creation form if one of the field is filled
     let hasError = false;
     let hasValid = false;
-    for (const value of Object.values(groupData.addIngredientForm.controls)) {
-      if (value.errors?.["required"]) {
+    for (const control of Object.values(
+      groupData.addIngredientRowData.ingredientQuantityForm.controls
+    )) {
+      if (control.errors?.["required"]) {
         hasError = true;
       } else {
         hasValid = true;
@@ -686,53 +620,51 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
     return hasError && hasValid;
   }
 
+  /**
+   * Return true if the group data as any pattern error in his ingredientRowData
+   * @param groupData The group data to check for pattern error
+   * @returns The value of the check
+   */
   hasPatternError(groupData: GroupData): boolean {
-    for (const formGroup of Object.values(
-      (groupData.form.get("ingredientQuantity") as FormArray).controls
-    )) {
-      if ((formGroup as FormGroup).controls["quantity"].errors?.["pattern"]) {
+    // Loop over the ingredientRowData ingredient quantity form and search for pattern error
+    for (const ingredientRowData of groupData.ingredientRowDataList) {
+      if (
+        ingredientRowData.ingredientQuantityForm.controls["quantity"].errors?.[
+          "pattern"
+        ]
+      ) {
         return true;
       }
     }
-    return groupData.addIngredientForm.controls["quantity"].errors?.["pattern"];
-  }
-
-  changeComaToPoint(row: UntypedFormGroup) {
-    row.controls["quantity"].setValue(
-      row.controls["quantity"].value.replaceAll(",", ".")
-    );
+    // Also check the creation form
+    return groupData.addIngredientRowData.ingredientQuantityForm.controls[
+      "quantity"
+    ].errors?.["pattern"];
   }
 
   /**
-   * Moves an item in a FormArray to another position.
-   * @param formArray FormArray instance in which to move the item.
-   * @param fromIndex Starting index of the item.
-   * @param toIndex Index to which he item should be moved.
+   * Change coma for point in the quantity form
+   * This allow the user to input coma even if the backend only accept point
+   * @param ingredientQuantityForm The ingredient form group in which the quantity need to be updated
    */
-  moveItemInFormArray(
-    fromArray: FormArray,
-    fromIndex: number,
-    toIndex: number
-  ): void {
-    const temp = fromArray.at(fromIndex);
-    fromArray.removeAt(fromIndex);
-    fromArray.insert(toIndex, temp);
+  changeComaToPoint(ingredientQuantityForm: FormGroup): void {
+    // Get the current value of the quantity in the form of the ingredientRowData
+    const currentQuantityFormValue = ingredientQuantityForm
+      .get("quantity")
+      .value.toString();
+
+    // Change coma by point if there is any
+    if (currentQuantityFormValue.includes(",")) {
+      ingredientQuantityForm
+        .get("quantity")
+        .setValue(currentQuantityFormValue.replaceAll(",", "."));
+    }
   }
 
-  transferItemBetweenFormArray(
-    fromArray: FormArray,
-    toArray: FormArray,
-    fromIndex: number,
-    toIndex: number
-  ): void {
-    const temp = fromArray.at(fromIndex);
-
-    if (toIndex >= toArray.length) {
-      toArray.push(temp);
-    } else {
-      toArray.insert(toIndex, temp);
-    }
-
-    fromArray.removeAt(fromIndex);
+  /**
+   * Compare function used by the material select input
+   */
+  compareFn(c1: any, c2: any): boolean {
+    return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
 }

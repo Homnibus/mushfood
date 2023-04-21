@@ -17,6 +17,7 @@ h1 {
   display: flex;
   align-items: center;
   width: 100%;
+  height: 56px;
   overflow-x: hidden;
   background: #f2f0f4;
   line-height: 24px;
@@ -25,13 +26,7 @@ h1 {
 
   .ingredient-group-title {
     flex-grow: 1;
-    display: inline-block;
-    padding: 19px 0 19px 2em;
-    color: #430e4b;
-    font-size: 12px;
-    font-weight: 500;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
-    line-height: 18px;
+    padding: 0 2em;
   }
 
   .ingredient-group-delete-button {
@@ -56,15 +51,13 @@ table {
     background: #fafafa;
   }
 
-  td {
-    padding-right: 2em;
+  td,
+  th {
+    padding-right: 1.5em;
   }
 
   .mat-column-ingredient {
     width: 100%;
-  }
-  .mat-column-deleteIngredient {
-    text-align: center;
   }
 }
 
@@ -75,6 +68,9 @@ tr.mat-row td {
   }
 }
 
+table td.mat-column-used {
+  text-align: center;
+}
 .material-icons.color_green {
   color: #407a52;
 }
@@ -82,23 +78,28 @@ tr.mat-row td {
   color: #8f1d21;
 }
 
+.mat-column-deleteIngredient {
+  text-align: end;
+}
+
 .cdk-drag-preview {
   box-sizing: border-box;
   border-radius: 4px;
   box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
     0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
-  td {
-    padding-right: 2em;
+
+  td.mat-cell:first-of-type {
+    padding-left: 1em;
   }
-  .mat-column-used {
-    padding-top: 0.4em;
+  td.mat-cell {
+    padding-right: 1.5em;
   }
 
   .mat-column-ingredient {
     width: 100%;
   }
-  .mat-column-deleteIngredient {
-    text-align: center;
+  .ingredient-group {
+    margin-top: 0;
   }
 }
 
@@ -110,6 +111,7 @@ tr.mat-row td {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
+.cdk-drop-list-dragging .ingredient-group-data:not(.cdk-drag-placeholder),
 .cdk-drop-list-dragging .mat-row:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
@@ -119,4 +121,9 @@ tr.mat-row td {
   transition: opacity 0.5s ease-in-out;
   position: relative;
   z-index: -1;
+}
+
+.add-group {
+  text-align: center;
+  margin: 2em 0 1em 0;
 }

@@ -13,6 +13,7 @@ import {
 import { RecipeUpdateCategoriesComponent } from "./recipe-update-categories/recipe-update-categories.component";
 import { CategoryModule } from "../category/category.module";
 import { DragDropModule } from "@angular/cdk/drag-drop";
+import { RecipeAddGroupDialogComponent } from './recipe-add-group-dialog/recipe-add-group-dialog.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { DragDropModule } from "@angular/cdk/drag-drop";
     RecipeUpdateGeneralSettingsComponent,
     RecipeUpdateDeleteDialogComponent,
     RecipeUpdateCategoriesComponent,
+    RecipeAddGroupDialogComponent,
   ],
   imports: [
     SharedModule,

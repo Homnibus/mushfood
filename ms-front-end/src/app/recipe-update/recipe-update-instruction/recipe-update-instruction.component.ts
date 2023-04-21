@@ -1,8 +1,4 @@
-import {
-  Component,
-  OnDestroy,
-  OnInit,
-} from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import * as CustomEditor from "ckeditor5-build-rescodex";
 import { Recipe } from "../../app.models";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
@@ -25,7 +21,7 @@ import { IngredientQuantityService } from "../../ingredient/services/ingredient-
 @Component({
   selector: "app-recipe-update-instruction",
   templateUrl: "./recipe-update-instruction.component.html",
-  styleUrls: ["./recipe-update-instruction.component.css"],
+  styleUrls: ["./recipe-update-instruction.component.scss"],
 })
 export class RecipeUpdateInstructionComponent implements OnInit, OnDestroy {
   public Editor = CustomEditor;

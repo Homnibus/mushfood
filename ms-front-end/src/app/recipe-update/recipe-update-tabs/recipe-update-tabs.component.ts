@@ -93,8 +93,8 @@ export class RecipeUpdateTabsComponent implements OnInit, OnDestroy {
         this.ingredientQuantityService
           .saveIngredientQuantity(
             this.ingredientService.saveIngredient(
-              this.ingredientQuantityService.toUpdateIngredientQuantity,
-              this.ingredientQuantityService.toCreateIngredientQuantity
+              this.ingredientQuantityService.toUpdateIngredientQuantityList,
+              this.ingredientQuantityService.toCreateIngredientQuantityList
             ),
             this.ingredientQuantityService
               .saveIngredientQuantityToDelete()

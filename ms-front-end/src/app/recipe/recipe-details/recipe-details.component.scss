@@ -1,8 +1,8 @@
-@import '../../../sass/theme/theme-small';
+@import "../../../sass/theme/theme-small";
 $item-height: 366;
 $item-width: 306;
 $image-mask-margin: 8;
-$image-mask-width: $item-width - ($image-mask-margin*2);
+$image-mask-width: $item-width - ($image-mask-margin * 2);
 
 .image-flex-container {
   display: flex;
@@ -23,7 +23,7 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
 
   .image-mask {
     display: inline-block;
-    height: $item-height - ($image-mask-margin*2) + 0px;
+    height: $item-height - ($image-mask-margin * 2) + 0px;
     width: $image-mask-width + 0px;
     margin-top: $image-mask-margin + 0px;
     margin-left: $image-mask-margin + 0px;
@@ -31,7 +31,6 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
     background-position: center;
     background-size: $item-height + 0px;
   }
-
 }
 
 .image-ingredient {
@@ -51,6 +50,9 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
     h1 {
       margin-bottom: 0.3em;
       color: $mat-primary-900;
+      &::first-letter {
+        text-transform: capitalize;
+      }
     }
   }
 }
@@ -94,12 +96,12 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
   h2 {
     white-space: nowrap;
     margin-right: 0.5em;
-    margin-left: .2em;
+    margin-left: 0.2em;
     color: $mat-primary-900;
   }
 }
 
-.categories{
+.categories {
   mat-chip {
     cursor: pointer;
   }
@@ -108,7 +110,6 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
   }
 }
 
-
 .variant {
   margin-bottom: 1em;
   a {
@@ -116,7 +117,7 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
     font-size: 16px;
     font-family: Impacto, Impact, sans-serif;
     color: $mat-primary-900;
-    &:first-letter{
+    &:first-letter {
       color: $mat-primary-400;
       text-transform: capitalize;
     }
@@ -126,6 +127,6 @@ $image-mask-width: $item-width - ($image-mask-margin*2);
   }
 }
 
-.auteur{
+.auteur {
   margin-bottom: 1em;
 }

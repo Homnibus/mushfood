@@ -7,12 +7,13 @@
 @import "ckeditor/content";
 
 @import "mat-components/mat-table";
+@import "mat-components/mat-textarea";
+@import "mat-components/mat-button";
 @import "ckeditor/theme";
+
 .mushfood {
   @import "mat-components/mat-list";
   @import "mat-components/mat-checkbox";
   @import "mat-components/mat-card";
-  @import "mat-components/mat-button";
-  @import "mat-components/mat-textarea";
   @import "mat-components/mat-snack-bar";
 }

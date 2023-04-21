@@ -34,4 +34,14 @@ export class MeasurementUnitService extends ModelService<MeasurementUnit> {
     }
   }
 
+
+  getMeasurementUnitById(measurementUnitId: number | MeasurementUnit): MeasurementUnit {
+    if (typeof measurementUnitId !== "number") {
+      return undefined;
+    }
+    return this.measurementUnitList.find(
+      (measurementUnit) => measurementUnit.id === measurementUnitId
+    );
+  }
+
 }

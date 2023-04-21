@@ -7,7 +7,7 @@ import { MatDialogRef } from "@angular/material/dialog";
   templateUrl: "./recipe-add-variant-dialog.component.html",
   styleUrls: ["./recipe-add-variant-dialog.component.scss"],
 })
-export class RecipeAddVariantDialogComponent implements OnInit {
+export class RecipeAddVariantDialogComponent {
   recipeForm = this.fb.group({
     title: ["", Validators.required],
   });
@@ -17,8 +17,6 @@ export class RecipeAddVariantDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<RecipeAddVariantDialogComponent>,
     private fb: UntypedFormBuilder
   ) {}
-
-  ngOnInit(): void {}
 
   createVariant(): void {
     if (this.recipeForm.get("title").valid && !this.isCreating) {

@@ -1,0 +1,31 @@
+<h1 mat-dialog-title>Nouveau groupe</h1>
+<div mat-dialog-content>
+  <form
+    (ngSubmit)="this.createIngredientGroup()"
+    [formGroup]="addIngredientGroupForm"
+  >
+    <mat-form-field>
+      <mat-label>Titre</mat-label>
+      <input
+        #titleInput
+        formControlName="title"
+        matInput
+        maxlength="30"
+        type="text"
+      />
+      <mat-hint align="end">{{ titleInput.value?.length || 0 }}/30</mat-hint>
+      <mat-error>Entrez un titre pour votre group</mat-error>
+    </mat-form-field>
+  </form>
+</div>
+<div class="mushfood" mat-dialog-actions>
+  <button
+    (click)="this.createIngredientGroup()"
+    cdkFocusInitial
+    color="primary"
+    mat-raised-button
+  >
+    Créer
+  </button>
+  <button [mat-dialog-close]="" mat-stroked-button>Annuler</button>
+</div>

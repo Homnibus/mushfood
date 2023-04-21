@@ -1,6 +1,7 @@
 .mat-table {
   .mat-header-cell {
     color: #430e4b;
+    font-size: 14px;
   }
 
   .mat-header-row {
@@ -12,38 +13,5 @@
 .mat-footer-row {
   td.mat-cell:first-of-type {
     padding-left: 1em;
-  }
-  .mat-form-field {
-    line-height: 47.2px;
-
-    &.small {
-      width: 5em;
-    }
-
-    &.medium {
-      width: 10em;
-    }
-
-    .mat-form-field-wrapper {
-      padding-bottom: 0;
-    }
-
-    &.number .mat-form-field-infix {
-      text-align: right;
-      font-family: "Roboto Mono", "Helvetica Neue", sans-serif;
-    }
-
-    .mat-form-field-infix {
-      border-top-width: 0;
-      padding: 0;
-    }
-    .mat-form-field-label-wrapper {
-      top: -1.25em;
-    }
-
-    .mat-form-field-underline {
-      bottom: 0;
-      background-color: transparent;
-    }
   }
 }

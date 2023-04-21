@@ -280,7 +280,6 @@ export class MeasurementUnitSerializer
   }
 }
 
-
 export class IngredientGroupSerializer
   implements ModelSerializer<IngredientGroup>
 {
@@ -325,7 +324,6 @@ export class IngredientGroupSerializer
   }
 }
 
-
 export class IngredientQuantitySerializer
   implements ModelSerializer<IngredientQuantity>
 {
@@ -335,14 +333,25 @@ export class IngredientQuantitySerializer
     const ingredientQuantity = new IngredientQuantity();
     ingredientQuantity.id = parseInt(json.id, 10);
     ingredientQuantity.quantity = +json.quantity;
-    ingredientQuantity.measurementUnit = measurementUnitSerializer.fromJson(
-      json.measurement_unit,
-      ModelState.Retrieved
-    );
-    ingredientQuantity.ingredient = ingredientSerializer.fromJson(
-      json.ingredient,
-      ModelState.Retrieved
-    );
+    if (parseInt(json.measurement_unit, 10)) {
+      ingredientQuantity.measurementUnit = parseInt(
+        json.measurement_unit,
+        10
+      ) as any;
+    } else {
+      ingredientQuantity.measurementUnit = measurementUnitSerializer.fromJson(
+        json.measurement_unit,
+        ModelState.Retrieved
+      );
+    }
+    if (parseInt(json.ingredient, 10)) {
+      ingredientQuantity.ingredient = parseInt(json.ingredient, 10) as any;
+    } else {
+      ingredientQuantity.ingredient = ingredientSerializer.fromJson(
+        json.ingredient,
+        ModelState.Retrieved
+      );
+    }
     ingredientQuantity.ingredientGroup = parseInt(json.ingredient_group, 10);
     ingredientQuantity.rank = parseInt(json.rank, 10);
     ingredientQuantity.creationDate = new Date(json.creation_date);

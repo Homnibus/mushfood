@@ -23,6 +23,14 @@ export class BaseModel {
   public id: number;
 }
 
+export class TempIdModel extends BaseModel {
+  public tempId: number;
+
+  getId(): number {
+    return this.id ? this.id : this.tempId;
+  }
+}
+
 export class User extends BaseModel implements Model {
   static modelName = "user";
   static modelPlural = "user";
@@ -111,11 +119,10 @@ export class MeasurementUnit extends BaseModel implements Model {
   updateDate: Date;
 }
 
-export class IngredientGroup extends BaseModel implements Model {
+export class IngredientGroup extends TempIdModel implements Model {
   static modelName = "ingredient-group";
   static modelPlural = "ingredient-groups";
 
-  tempId: number;
   title: string;
   recipe: number;
   rank: number;
@@ -123,11 +130,10 @@ export class IngredientGroup extends BaseModel implements Model {
   updateDate: Date;
 }
 
-export class IngredientQuantity extends BaseModel implements Model {
+export class IngredientQuantity extends TempIdModel implements Model {
   static modelName = "ingredient-quantities";
   static modelPlural = "ingredient-quantities";
 
-  tempId: number;
   quantity: number;
   measurementUnit: MeasurementUnit;
   ingredient: Ingredient;

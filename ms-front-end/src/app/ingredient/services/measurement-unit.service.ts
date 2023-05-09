@@ -21,7 +21,11 @@ export class MeasurementUnitService extends ModelService<MeasurementUnit> {
     );
   }
 
-  loadMeasurementUnitList(): Observable<MeasurementUnit[]> {
+    /**
+   * Retrieve from the backend the measurement unit list
+   * @returns An observable to subscribe to to get the measurement unit list
+   */
+  initMeasurementUnitList(): Observable<MeasurementUnit[]> {
     if (this.measurementUnitList) {
       return of(this.measurementUnitList);
     } else {
@@ -33,7 +37,6 @@ export class MeasurementUnitService extends ModelService<MeasurementUnit> {
       );
     }
   }
-
 
   getMeasurementUnitById(measurementUnitId: number | MeasurementUnit): MeasurementUnit {
     if (typeof measurementUnitId !== "number") {

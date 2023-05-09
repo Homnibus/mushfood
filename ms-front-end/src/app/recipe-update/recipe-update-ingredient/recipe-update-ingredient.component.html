@@ -7,7 +7,7 @@
 >
   <ng-container
     *ngIf="
-      this.measurementUnitService.measurementUnitList as measurementUnitList
+      this.measurementUnitList as measurementUnitList
     "
   >
     <div
@@ -148,7 +148,7 @@
                   placeholder="Unitée"
                 >
                   <mat-option
-                    *ngFor="let measurementUnit of measurementUnitList"
+                    *ngFor="let measurementUnit of this.measurementUnitList"
                     [value]="measurementUnit"
                   >
                     {{ measurementUnit.name }}
@@ -174,7 +174,7 @@
                   placeholder="Unitée"
                 >
                   <mat-option
-                    *ngFor="let measurementUnit of measurementUnitList"
+                    *ngFor="let measurementUnit of this.measurementUnitList"
                     [value]="measurementUnit"
                   >
                     {{ measurementUnit.name }}
@@ -212,7 +212,7 @@
                   #auto="matAutocomplete"
                   autoActiveFirstOption
                   [displayWith]="
-                    this.ingredientQuantityService.displayIngredient
+                    this.ingredientService.displayIngredient
                   "
                 >
                   <mat-option
@@ -249,7 +249,7 @@
                   #autoNew="matAutocomplete"
                   autoActiveFirstOption
                   [displayWith]="
-                    this.ingredientQuantityService.displayIngredient
+                    this.ingredientService.displayIngredient
                   "
                 >
                   <mat-option

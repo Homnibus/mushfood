@@ -19,8 +19,6 @@ export class RecipeHexagonComponent {
   @Input()
   recipeListHexagon: Position[];
   @Input()
-  variant: number[];
-  @Input()
   flashOn = false;
   @Output()
   hexagonClick = new EventEmitter();

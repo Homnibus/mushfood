@@ -1,16 +1,17 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { ModelState, Recipe } from "../../app.models";
 import { TabLink } from "../../shared/web-page/web-page-tabs/web-page-tabs.component";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Observable, Subscription } from "rxjs";
-import { switchMap, tap } from "rxjs/operators";
+import { first, switchMap, tap } from "rxjs/operators";
 import { RecipeService } from "../../recipe/services/recipe.service";
 import { RecipeImageService } from "../../recipe-image/services/recipe-image.service";
 import { IngredientQuantityService } from "../../ingredient/services/ingredient-quantity.service";
 import { IngredientService } from "../../ingredient/services/ingredient.service";
 import { IngredientQuantityMentionService } from "../../ingredient/services/ingredient-quantity-mention.service";
 import { IngredientGroupService } from "src/app/ingredient/services/ingredient-group.service";
+import { AuthService } from "src/app/core/services/auth.service";
 
 @Component({
   selector: "app-recipe-update-tabs",
@@ -19,12 +20,13 @@ import { IngredientGroupService } from "src/app/ingredient/services/ingredient-g
 })
 export class RecipeUpdateTabsComponent implements OnInit, OnDestroy {
   recipe: Recipe;
-  activeRecipeSubscription: Subscription;
   tabLinkList: TabLink[];
   isSaving = false;
 
   constructor(
     private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private authService: AuthService,
     private snackBar: MatSnackBar,
     private recipeService: RecipeService,
     private recipeImageService: RecipeImageService,
@@ -35,17 +37,22 @@ export class RecipeUpdateTabsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.activeRecipeSubscription = this.recipeService.activeRecipe$.subscribe(
-      (data) => {
-        this.recipe = data;
+    this.recipeService
+      .initActiveRecipe(this.activatedRoute.snapshot.paramMap.get("slug"))
+      .pipe(first())
+      .subscribe((recipe) => {
+        if (
+          this.authService.currentUser.userName &&
+          recipe.authorUserName !== this.authService.currentUser.userName
+        ) {
+          this.router.navigateByUrl("/error/forbidden");
+        }
+        this.recipe = recipe;
         this.initTabLinkList(this.recipe);
-      }
-    );
+      });
   }
 
   ngOnDestroy(): void {
-    this.activeRecipeSubscription.unsubscribe();
-    this.recipeService.resetModification();
     this.recipeImageService.resetModification();
     this.ingredientQuantityService.resetModification();
     this.ingredientGroupService.resetModification();
@@ -86,15 +93,14 @@ export class RecipeUpdateTabsComponent implements OnInit, OnDestroy {
     return this.recipeImageService.saveRecipeImage().pipe(
       // Update the active recipe with the new RecipeImage
       tap((recipeImage) => {
-        this.recipeService.updateRecipeImage(recipeImage);
+        this.recipeService.addRecipeImageToUpdate(recipeImage);
       }),
       // Update the ingredient quantity
       switchMap(() =>
         this.ingredientQuantityService
           .saveIngredientQuantity(
             this.ingredientService.saveIngredient(
-              this.ingredientQuantityService.toUpdateIngredientQuantityList,
-              this.ingredientQuantityService.toCreateIngredientQuantityList
+              this.ingredientQuantityService.getIngredientToCreate()
             ),
             this.ingredientQuantityService
               .saveIngredientQuantityToDelete()

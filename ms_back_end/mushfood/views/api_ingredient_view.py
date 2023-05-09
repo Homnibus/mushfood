@@ -6,6 +6,6 @@ from mushfood.serializers import IngredientSerializer
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
-  queryset = Ingredient.objects.all().order_by('-creation_date')
+  queryset = Ingredient.objects.all().order_by('name')
   serializer_class = IngredientSerializer
   permission_classes = (permissions.IsAuthenticatedOrReadOnly,)

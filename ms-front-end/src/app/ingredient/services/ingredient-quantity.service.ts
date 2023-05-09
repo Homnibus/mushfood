@@ -24,9 +24,9 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
   private activeIngredientQuantityListSubject = new BehaviorSubject<
     IngredientQuantity[]
   >([]);
-  public toCreateIngredientQuantityList: IngredientQuantity[] = [];
-  public toUpdateIngredientQuantityList: IngredientQuantity[] = [];
-  public toDeleteIngredientQuantityList: IngredientQuantity[] = [];
+  private toCreateIngredientQuantityList: IngredientQuantity[] = [];
+  private toUpdateIngredientQuantityList: IngredientQuantity[] = [];
+  private toDeleteIngredientQuantityList: IngredientQuantity[] = [];
 
   public activeIngredientQuantityList$ =
     this.activeIngredientQuantityListSubject.asObservable();
@@ -40,31 +40,65 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
   }
 
   /**
-   * Retrieve from the back the list of ingredient quantity linked to a given recipe and set it as the active one
+   * Retrieve from the backend the list of ingredient quantity linked to a given recipe and set it as the active one
    * @param recipe The recipe from witch the ingredient quantity will be loaded
-   * @returns The list of the of ingredient quantity linked the a given recipe
+   * @param keepActiveList If true, keep the current active list for the same recipe
+   * @returns The list of the of ingredient quantity linked to the given recipe
    */
-  setActiveIngredientQuantityList(
-    recipe: Recipe
+  initActiveIngredientQuantityList(
+    recipe: Recipe,
+    keepActiveList: boolean = false
   ): Observable<IngredientQuantity[]> {
-    // If the active recipe is a new one, load the linked ingredient quantities
-    if (this.activeRecipe !== recipe) {
+    if (this.activeRecipe === recipe && keepActiveList) {
+      return of(this.activeIngredientQuantityList);
+    } else {
       this.activeRecipe = recipe;
       return this.filteredList(
         `ingredient_group__recipe__id=${recipe.id}`
       ).pipe(
-        map((ingredientQuantityList) => {
-          this.activeIngredientQuantityList = ingredientQuantityList.slice();
+        tap((ingredientQuantityList) => {
+          this.activeIngredientQuantityList = ingredientQuantityList;
           this.activeIngredientQuantityListSubject.next(
             this.activeIngredientQuantityList
           );
-          return this.activeIngredientQuantityList;
         })
       );
-      // Else return the current ingredient quantities list
-    } else {
-      return of(this.activeIngredientQuantityList);
     }
+  }
+
+  /**
+   * Return the list of ingredient quantity linked to a given ingredient group
+   * @param ingredientQuantityList The ingredient quantity list to filter
+   * @param ingredientGroupId The ingredient group that should be find
+   * @returns A list a ingredient quantity that are only linked to the ingredient group
+   */
+  getIngredientQuantityOfGroup(
+    ingredientQuantityList: IngredientQuantity[],
+    ingredientGroupId: number
+  ): IngredientQuantity[] {
+    return ingredientQuantityList.filter(
+      (toFilterIngredientQuantity) =>
+        toFilterIngredientQuantity.ingredientGroup === ingredientGroupId
+    );
+  }
+
+  /**
+   * Get the list of name of ingredient to create
+   * @returns The list of name of ingredient to create
+   */
+  getIngredientToCreate(): string[] {
+    // List all the new ingredient to create
+    let toCreateIngredientNameList = this.toCreateIngredientQuantityList
+      .concat(this.toUpdateIngredientQuantityList)
+      .filter((ingredientQuantity) => !ingredientQuantity.ingredient?.id)
+      .map((ingredientQuantity) =>
+        ingredientQuantity.ingredient.name.trim().toLowerCase()
+      );
+    // Remove the duplicates
+    toCreateIngredientNameList = Array.from(
+      new Set(toCreateIngredientNameList)
+    );
+    return toCreateIngredientNameList;
   }
 
   /**
@@ -83,7 +117,6 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
     // Set the default values
     createdIngredientQuantity.tempId = Date.now();
     createdIngredientQuantity.state = ModelState.NotSaved;
-
     // Set rank of ingredientQuantity to last
     const ingredientQuantityOfGroup = this.getIngredientQuantityOfGroup(
       this.activeIngredientQuantityList,
@@ -114,7 +147,6 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
       new IngredientQuantity(),
       toUpdateIngredientQuantity
     );
-
     // Look into the delete list for the ingredient quantity to update
     const indexOfIngredientQuantityInDeleteList =
       this.toDeleteIngredientQuantityList.findIndex(
@@ -165,6 +197,10 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
     this.activeIngredientQuantityList[indexOfIngredientQuantityInActiveList] =
       updatedIngredientQuantity;
 
+    // Sort the list in case any of the ranks changed
+    // This should not change the list thanks to the use of the updateRank function when manipulating ranks
+    this.activeIngredientQuantityList.sort((a, b) => a.rank - b.rank);
+
     // Emit the new active ingredient quantity list
     this.activeIngredientQuantityListSubject.next(
       this.activeIngredientQuantityList.slice()
@@ -198,7 +234,7 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
       return deletedIngredientQuantity;
     }
 
-    // Look into the create list for the ingredient quantity to update
+    // Look into the create list for the ingredient quantity to delete
     const indexOfIngredientQuantityInCreateList =
       this.toCreateIngredientQuantityList.findIndex(
         (ingredientQuantity) =>
@@ -212,13 +248,13 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
       );
     }
 
-    // Look into the update list for the ingredient quantity to update
+    // Look into the update list for the ingredient quantity to delete
     const indexOfIngredientQuantityInUpdateList =
       this.toUpdateIngredientQuantityList.findIndex(
         (ingredientQuantity) =>
           ingredientQuantity.getId() === deletedIngredientQuantity.getId()
       );
-    // If the ingredientQuantity to update is already in the creation list, remove it
+    // If the ingredientQuantity to delete is already in the update list, remove it
     if (indexOfIngredientQuantityInUpdateList >= 0) {
       this.toUpdateIngredientQuantityList.splice(
         indexOfIngredientQuantityInUpdateList,
@@ -246,13 +282,63 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
         this.activeIngredientQuantityList,
         deletedIngredientQuantity.ingredientGroup
       );
-    this.updateRank(ingredientQuantityWithRankToUpdateList);
+    this.updateRankOfIngredientQuantity(ingredientQuantityWithRankToUpdateList);
 
     // Emit the new ingredient quantity active list
     this.activeIngredientQuantityListSubject.next(
       this.activeIngredientQuantityList.slice()
     );
     return deletedIngredientQuantity;
+  }
+
+  /**
+   * Recalculate the rank of the ingredient quantity in the given list
+   * The rank of each ingredient quantity will be equal to its position in the list
+   * @param ingredientQuantityList The ingredient quantity list in which the ingredient quantity rank must be recalculated
+   */
+  updateRankOfIngredientQuantity(
+    ingredientQuantityList: IngredientQuantity[]
+  ): void {
+    // Loop over the list to update the rank
+    for (const [
+      index,
+      ingredientQuantity,
+    ] of ingredientQuantityList.entries()) {
+      const updatedIngredientQuantity = Object.assign(
+        new IngredientQuantity(),
+        ingredientQuantity
+      );
+
+      // Update the rank of the ingredient quantity if needed
+      // The rank start at 1 and not at 0
+      if (updatedIngredientQuantity.rank != index + 1) {
+        updatedIngredientQuantity.rank = index + 1;
+        ingredientQuantity.rank = index + 1;
+        // Add the ingredientQuantity to the list of ingredientQuantity to update.
+        this.addIngredientQuantityToUpdate(updatedIngredientQuantity);
+      }
+    }
+  }
+
+  /**
+   * Update the group of a given ingredient quantity and add it to the updateList
+   * @param ingredientQuantity The ingredient quantity to update
+   * @param ingredientGroup The new ingredient group to link to the ingredient quantity
+   */
+  updateGroupOfIngredientQuantity(
+    ingredientQuantity: IngredientQuantity,
+    ingredientGroup: IngredientGroup
+  ): void {
+    const updatedIngredientQuantity = Object.assign(
+      new IngredientQuantity(),
+      ingredientQuantity
+    );
+
+    // Update the group of the ingredient quantity
+    updatedIngredientQuantity.ingredientGroup = ingredientGroup.getId();
+    ingredientQuantity.ingredientGroup = ingredientGroup.getId();
+    // Add the ingredientQuantity to the list of ingredientQuantity to update.
+    this.addIngredientQuantityToUpdate(updatedIngredientQuantity);
   }
 
   /**
@@ -314,7 +400,7 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
                 }
                 // Replace the group if it was created by the saveIngredientGroupObservable
                 const newIngredientGroup =
-                  this.ingredientGroupService.findIngredientGroupOfIngredientQuantityIfCreated(
+                  this.ingredientGroupService.getIngredientGroupOfIngredientQuantityIfCreated(
                     toCreateIngredientQuantity
                   );
                 if (newIngredientGroup) {
@@ -344,11 +430,12 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
                         createdIngredientQuantity.measurementUnit
                       );
 
-                    // Update the ingredient quantity in the current
+                    // Update the ingredient quantity in the current list
                     this.activeIngredientQuantityList[
                       createdIngredientQuantityPosition
                     ] = createdIngredientQuantity;
                     // Sort the active ingredient quantity list
+                    // This should not change the list because it's already sorted
                     this.activeIngredientQuantityList.sort(
                       (a, b) => a.rank - b.rank
                     );
@@ -385,7 +472,7 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
                 // For each ingredientQuantity, check if the ingredient group needed to be create and, if it's the case, replace it with
                 // the one created by saveIngredientGroupObservable.
                 const newIngredientGroup =
-                  this.ingredientGroupService.findIngredientGroupOfIngredientQuantityIfCreated(
+                  this.ingredientGroupService.getIngredientGroupOfIngredientQuantityIfCreated(
                     toUpdateIngredientQuantity
                   );
                 if (newIngredientGroup) {
@@ -417,6 +504,7 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
                       updatedIngredientQuantityPosition
                     ] = updatedIngredientQuantity;
                     // Sort the active ingredient quantity list
+                    // This should not change the list because it's already sorted
                     this.activeIngredientQuantityList.sort(
                       (a, b) => a.rank - b.rank
                     );
@@ -458,15 +546,12 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
     toCopyIngredientList: IngredientQuantity[]
   ): Observable<[IngredientQuantity[], Recipe]> {
     const newActiveIngredientQuantityList = toCopyIngredientList.map(
-      (ingredientQuantity) => {
-        const newIngredientQuantity = new IngredientQuantity();
+      (toCopyIngredientQuantity) => {
+        const newIngredientQuantity = Object.assign(
+          new IngredientQuantity(),
+          toCopyIngredientQuantity
+        );
         newIngredientQuantity.tempId = Date.now();
-        newIngredientQuantity.ingredient = ingredientQuantity.ingredient;
-        //TODO : mettre a jour la création de variante avec les groupes et les rangs
-        // newIngredientQuantity.recipe = variantRecipe.id;
-        newIngredientQuantity.quantity = ingredientQuantity.quantity;
-        newIngredientQuantity.measurementUnit =
-          ingredientQuantity.measurementUnit;
         return newIngredientQuantity;
       }
     );
@@ -474,9 +559,6 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
       newActiveIngredientQuantityList.map((newIngredientQuantity) =>
         this.create(newIngredientQuantity).pipe(
           map((createdIngredientQuantity) => {
-            const elementPos = newActiveIngredientQuantityList
-              .map((x) => x.tempId)
-              .indexOf(newIngredientQuantity.tempId);
             newIngredientQuantity.id = createdIngredientQuantity.id;
             newIngredientQuantity.creationDate =
               createdIngredientQuantity.creationDate;
@@ -492,83 +574,12 @@ export class IngredientQuantityService extends ModelService<IngredientQuantity> 
     );
   }
 
+  /**
+   * Reset the working list
+   */
   resetModification() {
     this.toCreateIngredientQuantityList = [];
     this.toUpdateIngredientQuantityList = [];
     this.toDeleteIngredientQuantityList = [];
-  }
-
-  updateRank(ingredientQuantityList: IngredientQuantity[]): void {
-    for (const [
-      index,
-      ingredientQuantity,
-    ] of ingredientQuantityList.entries()) {
-      // Retrieve the form values to create the updated entity
-      const updatedIngredientQuantity = Object.assign(
-        new IngredientQuantity(),
-        ingredientQuantity
-      );
-
-      // Update the rank of the ingredient quantity if needed
-      // The rank start at 1 and not at 0
-      if (updatedIngredientQuantity.rank != index + 1) {
-        updatedIngredientQuantity.rank = index + 1;
-        ingredientQuantity.rank = index + 1;
-        // Add the ingredientQuantity to the list of ingredientQuantity to update.
-        this.addIngredientQuantityToUpdate(updatedIngredientQuantity);
-      }
-    }
-  }
-
-  //TODO : ajouter des commentaire et la doc
-  updateGroup(
-    ingredientQuantity: IngredientQuantity,
-    ingredientGroup: IngredientGroup
-  ): void {
-    const updatedIngredientQuantity = Object.assign(
-      new IngredientQuantity(),
-      ingredientQuantity
-    );
-
-    // Update the group of the ingredient quantity
-    updatedIngredientQuantity.ingredientGroup = ingredientGroup.getId();
-    ingredientQuantity.ingredientGroup = ingredientGroup.getId();
-    // Add the ingredientQuantity to the list of ingredientQuantity to update.
-    this.addIngredientQuantityToUpdate(updatedIngredientQuantity);
-  }
-
-  filterIngredientList(
-    ingredient: Ingredient | string,
-    ingredientList: Ingredient[]
-  ): Ingredient[] {
-    let filterValue = "";
-    if (ingredient) {
-      if (ingredient instanceof Ingredient) {
-        filterValue = ingredient.name.trim().toLowerCase();
-      } else {
-        filterValue = ingredient.trim().toLowerCase();
-      }
-    }
-    return ingredientList.filter((toFilterIngredient) =>
-      toFilterIngredient?.name.toLowerCase().includes(filterValue)
-    );
-  }
-
-  displayIngredient(ingredient?: Ingredient | string): string | undefined {
-    if (typeof ingredient === "string") {
-      return ingredient;
-    } else {
-      return ingredient ? ingredient.name : undefined;
-    }
-  }
-
-  getIngredientQuantityOfGroup(
-    ingredientQuantityList: IngredientQuantity[],
-    ingredientGroupId: number
-  ): IngredientQuantity[] {
-    return ingredientQuantityList.filter(
-      (toFilterIngredientQuantity) =>
-        toFilterIngredientQuantity.ingredientGroup === ingredientGroupId
-    );
   }
 }

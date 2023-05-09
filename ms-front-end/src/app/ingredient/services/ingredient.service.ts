@@ -21,7 +21,11 @@ export class IngredientService extends ModelService<Ingredient> {
     super(http, Ingredient, new IngredientSerializer());
   }
 
-  setActiveIngredientList(): Observable<Ingredient[]> {
+  /**
+   * Retrieve from the backend the list of ingredient and set it as the active one
+   * @returns The list of the of ingredient
+   */
+  initActiveIngredientList(): Observable<Ingredient[]> {
     if (typeof this.activeIngredientList === "undefined") {
       return this.list().pipe(
         map((ingredientList) => {
@@ -35,21 +39,55 @@ export class IngredientService extends ModelService<Ingredient> {
     }
   }
 
-  saveIngredient(
-    toUpdateIngredientQuantity: IngredientQuantity[],
-    toCreateIngredientQuantity: IngredientQuantity[]
-  ): Observable<Ingredient[]> {
-    // List all the new ingredient to create
-    let toCreateIngredientNameList = toCreateIngredientQuantity
-      .concat(toUpdateIngredientQuantity)
-      .filter((ingredientQuantity) => !ingredientQuantity.ingredient?.id)
-      .map((ingredientQuantity) =>
-        ingredientQuantity.ingredient.name.trim().toLowerCase()
-      );
-    // Remove the duplicates
-    toCreateIngredientNameList = Array.from(
-      new Set(toCreateIngredientNameList)
+  /**
+   * Return the ingredient from the active list that correspond to the input ingredient id
+   * @param ingredientId The ingredient id
+   * @returns The corresponding ingredient that from the active list
+   */
+  getIngredientById(ingredientId: number | Ingredient): Ingredient {
+    if (typeof ingredientId !== "number") {
+      return undefined;
+    }
+    if (!this.activeIngredientList) {
+      return undefined;
+    }
+
+    return this.activeIngredientList.find(
+      (ingredient) => ingredient.id === ingredientId
     );
+  }
+
+  /**
+   * Return a list of ingredient which name contains the inputted ingredient string
+   * @param ingredient The string to find in the ingredient list
+   * @param ingredientList The ingredient list to filter
+   * @returns An new ingredient list with only ingredient containing the ingredient string
+   */
+  filterIngredientList(
+    ingredient: Ingredient | string,
+    ingredientList: Ingredient[]
+  ): Ingredient[] {
+    let filterValue = "";
+    if (ingredient) {
+      if (ingredient instanceof Ingredient) {
+        filterValue = ingredient.name.trim().toLowerCase();
+      } else {
+        filterValue = ingredient.trim().toLowerCase();
+      }
+    }
+    return ingredientList.filter((toFilterIngredient) =>
+      toFilterIngredient?.name.toLowerCase().includes(filterValue)
+    );
+  }
+
+  /**
+   * Generate an Observable that handle the creation of the ingredient present in the ingredient list
+   * by calling the backend
+   * @returns An Observable to subscribe to in order to call the backend and perform the creation
+   */
+  saveIngredient(
+    toCreateIngredientNameList: string[]
+  ): Observable<Ingredient[]> {
     // Map back ingredient names to ingredient objects
     const toCreateIngredientList = toCreateIngredientNameList.map(
       (ingredientName) => {
@@ -65,30 +103,26 @@ export class IngredientService extends ModelService<Ingredient> {
     } else {
       // Create a list of the result of the creation of the new ingredients
       const listOfIngredientObservable = toCreateIngredientList.map(
-        (ingredient) => this.create(ingredient)
+        (toCreateIngredient) => this.create(toCreateIngredient)
       );
       // Wait for all the API call to complete
       return forkJoin(listOfIngredientObservable).pipe(
         // Update the current ingredient list
-        tap((ingredientList) => {
-          this.activeIngredientList =
-            this.activeIngredientList.concat(ingredientList);
+        tap((createdIngredientList) => {
+          this.activeIngredientList = this.activeIngredientList.concat(
+            createdIngredientList
+          );
           this.activeIngredientListSubject.next(this.activeIngredientList);
         })
       );
     }
   }
 
-  getIngredientById(ingredientId: number | Ingredient): Ingredient {
-    if (typeof ingredientId !== "number") {
-      return undefined;
+  displayIngredient(ingredient?: Ingredient | string): string | undefined {
+    if (typeof ingredient === "string") {
+      return ingredient;
+    } else {
+      return ingredient ? ingredient.name : undefined;
     }
-    if (!this.activeIngredientList) {
-      return undefined;
-    }
-
-    return this.activeIngredientList.find(
-      (ingredient) => ingredient.id === ingredientId
-    );
   }
 }

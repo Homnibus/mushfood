@@ -44,13 +44,7 @@
 </form>
 <div>
   <h1>Image d'illustration</h1>
-  <app-recipe-image-update
-    (recipeImageCreated)="recipeImageService.createActiveRecipeImage($event)"
-    (recipeImageFileChanged)="
-      recipeImageService.updateActiveRecipeImage($event)
-    "
-    [recipeImage]="recipeImageService.activeRecipeImage$ | async"
-  ></app-recipe-image-update>
+  <app-recipe-image-update></app-recipe-image-update>
 </div>
 
 <app-recipe-update-categories></app-recipe-update-categories>

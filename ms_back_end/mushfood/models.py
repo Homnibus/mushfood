@@ -94,8 +94,9 @@ class Recipe(models.Model):
     """
     Override the save method to generate the creation date and the title slug.
     """
-    # At the creation of the codex
-    if not self.id:
+    # At the creation of the recipe
+    new_recipe = not self.id
+    if new_recipe:
       # Create a unique slug
       max_length = Recipe._meta.get_field("slug").max_length
       self.slug = slugify(self.title)[:max_length]
@@ -111,6 +112,9 @@ class Recipe(models.Model):
     # Set user permissions
     if getattr(self, 'author', None) is not None:
       assign_all_perm(self, self.author)
+    if new_recipe:
+      # Create a default ingredient group 
+      IngredientGroup.objects.create(title="Ingrédients",recipe=self)
 
 
 class RecipeImage(models.Model):

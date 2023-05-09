@@ -11,6 +11,7 @@ import { HoneyService, Position } from "../../shared/services/honey.service";
 import { UntypedFormBuilder } from "@angular/forms";
 import { RecipePaginationService } from "../services/recipe-pagination.service";
 import { map } from "rxjs/operators";
+import { CategoryService } from "src/app/category/services/category.service";
 
 @Component({
   selector: "app-recipe-list",
@@ -40,6 +41,7 @@ export class RecipeListComponent implements OnInit {
   constructor(
     private fb: UntypedFormBuilder,
     private recipeService: RecipeService,
+    private categoryService: CategoryService,
     private recipePaginationService: RecipePaginationService,
     private route: ActivatedRoute,
     private router: Router,
@@ -65,27 +67,43 @@ export class RecipeListComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.initCategoryList();
-    const searchWords = this.route.snapshot.queryParamMap.get("search");
-    if (searchWords) {
-      this.searchForm.get("searchWords").setValue(searchWords);
-    }
-    const numberOfRecipeToFetch = this.authService.currentUser
-      ? this.lastRecipeSize - 1
-      : this.lastRecipeSize;
-    this.recipePaginationService
-      .filteredList(this.getFilterString(searchWords), 1, numberOfRecipeToFetch)
-      .pipe(map((paginationContainer) => paginationContainer.results))
-      .subscribe((recipeList) => {
-        this.recipeList = recipeList;
-        // Format the margin of the honey like shape containing the recipes
-        this.initHoneyComb();
-        this.recipeListHexagon = this.honeyService.makeHoney(
-          this.recipeListHexagon,
-          this.itemSize,
-          this.honeyCombDivWidth
-        );
+    const categoryListFromURL = [].concat(
+      this.route.snapshot.queryParamMap
+        .get("category")
+        ?.toLowerCase()
+        .split(",")
+    );
+    this.categoryService.initCategoryList().subscribe((categoryList) => {
+      this.categoryList = categoryList;
+      this.categorySelectedList = this.categoryList.map((category) => {
+        return categoryListFromURL.indexOf(category.name) >= 0;
       });
+
+      const searchWords = this.route.snapshot.queryParamMap.get("search");
+      if (searchWords) {
+        this.searchForm.get("searchWords").setValue(searchWords);
+      }
+      const numberOfRecipeToFetch = this.authService.currentUser
+        ? this.lastRecipeSize - 1
+        : this.lastRecipeSize;
+      this.recipePaginationService
+        .filteredList(
+          this.getFilterString(searchWords),
+          1,
+          numberOfRecipeToFetch
+        )
+        .pipe(map((paginationContainer) => paginationContainer.results))
+        .subscribe((recipeList) => {
+          this.recipeList = recipeList;
+          // Format the margin of the honey like shape containing the recipes
+          this.initHoneyComb();
+          this.recipeListHexagon = this.honeyService.makeHoney(
+            this.recipeListHexagon,
+            this.itemSize,
+            this.honeyCombDivWidth
+          );
+        });
+    });
   }
 
   scroll(el: HTMLElement) {
@@ -170,7 +188,7 @@ export class RecipeListComponent implements OnInit {
 
   private getFilterString(searchWords: string): string {
     const queryParams: Params = {};
-    let filterString = `logical_delete=false&no_variant=true`;
+    let filterString = `logical_delete=false`;
     if (searchWords) {
       filterString = `${filterString}&search=${searchWords}`;
       queryParams.search = searchWords;
@@ -193,20 +211,5 @@ export class RecipeListComponent implements OnInit {
     if (this.authService.currentUser) {
       this.recipeListHexagon.unshift(Position.Middle);
     }
-  }
-
-  private initCategoryList() {
-    const categoryListFromURL = [].concat(
-      this.route.snapshot.queryParamMap
-        .get("category")
-        ?.toLowerCase()
-        .split(",")
-    );
-    this.route.data.subscribe((data) => {
-      this.categoryList = data.categoryList;
-      this.categorySelectedList = this.categoryList.map((category) => {
-        return categoryListFromURL.indexOf(category.name) >= 0;
-      });
-    });
   }
 }

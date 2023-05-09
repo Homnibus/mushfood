@@ -1,56 +1,70 @@
 <app-web-page>
   <app-web-page-content>
-    <h1>
-      <span class="mush">MUSH</span><span class="food">FOOD</span>
-    </h1>
-    <form (ngSubmit)="onSearch()" [formGroup]="searchForm" class="search" #recipeListDiv>
+    <h1><span class="mush">MUSH</span><span class="food">FOOD</span></h1>
+    <form
+      (ngSubmit)="onSearch()"
+      [formGroup]="searchForm"
+      class="search"
+      #recipeListDiv
+    >
       <mat-form-field appearance="outline">
         <mat-label> </mat-label>
-        <input matInput placeholder="Recherche" formControlName="searchWords">
+        <input matInput placeholder="Recherche" formControlName="searchWords" />
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
-      <button color="accent" mat-raised-button type="submit">
-        Rechercher
-      </button>
+      <button color="accent" mat-raised-button type="submit">Rechercher</button>
     </form>
     <div class="categories">
       <h2>Catégories:</h2>
       <ng-container *ngFor="let category of categoryList; let index = index">
-        <button *ngIf="!categorySelectedList[index]"
-          color="primary" mat-stroked-button
-          (click)="selectCategory(index)">
-          {{category.name | titlecase}}
+        <button
+          *ngIf="!categorySelectedList[index]"
+          color="primary"
+          mat-stroked-button
+          (click)="selectCategory(index)"
+        >
+          {{ category.name | titlecase }}
         </button>
-        <button *ngIf="categorySelectedList[index]"
-                color="primary" mat-flat-button
-                (click)="selectCategory(index)">
-          {{category.name | titlecase}}
+        <button
+          *ngIf="categorySelectedList[index]"
+          color="primary"
+          mat-flat-button
+          (click)="selectCategory(index)"
+        >
+          {{ category.name | titlecase }}
         </button>
       </ng-container>
     </div>
     <ng-container *ngIf="recipeList">
-    <div (resized)="onResized($event)" *ngIf="recipeListHexagon" class="recipe-list">
-      <app-recipe-hexagon
-        *ngIf="authService.currentUser$ | async"
-        [index]="0"
-        [recipeRouterLink]=""
-        [backgroundImageLink]="addRecipeImgUrl"
-        [hexagonTitle]="'Nouvelle recette'"
-        [recipeListHexagon]="this.recipeListHexagon"
-        (hexagonClick)="createRecipe()"
-        [flashOn]="this.flashOn"
-      ></app-recipe-hexagon>
-      <app-recipe-hexagon
-        *ngFor="let recipe of recipeList; let index = index"
-        [index]="this.getIndexForRecipeList(index)"
-        [recipeRouterLink]="['/recipe/details', recipe.slug]"
-        [backgroundImageLink]="'url('+(recipe.recipeImage ? recipe.recipeImage.imageUrl : '') + ') '"
-        [hexagonTitle]="recipe.title"
-        [recipeListHexagon]="this.recipeListHexagon"
-        [variant]="this.recipe.variant"
-        [flashOn]="this.flashOn"
-      ></app-recipe-hexagon>
-    </div>
+      <div
+        (resized)="onResized($event)"
+        *ngIf="recipeListHexagon"
+        class="recipe-list"
+      >
+        <app-recipe-hexagon
+          *ngIf="authService.currentUser$ | async"
+          [index]="0"
+          [recipeRouterLink]=""
+          [backgroundImageLink]="addRecipeImgUrl"
+          [hexagonTitle]="'Nouvelle recette'"
+          [recipeListHexagon]="this.recipeListHexagon"
+          (hexagonClick)="createRecipe()"
+          [flashOn]="this.flashOn"
+        ></app-recipe-hexagon>
+        <app-recipe-hexagon
+          *ngFor="let recipe of recipeList; let index = index"
+          [index]="this.getIndexForRecipeList(index)"
+          [recipeRouterLink]="['/recipe/details', recipe.slug]"
+          [backgroundImageLink]="
+            'url(' +
+            (recipe.recipeImage ? recipe.recipeImage.imageUrl : '') +
+            ') '
+          "
+          [hexagonTitle]="recipe.title"
+          [recipeListHexagon]="this.recipeListHexagon"
+          [flashOn]="this.flashOn"
+        ></app-recipe-hexagon>
+      </div>
     </ng-container>
   </app-web-page-content>
 </app-web-page>

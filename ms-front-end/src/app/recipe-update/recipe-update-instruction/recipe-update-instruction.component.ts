@@ -1,15 +1,12 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import * as CustomEditor from "ckeditor5-build-rescodex";
-import { Recipe } from "../../app.models";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
-import { Subscription } from "rxjs";
+import { FormControl } from "@angular/forms";
+import { Subscription, firstValueFrom } from "rxjs";
 import {
   debounceTime,
   distinctUntilChanged,
-  filter,
   first,
   map,
-  skip,
 } from "rxjs/operators";
 import {
   FeedItem,
@@ -24,11 +21,9 @@ import { IngredientQuantityService } from "../../ingredient/services/ingredient-
   styleUrls: ["./recipe-update-instruction.component.scss"],
 })
 export class RecipeUpdateInstructionComponent implements OnInit, OnDestroy {
-  public Editor = CustomEditor;
-  recipe: Recipe;
-  recipeForm: UntypedFormGroup;
-  activeRecipeSubscription: Subscription;
-  recipeInstructionFormOnChange: Subscription;
+  editor = CustomEditor;
+  recipeForm: FormControl<string>;
+  recipeInstructionFormOnChangeSubscription: Subscription;
   isCkeditorFocused: boolean = false;
 
   option = {
@@ -45,46 +40,44 @@ export class RecipeUpdateInstructionComponent implements OnInit, OnDestroy {
   constructor(
     private recipeService: RecipeService,
     private ingredientQuantityService: IngredientQuantityService,
-    private fb: UntypedFormBuilder,
     private ingredientQuantityMentionService: IngredientQuantityMentionService
   ) {}
 
   ngOnInit(): void {
-    this.activeRecipeSubscription = this.recipeService.activeRecipe$.subscribe(
-      (data) => {
-        this.recipe = data;
-      }
-    );
-    this.recipeService.activeRecipe$.pipe(first()).subscribe((data) => {
-      this.recipeForm = this.fb.group({
-        instructions: [data.instructions],
-      });
+    // The active recipe is already initialized in the parent tab component
+    this.recipeService.activeRecipe$.pipe(first()).subscribe((activeRecipe) => {
+      this.recipeForm = new FormControl(activeRecipe.instructions);
     });
-    this.recipeInstructionFormOnChange = this.recipeForm
-      .get("instructions")
-      .valueChanges.pipe(debounceTime(500), distinctUntilChanged())
-      .subscribe((instructions) =>
-        this.recipeService.updateActiveRecipeInstruction(instructions)
-      );
 
-    this.recipeService.activeRecipe$
-      .pipe(
-        skip(1),
-        filter((data) => !this.isCkeditorFocused)
-      )
-      .subscribe((data) => {
-        this.recipeForm.get("instructions").setValue(data.instructions);
-      });
+    this.recipeInstructionFormOnChangeSubscription =
+      this.recipeForm.valueChanges
+        .pipe(debounceTime(500), distinctUntilChanged())
+        .subscribe((instructions) =>
+          this.recipeService.addRecipeInstructionsToUpdate(instructions)
+        );
+
+    // The instruction also need to be updated when the mentions are changed by another component
+    // TODO : trouver un moyen plus saint de faire cette vérification
+    this.recipeService.updatedRecipe$.subscribe((updatedRecipe) => {
+      if (!this.isCkeditorFocused) {
+        return;
+      }
+      this.recipeForm.setValue(updatedRecipe.instructions);
+    });
   }
 
   ngOnDestroy(): void {
-    this.activeRecipeSubscription.unsubscribe();
-    this.recipeInstructionFormOnChange.unsubscribe();
+    this.recipeInstructionFormOnChangeSubscription.unsubscribe();
   }
 
-  getFeedItems(queryText: string) {
-    return this.ingredientQuantityService.activeIngredientQuantityList$
-      .pipe(
+  /**
+   * Return a promise of a list of FeedItem by listing all the ingredients that match the input text
+   * @param queryText The text to mach
+   * @returns  A promise of a list of FeedItem
+   */
+  getFeedItems(queryText: string): Promise<FeedItem[]> {
+    return firstValueFrom(
+      this.ingredientQuantityService.activeIngredientQuantityList$.pipe(
         first(),
         map((ingredientQuantityList) =>
           ingredientQuantityList
@@ -97,18 +90,30 @@ export class RecipeUpdateInstructionComponent implements OnInit, OnDestroy {
             .slice(0, 10)
         )
       )
-      .toPromise();
+    );
   }
 
+  /**
+   * Return true if a feed item match a input text
+   * @param feedItem The item feed to check
+   * @param queryText The text to mach
+   * @returns True if the text match the feed item
+   */
   isFeedItemMatching(feedItem: FeedItem, queryText: string): boolean {
     const searchString = queryText.toLowerCase();
     return feedItem.id.toLowerCase().includes(searchString);
   }
 
+  /**
+   * Tag the editor as focus
+   */
   onCkeditorFocus(): void {
     this.isCkeditorFocused = true;
   }
 
+  /**
+   * Tag the editor as unfocus
+   */
   onCkeditorBlur(): void {
     this.isCkeditorFocused = false;
   }

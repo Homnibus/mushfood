@@ -1,47 +1,68 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {CategoryService} from '../../category/services/category.service';
-import {Category, Recipe} from '../../app.models';
-import {RecipeService} from '../../recipe/services/recipe.service';
-import {Subscription} from 'rxjs';
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { CategoryService } from "../../category/services/category.service";
+import { Category } from "../../app.models";
+import { RecipeService } from "../../recipe/services/recipe.service";
+import { Subscription } from "rxjs";
 
 @Component({
-  selector: 'app-recipe-update-categories',
-  templateUrl: './recipe-update-categories.component.html',
-  styleUrls: ['./recipe-update-categories.component.scss']
+  selector: "app-recipe-update-categories",
+  templateUrl: "./recipe-update-categories.component.html",
+  styleUrls: ["./recipe-update-categories.component.scss"],
 })
 export class RecipeUpdateCategoriesComponent implements OnInit, OnDestroy {
-
-  recipe: Recipe;
+  recipeCategoryList: Category[];
   activeRecipeSubscription: Subscription;
   categoryList: Category[];
 
   constructor(
     private recipeService: RecipeService,
     private categoryService: CategoryService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    this.categoryList = this.categoryService.categoryList;
-    this.activeRecipeSubscription = this.recipeService.activeRecipe$.subscribe(data => {
-      this.recipe = data;
-    });
+    // The active recipe is already initialized in the parent tab component
+    // The form need to be reset if the active recipe changes
+    this.activeRecipeSubscription = this.recipeService.activeRecipe$.subscribe(
+      (activeRecipe) => {
+        this.recipeCategoryList = activeRecipe.categories;
+      }
+    );
+
+    this.categoryService
+      .initCategoryList()
+      .subscribe(
+        (activeCategoryList) => (this.categoryList = activeCategoryList)
+      );
   }
 
   ngOnDestroy(): void {
     this.activeRecipeSubscription.unsubscribe();
   }
 
+  /**
+   * Return if the given category is present in the updated recipe
+   * @param categoryToCheck the category to find
+   * @returns True if the given category is present in the updated recipe
+   */
   isRecipeOfThisCategory(categoryToCheck: Category): boolean {
-    return this.recipe.categories.map(category => category.id).includes(categoryToCheck.id);
+    return this.recipeCategoryList
+      .map((category) => category.id)
+      .includes(categoryToCheck.id);
   }
 
+  /**
+   * Add or remove a category and set it to be updated in the active recipe
+   * @param selectedCategory the category to switch
+   */
   selectChip(selectedCategory: Category): void {
-    if (this.isRecipeOfThisCategory(selectedCategory)){
-      const index = this.recipe.categories.findIndex(category => category.id === selectedCategory.id)
-      this.recipe.categories.splice(index,1);
+    if (this.isRecipeOfThisCategory(selectedCategory)) {
+      const index = this.recipeCategoryList.findIndex(
+        (category) => category.id === selectedCategory.id
+      );
+      this.recipeCategoryList.splice(index, 1);
     } else {
-      this.recipe.categories.push(selectedCategory);
+      this.recipeCategoryList.push(selectedCategory);
     }
-    this.recipeService.updateActiveRecipeCategories(this.recipe.categories);
+    this.recipeService.addRecipeCategoriesToUpdate(this.recipeCategoryList);
   }
 }

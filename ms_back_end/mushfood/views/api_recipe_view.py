@@ -39,6 +39,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
   permission_classes = (ObjectPermissionsOrReadOnly,)
   filter_backends = [SearchFilter, DjangoFilterBackend]
   filter_class = RecipeFilter
-  search_fields = ['title', 'recipe_quantity__ingredient__name', '=author__username', 'variant__title',
-                   'variant__recipe_quantity__ingredient__name']
+  search_fields = ['title', 'recipe_group__group_quantity__ingredient__name', '=author__username', 'variant__title',
+                   'variant__recipe_group__group_quantity__ingredient__name']
   pagination_class = StandardResultsSetPagination

@@ -10,7 +10,8 @@ import { RecipeImage } from "../../app.models";
 import { Subscription } from "rxjs";
 import { RecipeImageService } from "../services/recipe-image.service";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
-import { filter, tap } from "rxjs/operators";
+import { filter, first, tap } from "rxjs/operators";
+import { RecipeService } from "src/app/recipe/services/recipe.service";
 
 @Component({
   selector: "app-recipe-image-update",
@@ -18,31 +19,36 @@ import { filter, tap } from "rxjs/operators";
   styleUrls: ["./recipe-image-update.component.scss"],
 })
 export class RecipeImageUpdateComponent implements OnInit, OnDestroy {
-  @Input() recipeImage: RecipeImage;
   @Output() recipeImageFileChanged = new EventEmitter<File>();
   @Output() recipeImageCreated = new EventEmitter<File>();
+  recipeImage: RecipeImage;
   recipeImageOnFileChangeSubscription: Subscription;
   imgURL: string | ArrayBuffer;
   recipeImageFormGroup: UntypedFormGroup;
 
   constructor(
     private fb: UntypedFormBuilder,
-    public recipeImageService: RecipeImageService
+    private recipeImageService: RecipeImageService,
+    private recipeService: RecipeService
   ) {}
 
   ngOnInit(): void {
-    this.recipeImageFormGroup = this.fb.group({
-      recipeImageFile: [
-        undefined,
-        this.recipeImageService.emailDomainValidator,
-      ],
+    this.recipeService.activeRecipe$.pipe(first()).subscribe((activeRecipe) => {
+      this.recipeImageService
+        .initActiveRecipeImage(activeRecipe, true)
+        .subscribe((activeRecipeImage) => {
+          this.recipeImage = activeRecipeImage;
+          if (activeRecipeImage?.imageFile) {
+            this.preview(activeRecipeImage?.imageFile);
+          } else {
+            this.imgURL = activeRecipeImage?.imageUrl;
+          }
+        });
     });
 
-    if (this.recipeImage?.imageFile) {
-      this.preview(this.recipeImage?.imageFile);
-    } else {
-      this.imgURL = this.recipeImage?.imageUrl;
-    }
+    this.recipeImageFormGroup = this.fb.group({
+      recipeImageFile: [undefined, this.recipeImageService.imageTypeValidator],
+    });
 
     this.recipeImageOnFileChangeSubscription = this.recipeImageFormGroup
       .get("recipeImageFile")
@@ -75,10 +81,10 @@ export class RecipeImageUpdateComponent implements OnInit, OnDestroy {
   createOrUpdateRecipeImage(imageFile: File): void {
     if (!this.recipeImage) {
       // Create
-      this.recipeImageCreated.emit(imageFile);
+      this.recipeImageService.addRecipeImageToCreate(imageFile);
     } else {
       // Update
-      this.recipeImageFileChanged.emit(imageFile);
+      this.recipeImageService.addRecipeImageToUpdate(imageFile);
     }
   }
 }

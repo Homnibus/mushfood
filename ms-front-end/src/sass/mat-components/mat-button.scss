@@ -1,3 +1,10 @@
+button.mat-raised-button,
+button.mat-stroked-button,
+button.mat-flat-button {
+  margin: 0 0.65em;
+  min-width: 3em;
+}
+
 .mat-raised-button {
   font-size: 16px;
 

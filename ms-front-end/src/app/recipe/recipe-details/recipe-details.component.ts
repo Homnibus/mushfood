@@ -1,12 +1,12 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { IngredientGroup, IngredientQuantity, Recipe } from "../../app.models";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AuthService } from "../../core/services/auth.service";
 import { DomSanitizer } from "@angular/platform-browser";
 import { IngredientQuantityMentionService } from "../../ingredient/services/ingredient-quantity-mention.service";
 import { RecipeService } from "../services/recipe.service";
-import { forkJoin } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
+import { Subscription, forkJoin } from "rxjs";
+import { first, map, switchMap } from "rxjs/operators";
 import { RecipeAddVariantDialogComponent } from "../recipe-add-variant-dialog/recipe-add-variant-dialog.component";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { IngredientQuantityService } from "../../ingredient/services/ingredient-quantity.service";
@@ -18,7 +18,7 @@ import { IngredientGroupService } from "src/app/ingredient/services/ingredient-g
   templateUrl: "./recipe-details.component.html",
   styleUrls: ["./recipe-details.component.scss"],
 })
-export class RecipeDetailsComponent implements OnInit {
+export class RecipeDetailsComponent implements OnInit, OnDestroy {
   readonly modalWidth = "250px";
 
   recipe: Recipe;
@@ -27,7 +27,7 @@ export class RecipeDetailsComponent implements OnInit {
   updatedPortions: number;
   variantList: Recipe[];
   variantOf: Recipe;
-  data;
+  activeRouteSubscription: Subscription;
 
   constructor(
     public authService: AuthService,
@@ -35,28 +35,87 @@ export class RecipeDetailsComponent implements OnInit {
     private ingredientQuantityService: IngredientQuantityService,
     private ingredientGroupService: IngredientGroupService,
     private recipeService: RecipeService,
-    private route: ActivatedRoute,
     private dialog: MatDialog,
     private router: Router,
+    private activatedRoute: ActivatedRoute,
     private snackBar: MatSnackBar,
     public sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
-    this.route.data.subscribe((data) => {
-      this.data = data;
-      this.recipe = data.recipeIngredientQuantityList.recipe;
-      this.ingredientQuantityList =
-        data.recipeIngredientQuantityList.ingredientQuantityList;
-      this.ingredientGroupList =
-        data.recipeIngredientQuantityList.ingredientGroupList;
-      this.updatedPortions = this.recipe.portions;
-      if (this.recipe.logicalDelete) {
-        this.router.navigateByUrl("/error/not-found");
-      }
-      this.getVariant();
-      this.getVariantOf();
-    });
+    this.activeRouteSubscription = this.activatedRoute.paramMap
+      .pipe(
+        switchMap((paramMap) =>
+          this.recipeService
+            .initActiveRecipe(paramMap.get("slug"))
+            .pipe(first())
+        )
+      )
+      .subscribe((recipe) => {
+        if (recipe.logicalDelete) {
+          this.router.navigateByUrl("/error/not-found");
+        }
+        this.recipe = recipe;
+        this.updatedPortions = this.recipe.portions;
+        this.getVariant();
+        this.getVariantOf();
+        this.ingredientGroupService
+          .initActiveIngredientGroupList(this.recipe)
+          .pipe(first())
+          .subscribe(
+            (ingredientGroupList) =>
+              (this.ingredientGroupList = ingredientGroupList)
+          );
+        this.ingredientQuantityService
+          .initActiveIngredientQuantityList(this.recipe)
+          .pipe(first())
+          .subscribe(
+            (ingredientQuantityList) =>
+              (this.ingredientQuantityList = ingredientQuantityList)
+          );
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.activeRouteSubscription.unsubscribe();
+    this.ingredientQuantityMentionService.updateAllMentionPortions(
+      this.ingredientQuantityList,
+      this.recipe,
+      this.recipe.portions
+    );
+  }
+
+  getVariant(): void {
+    if (this.recipe.variant.length > 0) {
+      forkJoin(
+        this.recipe.variant.map((id) =>
+          this.recipeService
+            .filteredList(`id=${id}`)
+            .pipe(
+              map((resultRecipeList) =>
+                resultRecipeList.length > 0 ? resultRecipeList[0] : undefined
+              )
+            )
+        )
+      ).subscribe((recipeList) => (this.variantList = recipeList));
+    } else {
+      this.variantList = [];
+    }
+  }
+
+  getVariantOf(): void {
+    if (this.recipe.variantOf) {
+      this.recipeService
+        .filteredList(`id=${this.recipe.variantOf}`)
+        .pipe(
+          map((resultRecipeList) =>
+            resultRecipeList.length > 0 ? resultRecipeList[0] : undefined
+          )
+        )
+        .subscribe((recipe) => (this.variantOf = recipe));
+    } else {
+      this.variantOf = undefined;
+    }
   }
 
   ingredientQuantityOfIngredientGroup(
@@ -105,13 +164,23 @@ export class RecipeDetailsComponent implements OnInit {
         this.recipeService
           .createVariant(variantTitle, this.recipe)
           .pipe(
-            // Loop over the ingredient quantity to create them
-            switchMap((recipe) =>
-              this.ingredientQuantityService.createVariant(
-                recipe,
+            // Loop over the ingredient group to create them
+            switchMap((createdRecipe) =>
+              this.ingredientGroupService.createVariant(
+                createdRecipe,
+                this.ingredientGroupList,
                 this.ingredientQuantityList
               )
             ),
+            // Loop over the ingredient quantity to create them
+            switchMap((resultTuple) => {
+              const recipe = resultTuple[0];
+              const ingredientQuantityList = resultTuple[1];
+              return this.ingredientQuantityService.createVariant(
+                recipe,
+                ingredientQuantityList
+              );
+            }),
             // Update the recipe mentions with the right ingredientQuantity id
             switchMap((resultTuple) => {
               const ingredientQuantityList = resultTuple[0];
@@ -136,38 +205,5 @@ export class RecipeDetailsComponent implements OnInit {
           });
       }
     });
-  }
-
-  private getVariant(): void {
-    if (this.recipe.variant.length > 0) {
-      forkJoin(
-        this.recipe.variant.map((id) =>
-          this.recipeService
-            .filteredList(`id=${id}`)
-            .pipe(
-              map((resultRecipeList) =>
-                resultRecipeList.length > 0 ? resultRecipeList[0] : undefined
-              )
-            )
-        )
-      ).subscribe((recipeList) => (this.variantList = recipeList));
-    } else {
-      this.variantList = [];
-    }
-  }
-
-  private getVariantOf(): void {
-    if (this.recipe.variantOf) {
-      this.recipeService
-        .filteredList(`id=${this.recipe.variantOf}`)
-        .pipe(
-          map((resultRecipeList) =>
-            resultRecipeList.length > 0 ? resultRecipeList[0] : undefined
-          )
-        )
-        .subscribe((recipe) => (this.variantOf = recipe));
-    } else {
-      this.variantOf = undefined;
-    }
   }
 }

@@ -10,6 +10,7 @@ import {
   Ingredient,
   IngredientGroup,
   IngredientQuantity,
+  MeasurementUnit,
   Recipe,
 } from "../../app.models";
 import {
@@ -75,7 +76,7 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
   recipe: Recipe;
   groupDataList: GroupData[] = [];
   ingredientList: Ingredient[];
-  activeIngredientListSubscription: Subscription;
+  measurementUnitList: MeasurementUnit[];
 
   isLoaded = false;
   displayedColumns: string[] = [
@@ -95,7 +96,7 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
   constructor(
     private recipeService: RecipeService,
     private ingredientGroupService: IngredientGroupService,
-    private ingredientService: IngredientService,
+    public ingredientService: IngredientService,
     public ingredientQuantityService: IngredientQuantityService,
     public measurementUnitService: MeasurementUnitService,
     public ingredientQuantityMentionService: IngredientQuantityMentionService,
@@ -105,22 +106,20 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Retrieve the active recipe
-    this.recipeService.activeRecipe$.pipe(first()).subscribe((data) => {
-      this.recipe = data;
-    });
-    // Retrieve the active ingredient list
-    this.activeIngredientListSubscription =
-      this.ingredientService.activeIngredientList$.subscribe((data) => {
-        this.ingredientList = data;
-      });
+    this.recipeService.activeRecipe$.pipe(first()).subscribe((activeRecipe) => {
+      this.recipe = activeRecipe;
 
-    // Initialize the GroupDataList
-    combineLatest([
-      this.ingredientQuantityService.activeIngredientQuantityList$,
-      this.ingredientGroupService.activeIngredientGroupList$,
-    ])
-      .pipe(first())
-      .subscribe(([ingredientQuantityList, ingredientGroupList]) => {
+      // Initialize the GroupDataList
+      combineLatest([
+        this.ingredientQuantityService.initActiveIngredientQuantityList(
+          activeRecipe,
+          true
+        ),
+        this.ingredientGroupService.initActiveIngredientGroupList(
+          activeRecipe,
+          true
+        ),
+      ]).subscribe(([ingredientQuantityList, ingredientGroupList]) => {
         // Create a GroupData for each ingredient group
         ingredientGroupList.forEach((ingredientGroup) => {
           // Filter the ingredient quantity corresponding to the ingredient group
@@ -139,10 +138,24 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
         // State that the tables are initialized and can be show
         this.isLoaded = true;
       });
+    });
+
+    // Retrieve the active ingredient list
+    this.ingredientService
+      .initActiveIngredientList()
+      .subscribe((activeIngredientList) => {
+        this.ingredientList = activeIngredientList;
+      });
+
+    //Retrieve the active measurement unit list
+    this.measurementUnitService
+      .initMeasurementUnitList()
+      .subscribe((activeMeasurementUnityList) => {
+        this.measurementUnitList = activeMeasurementUnityList;
+      });
   }
 
   ngOnDestroy(): void {
-    this.activeIngredientListSubscription.unsubscribe();
     this.groupDataList.forEach((groupData) => {
       groupData.ingredientGroupNameValueChangesSubscription.unsubscribe();
       groupData.ingredientRowDataList.forEach((ingredientRowData) => {
@@ -228,7 +241,7 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
           // Needed to create the ingredient filtered list before the user start using the input.
           startWith(ingredientQuantity?.ingredient?.name),
           map((ingredient) =>
-            this.ingredientQuantityService.filterIngredientList(
+            this.ingredientService.filterIngredientList(
               ingredient,
               this.ingredientList
             )
@@ -352,7 +365,7 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
     );
     // If the mention was updated, send the recipe to the recipe service to let it manage the backend update
     if (mentionUpdated) {
-      this.recipe = this.recipeService.updateActiveRecipeInstruction(
+      this.recipe = this.recipeService.addRecipeInstructionsToUpdate(
         this.recipe.instructions
       );
     }
@@ -513,7 +526,7 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
       );
 
       // Update the rank of each ingredient quantity if needed and push them to be updated
-      this.ingredientQuantityService.updateRank(
+      this.ingredientQuantityService.updateRankOfIngredientQuantity(
         currentGroupData.getIngredientQuantityList()
       );
 
@@ -536,17 +549,17 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
       );
 
       // Update the group of the dropped ingredient quantity and push it to the ingredient quantity service to be updated
-      this.ingredientQuantityService.updateGroup(
+      this.ingredientQuantityService.updateGroupOfIngredientQuantity(
         currentGroupData.ingredientRowDataList[event.currentIndex]
           .ingredientQuantity,
         currentGroupData.ingredientGroup
       );
 
       // Update the rank of each ingredient quantity if needed and push them to be updated in both list
-      this.ingredientQuantityService.updateRank(
+      this.ingredientQuantityService.updateRankOfIngredientQuantity(
         currentGroupData.getIngredientQuantityList()
       );
-      this.ingredientQuantityService.updateRank(
+      this.ingredientQuantityService.updateRankOfIngredientQuantity(
         previousGroupData.getIngredientQuantityList()
       );
 
@@ -569,7 +582,7 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
       event.currentIndex
     );
     // Update the rank of each ingredient group if needed and push them to be updated
-    this.ingredientGroupService.updateRank(
+    this.ingredientGroupService.updateRankOfIngredientGroup(
       this.groupDataList.map((groupData) => groupData.ingredientGroup)
     );
   }
@@ -654,11 +667,9 @@ export class RecipeUpdateIngredientComponent implements OnInit, OnDestroy {
       .value.toString();
 
     // Change coma by point if there is any
-    if (currentQuantityFormValue.includes(",")) {
-      ingredientQuantityForm
-        .get("quantity")
-        .setValue(currentQuantityFormValue.replaceAll(",", "."));
-    }
+    ingredientQuantityForm
+      .get("quantity")
+      .setValue(parseFloat(currentQuantityFormValue.replaceAll(",", ".")));
   }
 
   /**

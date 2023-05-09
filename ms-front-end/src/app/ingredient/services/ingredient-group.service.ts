@@ -1,6 +1,5 @@
 import { ModelService } from "../../core/services/model.service";
 import {
-  Ingredient,
   IngredientGroup as IngredientGroup,
   IngredientQuantity,
   ModelState,
@@ -9,16 +8,16 @@ import {
 import { IngredientGroupSerializer } from "../../app.serializers";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, forkJoin, Observable, of } from "rxjs";
-import { map, switchMap, tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 
 @Injectable({
   providedIn: "root",
 })
 export class IngredientGroupService extends ModelService<IngredientGroup> {
-  public toCreateIngredientGroup: IngredientGroup[] = [];
-  public toUpdateIngredientGroup: IngredientGroup[] = [];
-  public toDeleteIngredientGroup: IngredientGroup[] = [];
+  private toCreateIngredientGroupList: IngredientGroup[] = [];
+  private toUpdateIngredientGroupList: IngredientGroup[] = [];
+  private toDeleteIngredientGroupList: IngredientGroup[] = [];
   private activeIngredientGroupListSubject = new BehaviorSubject<
     IngredientGroup[]
   >(undefined);
@@ -31,34 +30,18 @@ export class IngredientGroupService extends ModelService<IngredientGroup> {
     super(http, IngredientGroup, new IngredientGroupSerializer());
   }
 
-  // filterIngredientList(
-  //   ingredient: Ingredient | string,
-  //   ingredientList: Ingredient[]
-  // ): Ingredient[] {
-  //   let filterValue = "";
-  //   if (ingredient) {
-  //     if (ingredient instanceof Ingredient) {
-  //       filterValue = ingredient.name.trim().toLowerCase();
-  //     } else {
-  //       filterValue = ingredient.trim().toLowerCase();
-  //     }
-  //   }
-  //   return ingredientList.filter((toFilterIngredient) =>
-  //     toFilterIngredient?.name.toLowerCase().includes(filterValue)
-  //   );
-  // }
-
-  // displayIngredient(ingredient?: Ingredient | string): string | undefined {
-  //   if (typeof ingredient === "string") {
-  //     return ingredient;
-  //   } else {
-  //     return ingredient ? ingredient.name : undefined;
-  //   }
-  // }
-
-  setActiveIngredientGroupList(recipe: Recipe): Observable<IngredientGroup[]> {
-    // If the active recipe is a new one, load the linked ingredient group
-    if (this.activeRecipe !== recipe) {
+  /**
+   * Retrieve from the backend the list of ingredient group linked to a given recipe and set it as the active one
+   * @param recipe The recipe from witch the ingredient group will be loaded
+   * @returns The list of the of ingredient group linked the a given recipe
+   */
+  initActiveIngredientGroupList(
+    recipe: Recipe,
+    keepActiveList: boolean = false
+  ): Observable<IngredientGroup[]> {
+    if (this.activeRecipe === recipe && keepActiveList) {
+      return of(this.activeIngredientGroupList);
+    } else {
       this.activeRecipe = recipe;
       return this.filteredList(`recipe__id=${recipe.id}`).pipe(
         map((ingredientGroupList) => {
@@ -69,10 +52,35 @@ export class IngredientGroupService extends ModelService<IngredientGroup> {
           return ingredientGroupList;
         })
       );
-      // Else return the current ingredient group list
-    } else {
-      return of(this.activeIngredientGroupList);
     }
+  }
+
+  /**
+   * Return the ingredient group linked to a given ingredient quantity from the active list
+   * @param ingredientQuantity The ingredient quantity of which to find the ingredient group
+   * @returns The ingredient group that are is linked to the ingredient quantity in the active list
+   */
+  getIngredientGroupOfIngredientQuantityInActiveList(
+    ingredientQuantity: IngredientQuantity
+  ): IngredientGroup {
+    return this.activeIngredientGroupList.find(
+      (ingredientGroup) =>
+        ingredientGroup.id === ingredientQuantity.ingredientGroup
+    );
+  }
+
+  /**
+   * Return an ingredient group that was created by the backend using the ingredient group id that was created in local
+   * @param ingredientQuantity The ingredient quantity to which retrieve the newly created ingredient group
+   * @returns The ingredient group newly created by the backend linked to the input ingredient quantity
+   */
+  getIngredientGroupOfIngredientQuantityIfCreated(
+    ingredientQuantity: IngredientQuantity
+  ): IngredientGroup {
+    return this.activeIngredientGroupList.find(
+      (ingredientGroup) =>
+        ingredientGroup.tempId === ingredientQuantity.ingredientGroup
+    );
   }
 
   /**
@@ -93,8 +101,8 @@ export class IngredientGroupService extends ModelService<IngredientGroup> {
     createdIngredientGroup.state = ModelState.NotSaved;
     // Set rank of ingredientGroup to last
     createdIngredientGroup.rank = this.activeIngredientGroupList.length + 1;
-     // Add the ingredient group to the add list
-    this.toCreateIngredientGroup.push(createdIngredientGroup);
+    // Add the ingredient group to the add list
+    this.toCreateIngredientGroupList.push(createdIngredientGroup);
     // Add the ingredient group to the active list and emit the new list
     this.activeIngredientGroupList.push(createdIngredientGroup);
     this.activeIngredientGroupListSubject.next(
@@ -103,85 +111,189 @@ export class IngredientGroupService extends ModelService<IngredientGroup> {
     return createdIngredientGroup;
   }
 
+  /**
+   * Add the given ingredient group to the updateList and update it in the current ingredient quantity list
+   * The update is handle with the backend when the save function is used
+   * @param toUpdateIngredientGroup The ingredient group to update
+   * @returns The ingredient group to update, updated with default parameters
+   */
   addIngredientGroupToUpdate(
-    ingredientGroup: IngredientGroup
+    toUpdateIngredientGroup: IngredientGroup
   ): IngredientGroup {
-    const indexOfIngredientGroupInCreateList = this.toCreateIngredientGroup
-      .map((x) => x.tempId)
-      .indexOf(ingredientGroup.tempId);
-    const indexOfIngredientGroupInUpdateList = this.toUpdateIngredientGroup
-      .map((x) => x.id)
-      .indexOf(ingredientGroup.id);
-    let elementPos: number;
-    // If the ingredientGroup to update is already in the creation list, only update the creation list
-    if (indexOfIngredientGroupInCreateList >= 0) {
-      this.toCreateIngredientGroup[indexOfIngredientGroupInCreateList] =
-        ingredientGroup;
-      elementPos = this.activeIngredientGroupList
-        .map((x) => x.tempId)
-        .indexOf(ingredientGroup.tempId);
-      // If the ingredientGroup to update is already in the update list, only update the update list
-    } else if (indexOfIngredientGroupInUpdateList >= 0) {
-      this.toUpdateIngredientGroup[indexOfIngredientGroupInUpdateList] =
-        ingredientGroup;
-      elementPos = this.activeIngredientGroupList
-        .map((x) => x.id)
-        .indexOf(ingredientGroup.id);
-    } else {
-      this.toUpdateIngredientGroup.push(ingredientGroup);
-      elementPos = this.activeIngredientGroupList
-        .map((x) => x.id)
-        .indexOf(ingredientGroup.id);
+    const updatedIngredientGroup = Object.assign(
+      new IngredientGroup(),
+      toUpdateIngredientGroup
+    );
+    // Look into the delete list for the ingredient group to update
+    const indexOfIngredientGroupInDeleteList =
+      this.toDeleteIngredientGroupList.findIndex(
+        (toFindIngredientGroup) =>
+          toFindIngredientGroup.getId() === updatedIngredientGroup.getId()
+      );
+    // If the ingredient group to update is already in the delete list do nothing and return
+    if (indexOfIngredientGroupInDeleteList >= 0) {
+      return updatedIngredientGroup;
     }
-    this.activeIngredientGroupList[elementPos] = ingredientGroup;
+
+    // Set the default values
+    updatedIngredientGroup.state = ModelState.NotSaved;
+
+    // Look into the creation list for the ingredient group to update
+    const indexOfIngredientGroupInCreateList =
+      this.toCreateIngredientGroupList.findIndex(
+        (toFindIngredientQuantity) =>
+          toFindIngredientQuantity.getId() === updatedIngredientGroup.getId()
+      );
+    // Look into the update list for the ingredient group to update
+    const indexOfIngredientGroupInUpdateList =
+      this.toUpdateIngredientGroupList.findIndex(
+        (toFindIngredientQuantity) =>
+          toFindIngredientQuantity.getId() === updatedIngredientGroup.getId()
+      );
+    // If the ingredient group to update is already in the creation list, only update the creation list
+    if (indexOfIngredientGroupInCreateList >= 0) {
+      this.toCreateIngredientGroupList[indexOfIngredientGroupInCreateList] =
+        updatedIngredientGroup;
+      // If the ingredient group to update is already in the update list, only update the update list
+    } else if (indexOfIngredientGroupInUpdateList >= 0) {
+      this.toUpdateIngredientGroupList[indexOfIngredientGroupInUpdateList] =
+        updatedIngredientGroup;
+      // If the ingredient group is not in any list, add it to the update list
+    } else {
+      this.toUpdateIngredientGroupList.push(updatedIngredientGroup);
+    }
+
+    // Update the ingredient group in the active list
+    const indexOfIngredientGroupInActiveList =
+      this.activeIngredientGroupList.findIndex(
+        (toFindIngredientQuantity) =>
+          toFindIngredientQuantity.getId() === updatedIngredientGroup.getId()
+      );
+    this.activeIngredientGroupList[indexOfIngredientGroupInActiveList] =
+      updatedIngredientGroup;
+
+    // Sort the list in case any of the ranks changed
+    // This should not change the list thanks to the use of the updateRank function when manipulating ranks
     this.activeIngredientGroupList.sort((a, b) => a.rank - b.rank);
+
+    // Emit the new active ingredient group list
     this.activeIngredientGroupListSubject.next(
       this.activeIngredientGroupList.slice()
     );
-    return ingredientGroup;
+    return toUpdateIngredientGroup;
   }
 
+  /**
+   * Add the given ingredient group to the deleteList and remove it from the current ingredient group list
+   * The deletion is handle with the backend when the save function is used
+   * @param toDeleteIngredientGroup The ingredient group to delete
+   * @returns The ingredient group to delete, updated with default parameters
+   */
   addIngredientGroupToDelete(
-    ingredientGroup: IngredientGroup
+    toDeleteIngredientGroup: IngredientGroup
   ): IngredientGroup {
+    const deletedIngredientGroup = Object.assign(
+      new IngredientQuantity(),
+      toDeleteIngredientGroup
+    );
+
+    // Look into the delete list for the ingredient group to update
+    const indexOfIngredientGroupInDeleteList =
+      this.toDeleteIngredientGroupList.findIndex(
+        (toFindIngredientGroup) =>
+          toFindIngredientGroup.getId() === deletedIngredientGroup.getId()
+      );
+    // If the ingredient group to update is already in the delete list do nothing and return
+    if (indexOfIngredientGroupInDeleteList >= 0) {
+      return deletedIngredientGroup;
+    }
+
+    // Look into the creation list for the ingredient group to update
     const indexOfIngredientGroupInCreateList =
-      this.toCreateIngredientGroup.indexOf(ingredientGroup);
+      this.toCreateIngredientGroupList.findIndex(
+        (toFindIngredientQuantity) =>
+          toFindIngredientQuantity.getId() === deletedIngredientGroup.getId()
+      );
+    // If the ingredientQuantity to update is already in the creation list, remove it
     if (indexOfIngredientGroupInCreateList >= 0) {
-      this.toCreateIngredientGroup.splice(
+      this.toCreateIngredientGroupList.splice(
         indexOfIngredientGroupInCreateList,
         1
       );
-    } else {
-      // Remove the group from the update list
-      const indexOfIngredientGroupInUpdateList =
-        this.toUpdateIngredientGroup.indexOf(ingredientGroup);
-      if (indexOfIngredientGroupInUpdateList >= 0) {
-        this.toUpdateIngredientGroup.splice(
-          indexOfIngredientGroupInUpdateList,
-          1
-        );
-      }
-      this.toDeleteIngredientGroup.push(ingredientGroup);
     }
+
+    // Look into the update list for the ingredient group to update
+    const indexOfIngredientGroupInUpdateList =
+      this.toUpdateIngredientGroupList.findIndex(
+        (toFindIngredientQuantity) =>
+          toFindIngredientQuantity.getId() === deletedIngredientGroup.getId()
+      );
+    // If the ingredient group to delete is already in the update list, remove it
+    if (indexOfIngredientGroupInUpdateList >= 0) {
+      this.toUpdateIngredientGroupList.splice(
+        indexOfIngredientGroupInUpdateList,
+        1
+      );
+    }
+
+    // Set the default values
+    deletedIngredientGroup.state = ModelState.NotSaved;
+
+    // Add the ingredient group to the delete list
+    this.toDeleteIngredientGroupList.push(deletedIngredientGroup);
+
+    // Remove the ingredient group from the active list
     this.activeIngredientGroupList = this.activeIngredientGroupList.filter(
-      (toFilterIngredientGroup) => toFilterIngredientGroup !== ingredientGroup
+      (toFilterIngredientGroup) =>
+        toFilterIngredientGroup.getId() !== deletedIngredientGroup.getId()
     );
-    // change the rank of each other ingredient Group and tag them for update
-    this.updateRank(this.activeIngredientGroupList);
+
+    // Update the rank of each other ingredient group and tag them for update
+    this.updateRankOfIngredientGroup(this.activeIngredientGroupList);
+
+    // Emit the new ingredient group active list
     this.activeIngredientGroupListSubject.next(
       this.activeIngredientGroupList.slice()
     );
-    return ingredientGroup;
+    return deletedIngredientGroup;
   }
 
+  /**
+   * Recalculate the rank of the ingredient group in the given list
+   * The rank of each ingredient group will be equal to its position in the list
+   * @param ingredientGroupList The ingredient group list in which the ingredient group rank must be recalculated
+   */
+  updateRankOfIngredientGroup(ingredientGroupList: IngredientGroup[]): void {
+    // Loop over the list to update the rank
+    for (const [index, ingredientGroup] of ingredientGroupList.entries()) {
+      const updatedIngredientGroup = Object.assign(
+        new IngredientGroup(),
+        ingredientGroup
+      );
+      // Update the rank of the ingredient group if needed
+      // The rank start at 1 and not at 0
+      if (updatedIngredientGroup.rank != index + 1) {
+        ingredientGroup.rank = index + 1;
+        updatedIngredientGroup.rank = index + 1;
+        // Add the created ingredientGroup to the update list.
+        this.addIngredientGroupToUpdate(updatedIngredientGroup);
+      }
+    }
+  }
+
+  /**
+   * Generate an Observable that handle the creation, the update and the deletion of the ingredient group present in the ingredient group list
+   * by calling the backend
+   * @returns An Observable to subscribe to in order to call the backend and perform the creation, update and deletion
+   */
   saveIngredientGroup(): Observable<IngredientGroup[]> {
-    // return savedIngredient.pipe(
-    // switchMap((newIngredientList) => {
+    //TODO : don't use the return of the observable but call the service
+
     // Create the list off API call to delete the ingredient group
     let listOfIngredientGroupToDeleteObservable: Observable<IngredientGroup>[];
-    if (this.toDeleteIngredientGroup.length > 0) {
+    if (this.toDeleteIngredientGroupList.length > 0) {
       listOfIngredientGroupToDeleteObservable =
-        this.toDeleteIngredientGroup.map((ingredientGroup) => {
+        this.toDeleteIngredientGroupList.map((ingredientGroup) => {
           return this.delete(ingredientGroup);
         });
     } else {
@@ -190,32 +302,32 @@ export class IngredientGroupService extends ModelService<IngredientGroup> {
 
     // Create the list off API call to create the ingredient group
     let listOfIngredientGroupToCreateObservable: Observable<IngredientGroup>[];
-    if (this.toCreateIngredientGroup.length > 0) {
+    if (this.toCreateIngredientGroupList.length > 0) {
       listOfIngredientGroupToCreateObservable =
-        this.toCreateIngredientGroup.map((ingredientGroup) => {
-          // if (!ingredientGroup.ingredient.id) {
-          //   ingredientGroup.ingredient = newIngredientList.find(
-          //     (ingredient) =>
-          //       ingredient.name.trim().toLowerCase() ===
-          //       ingredientGroup.ingredient.name.trim().toLowerCase()
-          //   );
-          // }
-          return this.create(ingredientGroup).pipe(
+        this.toCreateIngredientGroupList.map((toCreateIngredientGroup) => {
+          return this.create(toCreateIngredientGroup).pipe(
             // Update the active ingredient Group list data with the api return
             map((createdIngredientGroup) => {
-              const elementPos = this.activeIngredientGroupList
-                .map((x) => x.tempId)
-                .indexOf(ingredientGroup.tempId);
-              ingredientGroup.id = createdIngredientGroup.id;
-              ingredientGroup.creationDate =
-                createdIngredientGroup.creationDate;
-              ingredientGroup.updateDate = createdIngredientGroup.updateDate;
-              ingredientGroup.state = createdIngredientGroup.state;
-              this.activeIngredientGroupList[elementPos] = ingredientGroup;
+              const createdIngredientGroupPosition =
+                this.activeIngredientGroupList.findIndex(
+                  (toFindIngredientGroup) =>
+                    toFindIngredientGroup.getId() ===
+                    toCreateIngredientGroup.getId()
+                );
+              // Keep the temp ID to update ingredient quantity
+              createdIngredientGroup.tempId = toCreateIngredientGroup.tempId;
+
+              // Update the ingredient group in the current list
+              this.activeIngredientGroupList[createdIngredientGroupPosition] =
+                createdIngredientGroup;
+              // Sort the active ingredient quantity list
+              // This should not change the list because it's already sorted
+              this.activeIngredientGroupList.sort((a, b) => a.rank - b.rank);
+              // Emit the new list value
               this.activeIngredientGroupListSubject.next(
                 this.activeIngredientGroupList.slice()
               );
-              return ingredientGroup;
+              return toCreateIngredientGroup;
             })
           );
         });
@@ -225,30 +337,30 @@ export class IngredientGroupService extends ModelService<IngredientGroup> {
 
     // Create the list off API call to update the ingredient group
     let listOfIngredientGroupToUpdateObservable: Observable<IngredientGroup>[];
-    if (this.toUpdateIngredientGroup.length > 0) {
+    if (this.toUpdateIngredientGroupList.length > 0) {
       listOfIngredientGroupToUpdateObservable =
-        this.toUpdateIngredientGroup.map((ingredientGroup) => {
-          // if (!ingredientGroup.ingredient.id) {
-          //   ingredientGroup.ingredient = newIngredientList.find(
-          //     (ingredient) =>
-          //       ingredient.name.trim().toLowerCase() ===
-          //       ingredientGroup.ingredient.name.trim().toLowerCase()
-          //   );
-          // }
+        this.toUpdateIngredientGroupList.map((toUpdateIngredientGroup) => {
           // Call the API to update the ingredient Group
-          return this.update(ingredientGroup).pipe(
+          return this.update(toUpdateIngredientGroup).pipe(
             // Update the active ingredient Group list data with the api return
             map((createdIngredientGroup) => {
-              const elementPos = this.activeIngredientGroupList
-                .map((x) => x.id)
-                .indexOf(ingredientGroup.id);
-              ingredientGroup.updateDate = createdIngredientGroup.updateDate;
-              ingredientGroup.state = createdIngredientGroup.state;
-              this.activeIngredientGroupList[elementPos] = ingredientGroup;
+              const updatedIngredientGroupPosition =
+                this.activeIngredientGroupList.findIndex(
+                  (toFindIngredientGroup) =>
+                    toFindIngredientGroup.getId() ===
+                    toUpdateIngredientGroup.getId()
+                );
+              // Update the active ingredient quantity list
+              this.activeIngredientGroupList[updatedIngredientGroupPosition] =
+                createdIngredientGroup;
+              // Sort the active ingredient quantity list
+              // This should not change the list because it's already sorted
+              this.activeIngredientGroupList.sort((a, b) => a.rank - b.rank);
+              // Emit the new list value
               this.activeIngredientGroupListSubject.next(
                 this.activeIngredientGroupList.slice()
               );
-              return ingredientGroup;
+              return toUpdateIngredientGroup;
             })
           );
         });
@@ -260,96 +372,63 @@ export class IngredientGroupService extends ModelService<IngredientGroup> {
         .concat(listOfIngredientGroupToUpdateObservable)
         .concat(listOfIngredientGroupToDeleteObservable)
     ).pipe(
-      // remove all the undefined ingredientGroup produced by the of(undefined)
+      // Remove all the undefined ingredientGroup produced by the of(undefined)
       map((ingredientGroupList) =>
         ingredientGroupList.filter((ingredientGroup) => ingredientGroup)
       ),
-      // );
-      // }),
       tap(() => {
-        // reset the list
-        this.toCreateIngredientGroup = [];
-        this.toUpdateIngredientGroup = [];
-        this.toDeleteIngredientGroup = [];
+        // Reset the list
+        this.toCreateIngredientGroupList = [];
+        this.toUpdateIngredientGroupList = [];
+        this.toDeleteIngredientGroupList = [];
       })
     );
   }
 
-  // createVariant(
-  //   variantRecipe: Recipe,
-  //   toCopyIngredientList: IngredientGroup[]
-  // ): Observable<[IngredientGroup[], Recipe]> {
-  //   const newActiveIngredientGroupList = toCopyIngredientList.map(
-  //     (ingredientGroup) => {
-  //       const newIngredientGroup = new IngredientGroup();
-  //       newIngredientGroup.tempId = Date.now();
-  //       newIngredientGroup.ingredient = ingredientGroup.ingredient;
-  //       newIngredientGroup.recipe = variantRecipe.id;
-  //       newIngredientGroup.Group = ingredientGroup.Group;
-  //       newIngredientGroup.measurementUnit =
-  //         ingredientGroup.measurementUnit;
-  //       return newIngredientGroup;
-  //     }
-  //   );
-  //   return forkJoin(
-  //     newActiveIngredientGroupList.map((newIngredientGroup) =>
-  //       this.create(newIngredientGroup).pipe(
-  //         map((createdIngredientGroup) => {
-  //           const elementPos = newActiveIngredientGroupList
-  //             .map((x) => x.tempId)
-  //             .indexOf(newIngredientGroup.tempId);
-  //           newIngredientGroup.id = createdIngredientGroup.id;
-  //           newIngredientGroup.creationDate =
-  //             createdIngredientGroup.creationDate;
-  //           newIngredientGroup.updateDate =
-  //             createdIngredientGroup.updateDate;
-  //           newIngredientGroup.state = createdIngredientGroup.state;
-  //           return newIngredientGroup;
-  //         })
-  //       )
-  //     )
-  //   ).pipe(
-  //     map((ingredientGroupList) => [ingredientGroupList, variantRecipe])
-  //   );
-  // }
-
-  resetModification() {
-    this.toCreateIngredientGroup = [];
-    this.toUpdateIngredientGroup = [];
-    this.toDeleteIngredientGroup = [];
-  }
-
-  updateRank(ingredientGroupList: IngredientGroup[]): void {
-    for (const [index, ingredientGroup] of ingredientGroupList.entries()) {
-      // Retrieve the form values to create the updated entity
-      const updatedIngredientGroup = Object.assign(
-        new IngredientGroup(),
-        ingredientGroup
-      );
-      if (updatedIngredientGroup.rank != index + 1) {
-        ingredientGroup.rank = index + 1;
-        updatedIngredientGroup.rank = index + 1;
-        // Add the created ingredientGroup to the list of the currents recipe ingredient.
-        this.addIngredientGroupToUpdate(updatedIngredientGroup);
+  createVariant(
+    createdRecipe: Recipe,
+    toCopyIngredientGroupList: IngredientGroup[],
+    toCopyIngredientQuantityList: IngredientQuantity[]
+  ): Observable<[Recipe, IngredientQuantity[]]> {
+    const toCreateIngredientGroupList = toCopyIngredientGroupList.map(
+      (toCopyIngredientGroup) => {
+        const toCreateIngredientGroup = Object.assign(
+          new IngredientGroup(),
+          toCopyIngredientGroup
+        );
+        toCreateIngredientGroup.id = undefined;
+        toCreateIngredientGroup.tempId = Date.now();
+        toCreateIngredientGroup.recipe = createdRecipe.id;
+        return toCreateIngredientGroup;
       }
-    }
-  }
+    );
+    return forkJoin(
+      toCreateIngredientGroupList.map((toCreateIngredientGroup) =>
+        this.create(toCreateIngredientGroup)
+      )
+    ).pipe(
+      map((createdIngredientGroupList) => {
+        toCopyIngredientQuantityList.forEach((toUpdateIngredientQuantity) => {
+          const indexOfIngredientGroup = toCopyIngredientGroupList.findIndex(
+            (toFindIngredientGroup) =>
+              toUpdateIngredientQuantity.ingredientGroup ===
+              toFindIngredientGroup.getId()
+          );
+          toUpdateIngredientQuantity.ingredientGroup =
+            createdIngredientGroupList[indexOfIngredientGroup].getId();
+        });
 
-  findIngredientGroupOfIngredientQuantityInActiveList(
-    ingredientQuantity: IngredientQuantity
-  ): IngredientGroup {
-    return this.activeIngredientGroupList.find(
-      (ingredientGroup) =>
-        ingredientGroup.id === ingredientQuantity.ingredientGroup
+        return [createdRecipe, toCopyIngredientQuantityList];
+      })
     );
   }
 
-  findIngredientGroupOfIngredientQuantityIfCreated(
-    ingredientQuantity: IngredientQuantity
-  ): IngredientGroup {
-    return this.activeIngredientGroupList.find(
-      (ingredientGroup) =>
-        ingredientGroup.tempId === ingredientQuantity.ingredientGroup
-    );
+  /**
+   * Reset the working list
+   */
+  resetModification() {
+    this.toCreateIngredientGroupList = [];
+    this.toUpdateIngredientGroupList = [];
+    this.toDeleteIngredientGroupList = [];
   }
 }

@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { MatDialogRef } from "@angular/material/dialog";
+import { MatLegacyDialogRef as MatDialogRef } from "@angular/material/legacy-dialog";
 import { UntypedFormBuilder, Validators } from "@angular/forms";
 import { Recipe } from "../../app.models";
 import { Router } from "@angular/router";

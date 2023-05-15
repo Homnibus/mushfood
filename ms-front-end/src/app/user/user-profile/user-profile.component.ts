@@ -9,7 +9,7 @@ import {
   ValidatorFn,
   Validators,
 } from "@angular/forms";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatLegacySnackBar as MatSnackBar } from "@angular/material/legacy-snack-bar";
 import { PasswordService } from "../services/password.service";
 
 @Component({

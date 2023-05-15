@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { ModelState, Recipe } from "../../app.models";
 import { TabLink } from "../../shared/web-page/web-page-tabs/web-page-tabs.component";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatLegacySnackBar as MatSnackBar } from "@angular/material/legacy-snack-bar";
 import { Observable, Subscription } from "rxjs";
 import { first, switchMap, tap } from "rxjs/operators";
 import { RecipeService } from "../../recipe/services/recipe.service";

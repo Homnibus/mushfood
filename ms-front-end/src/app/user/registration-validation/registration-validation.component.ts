@@ -2,10 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {RegistrationService} from "../services/registration.service";
 import {Registration, User} from "../../app.models";
 import {animate, state, style, transition, trigger} from "@angular/animations";
-import {MatTableDataSource} from "@angular/material/table";
+import {MatLegacyTableDataSource as MatTableDataSource} from "@angular/material/legacy-table";
 import {SelectionModel} from "@angular/cdk/collections";
 import {forkJoin, Observable} from "rxjs";
-import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatLegacySnackBar as MatSnackBar} from "@angular/material/legacy-snack-bar";
 import {UserService} from "../services/user.service";
 
 @Component({

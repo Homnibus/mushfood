@@ -3,7 +3,7 @@ import { RecipeService } from "../services/recipe.service";
 import { Category, Recipe } from "../../app.models";
 import { AuthService } from "../../core/services/auth.service";
 import { ResizedEvent } from "angular-resize-event";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { RecipeAddDialogComponent } from "../recipe-add-dialog/recipe-add-dialog.component";
 import { environment } from "../../../environments/environment";
 import { ActivatedRoute, Params, Router } from "@angular/router";

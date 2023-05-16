@@ -1,83 +1,55 @@
-.mat-form-field.mat-form-field-appearance-outline {
-  font-size: 16px;
-  flex: 999;
-
-  .mat-input-element {
-    line-height: 18px;
-    min-height: 18px;
-  }
-
-  .mat-form-field-wrapper {
-    margin: 0.5em;
-    padding-bottom: 0;
-  }
-
-  .mat-form-field-subscript-wrapper {
-    padding: 1.5em 1em;
-  }
-
-  .mat-form-field-outline:not(.mat-form-field-outline-thick) > * {
-    background: #fafafa;
-  }
-  .mat-form-field-outline-thick {
-    background: white;
-  }
-
-  &.mat-form-field-appearance-outline .mat-form-field-infix {
-    padding: 0.7em 0 0.7em 0;
-    border-top: 0.24em solid transparent;
-  }
-
-  &.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label,
-  &.mat-form-field-can-float
-    .mat-input-server:focus
-    + .mat-form-field-label-wrapper
-    .mat-form-field-label {
-    width: 133.33333333%;
-    -webkit-transform: translateY(-1.1em) scale(0.75);
-    transform: translateY(-1.1em) scale(0.75);
+.search-form {
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
   }
 }
 
-.mat-form-field.inline-form-field {
-  line-height: 47.2px;
+.mat-mdc-form-field.mat-form-field-appearance-outline {
+  font-size: 16px;
+
+  &:not(&.mat-focused) .mdc-text-field {
+    background: #fafafa;
+  }
+  &.mat-focused .mdc-text-field {
+    background: white;
+  }
+  .mdc-text-field {
+    border-radius: var(--mdc-shape-small, 4px);
+  }
+}
+
+.mat-mdc-form-field.inline-form-field {
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+
+  .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+    background: transparent;
+  }
+
+  .mdc-text-field {
+    border-radius: 0px;
+  }
 
   &.small {
-    width: 5em;
+    width: 6rem;
   }
 
   &.medium {
-    width: 10em;
+    width: 12rem;
   }
 
   &.h1-like {
     font-size: 1.5rem;
-    line-height: 54px;
-    margin-top: 0;
-    input:first-letter {
-      text-transform: capitalize;
-    }
+    width: 100%;
+    margin-top: 0px;
   }
 
-  .mat-form-field-wrapper {
-    padding-bottom: 0;
-  }
-
-  &.number .mat-form-field-infix {
+  &.number input {
     text-align: right;
-    font-family: "Roboto Mono", "Helvetica Neue", sans-serif;
   }
 
-  .mat-form-field-infix {
-    border-top-width: 0;
-    padding: 0;
-  }
-  .mat-form-field-label-wrapper {
-    top: -1.25em;
-  }
-
-  .mat-form-field-underline {
-    bottom: 0;
-    background-color: transparent;
+  .mdc-line-ripple::before {
+    border-width: 0px;
   }
 }

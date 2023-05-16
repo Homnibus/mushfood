@@ -34,7 +34,7 @@ import {
   UntypedFormBuilder,
   Validators,
 } from "@angular/forms";
-import { MatLegacyTable as MatTable } from "@angular/material/legacy-table";
+import { MatTable } from "@angular/material/table";
 import {
   CdkDragDrop,
   moveItemInArray,
@@ -42,7 +42,7 @@ import {
 } from "@angular/cdk/drag-drop";
 import { flyInOutTransition } from "src/app/shared/fly-in-out.animation";
 import { IngredientGroupService } from "src/app/ingredient/services/ingredient-group.service";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { RecipeAddGroupDialogComponent } from "../recipe-add-group-dialog/recipe-add-group-dialog.component";
 
 export class IngredientRowData {

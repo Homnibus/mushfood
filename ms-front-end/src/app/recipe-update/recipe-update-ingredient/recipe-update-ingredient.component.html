@@ -5,11 +5,7 @@
   cdkDropList
   (cdkDropListDropped)="onGroupListDrop($event)"
 >
-  <ng-container
-    *ngIf="
-      this.measurementUnitList as measurementUnitList
-    "
-  >
+  <ng-container *ngIf="this.measurementUnitList as measurementUnitList">
     <div
       *ngFor="let groupData of groupDataList"
       cdkDrag
@@ -199,7 +195,10 @@
               *matCellDef="let ingredientRowData"
               [formGroup]="ingredientRowData.ingredientQuantityForm"
             >
-              <mat-form-field floatLabel="never" class="inline-form-field">
+              <mat-form-field
+                floatLabel="never"
+                class="inline-form-field medium"
+              >
                 <input
                   [matAutocomplete]="auto"
                   formControlName="ingredient"
@@ -211,9 +210,7 @@
                 <mat-autocomplete
                   #auto="matAutocomplete"
                   autoActiveFirstOption
-                  [displayWith]="
-                    this.ingredientService.displayIngredient
-                  "
+                  [displayWith]="this.ingredientService.displayIngredient"
                 >
                   <mat-option
                     *ngFor="
@@ -236,7 +233,7 @@
               <mat-form-field
                 floatLabel="never"
                 hideRequiredMarker="true"
-                class="inline-form-field"
+                class="inline-form-field medium"
               >
                 <input
                   matInput
@@ -248,9 +245,7 @@
                 <mat-autocomplete
                   #autoNew="matAutocomplete"
                   autoActiveFirstOption
-                  [displayWith]="
-                    this.ingredientService.displayIngredient
-                  "
+                  [displayWith]="this.ingredientService.displayIngredient"
                 >
                   <mat-option
                     *ngFor="

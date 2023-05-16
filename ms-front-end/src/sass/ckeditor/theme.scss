@@ -1,3 +1,4 @@
+@use "@angular/material" as mat;
 @import "../theme/mushfood-theme";
 
 .mushfood {
@@ -7,7 +8,7 @@
     padding: 0 0.3em;
     margin: 0 -0.3em;
     background-color: inherit;
-    color: mat-color($mat-primary, 600);
+    color: mat.get-color-from-palette($mat-primary, 600);
     font-weight: bold;
 
     &:hover {

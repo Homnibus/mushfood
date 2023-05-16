@@ -1,17 +1,17 @@
-.mat-table {
-  .mat-header-cell {
+.mat-mdc-table {
+  .mat-mdc-header-cell {
     color: #430e4b;
     font-size: 14px;
   }
 
-  .mat-header-row {
+  .mat-mdc-header-row {
     background: #f2f0f4;
   }
 }
 
-.mat-row,
-.mat-footer-row {
-  td.mat-cell:first-of-type {
+.mat-mdc-row,
+.mat-mdc-footer-row {
+  td.mat-mdc-cell:first-of-type {
     padding-left: 1em;
   }
 }

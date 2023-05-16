@@ -41,27 +41,34 @@
       </div>
       <div class="ingredient">
         <div class="portion-picker">
-          <h2>Pour {{ updatedPortions }} parts</h2>
+          <h2>
+            Pour
+            <span class="portion-picker-value">{{ updatedPortions }}</span>
+            parts
+          </h2>
           <button
             (click)="removePortions()"
             [disabled]="updatedPortions <= 1"
             aria-label="Example icon-button with a heart icon"
             color="primary"
-            mat-icon-button
+            mat-mini-fab
           >
-            <mat-icon>remove_circle</mat-icon>
+            <mat-icon>remove</mat-icon>
           </button>
           <button
             (click)="addPortions()"
             aria-label="Example icon-button with a heart icon"
             color="primary"
-            mat-icon-button
+            mat-mini-fab
           >
-            <mat-icon>add_circle</mat-icon>
+            <mat-icon>add</mat-icon>
           </button>
         </div>
-        <ng-container *ngIf="ingredientQuantityList && ingredientGroupList">
-          <ng-container *ngFor="let ingredientGroup of ingredientGroupList">
+        <div
+          class="ingredient-list"
+          *ngIf="ingredientQuantityList && ingredientGroupList"
+        >
+          <div *ngFor="let ingredientGroup of ingredientGroupList">
             <h1>{{ ingredientGroup.title }}</h1>
             <mat-list>
               <mat-list-item
@@ -71,26 +78,26 @@
                   )
                 "
               >
-                <mat-icon color="accent" matListIcon>local_dining</mat-icon>
-                <h4
+                <mat-icon matListItemIcon>local_dining</mat-icon>
+                <div
+                  matListItemTitle
                   *ngIf="!ingredientQuantity.measurementUnit.isIgnorable"
-                  mat-line
                 >
                   {{ quantityToString(ingredientQuantity.quantity) }}
                   {{ ingredientQuantity.measurementUnit.name }} de
                   {{ ingredientQuantity.ingredient.name }}
-                </h4>
-                <h4
+                </div>
+                <div
+                  matListItemTitle
                   *ngIf="ingredientQuantity.measurementUnit.isIgnorable"
-                  mat-line
                 >
                   {{ quantityToString(ingredientQuantity.quantity) }}
                   {{ ingredientQuantity.ingredient.name }}
-                </h4>
+                </div>
               </mat-list-item>
             </mat-list>
-          </ng-container>
-        </ng-container>
+          </div>
+        </div>
       </div>
     </div>
     <div class="instructions">
@@ -130,17 +137,19 @@
       </a>
     </div>
     <div class="categories">
-      <mat-chip-list aria-label="Categories" multiple>
+      <mat-chip-set role="list">
         <h2>Categories :</h2>
         <mat-chip
           *ngFor="let category of recipe.categories"
+          role="listitem"
           color="accent"
-          selected
+          highlighted
           [routerLink]="['/recipe']"
           [queryParams]="{ category: category.name }"
-          >{{ category.name | titlecase }}</mat-chip
         >
-      </mat-chip-list>
+          {{ category.name | titlecase }}
+        </mat-chip>
+      </mat-chip-set>
     </div>
   </app-web-page-content>
 </app-web-page>

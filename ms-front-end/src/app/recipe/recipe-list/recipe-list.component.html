@@ -7,9 +7,12 @@
       class="search"
       #recipeListDiv
     >
-      <mat-form-field appearance="outline">
-        <mat-label> </mat-label>
-        <input matInput placeholder="Recherche" formControlName="searchWords" />
+      <mat-form-field appearance="outline" class="search-form">
+        <input
+          matInput
+          placeholder="Recette ou ingredient"
+          formControlName="searchWords"
+        />
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
       <button color="accent" mat-raised-button type="submit">Rechercher</button>

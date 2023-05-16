@@ -1,12 +1,9 @@
-/**
-* Generated theme by Material Theme Generator
-* https://material-theme-generator.travetto.io
-*/
-@import "~@angular/material/theming";
+@use "@angular/material" as mat;
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
 
-@include mat-core();
+@include mat.core();
+@include mat.legacy-core();
 
 // Theme Config
 /* For use in src/lib/core/theming/_palette.scss */
@@ -142,30 +139,36 @@ $mat-warn: (
   ),
 );
 
-$mushfood-light-primary: mat-palette($mat-primary);
-$mushfood-light-accent: mat-palette($mat-accent);
-$mushfood-light-warn: mat-palette($mat-warn);
+$mushfood-light-primary: mat.define-palette($mat-primary);
+$mushfood-light-accent: mat.define-palette($mat-accent);
+$mushfood-light-warn: mat.define-palette($mat-warn);
 
-$theme: mat-light-theme(
-  $mushfood-light-primary,
-  $mushfood-light-accent,
-  $mushfood-light-warn
+/* Styles to be applied to buttons */
+$my-custom-button: mat.define-typography-level(
+  $font-family: "Roboto",
+  $font-weight: 500,
+  $font-size: 1rem,
+  $line-height: 1,
+  $letter-spacing: "normal",
+);
+
+/* Merge custom configs into existing config */
+$my-typography-config: mat.define-typography-config(
+  $button: $my-custom-button,
+);
+
+$theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $mushfood-light-primary,
+      accent: $mushfood-light-accent,
+      warn: $mushfood-light-warn,
+    ),
+    typography: $my-typography-config,
+    density: 0,
+  )
 );
 
 // Theme Init
-@include angular-material-theme($theme);
-
-// Handle buttons appropriately, with respect to line-height
-.mat-raised-button,
-.mat-stroked-button,
-.mat-flat-button {
-  padding: 0 1.15em;
-  margin: 0 0.65em;
-  min-width: 3em;
-  line-height: 36.4px;
-}
-
-.mat-standard-chip {
-  padding: 0.5em 0.85em;
-  min-height: 2.5em;
-}
+@include mat.core-theme($theme);
+@include mat.all-component-themes($theme);

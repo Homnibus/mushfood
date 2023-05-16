@@ -1,4 +1,4 @@
-@import '../../../sass/theme/theme-small';
+@import "../../../sass/theme/theme-small";
 
 :host {
   display: flex;
@@ -7,7 +7,8 @@
 
   > * {
     flex: 1;
-    margin-bottom: 1em;
+    margin: 1em;
+    min-width: 320px;
 
     > .button {
       margin: 0.5em;
@@ -22,5 +23,4 @@
       width: 100%;
     }
   }
-
 }

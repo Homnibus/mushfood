@@ -12,9 +12,11 @@
   flex: 1;
   max-width: 850px;
   display: flex;
+  align-items: center;
 }
 
-.mat-toolbar-row, .mat-toolbar-single-row {
+.mat-toolbar-row,
+.mat-toolbar-single-row {
   height: 2.5em;
 }
 
@@ -24,8 +26,8 @@
 }
 
 // Navigation button
-.mat-button {
-  font-size: 0.9em;
+.mat-mdc-button {
+  font-size: 1.3rem;
 }
 
 mat-progress-bar {
@@ -34,4 +36,3 @@ mat-progress-bar {
   left: 0;
   right: 0;
 }
-

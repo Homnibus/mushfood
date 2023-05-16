@@ -9,7 +9,7 @@ import {WebPageTitleComponent} from './web-page-title/web-page-title.component';
 import {WebPageSubtitleComponent} from './web-page-subtitle/web-page-subtitle.component';
 import {WebPageActionMenuComponent} from './web-page-action-menu/web-page-action-menu.component';
 import {MatDividerModule} from '@angular/material/divider';
-import {MatLegacyTabsModule as MatTabsModule} from '@angular/material/legacy-tabs';
+import {MatTabsModule} from '@angular/material/tabs';
 
 @NgModule({
   declarations: [

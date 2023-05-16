@@ -1,9 +1,9 @@
 <h1>Catégories de la recette</h1>
-<mat-chip-list aria-label="Categories" multiple>
-  <mat-chip
+<mat-chip-listbox aria-label="Categories" multiple>
+  <mat-chip-option
     *ngFor="let category of categoryList"
     color="accent"
     [selected]="isRecipeOfThisCategory(category)"
     (click)="selectChip(category)"
-  >{{category.name | titlecase}}</mat-chip>
-</mat-chip-list>
+  >{{category.name | titlecase}}</mat-chip-option>
+</mat-chip-listbox>

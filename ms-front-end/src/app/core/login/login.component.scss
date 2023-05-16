@@ -1,4 +1,4 @@
-@import '../../../sass/theme/theme-small';
+@import "../../../sass/theme/theme-small";
 
 h1 {
   font-size: 2em;
@@ -7,17 +7,17 @@ h1 {
   margin: 4rem 0 3rem 0;
 }
 
-mat-card{
+mat-card {
   max-width: 320px;
   margin: auto;
 }
 
-.mat-card-content {
+mat-card-content.mat-mdc-card-content {
   padding: 2em;
 }
 
 form {
-  .mat-form-field {
+  .mat-mdc-form-field {
     display: block;
     margin-bottom: 1em;
   }
@@ -27,7 +27,7 @@ form {
     justify-content: space-evenly;
   }
 
-  .mat-form-field:last-of-type {
+  .mat-mdc-form-field:last-of-type {
     margin-bottom: 2em;
   }
 
@@ -37,13 +37,14 @@ form {
   }
 }
 
-.registration-link{
+.registration-link {
   display: block;
+  font-size: 14px;
   text-align: center;
-  margin: 2rem;
+  margin: 1.5rem;
 }
 
-form .mat-form-field:last-of-type {
+form .mat-mdc-form-field:last-of-type {
   margin-bottom: 0;
 }
 

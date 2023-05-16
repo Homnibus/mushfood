@@ -1,76 +1,79 @@
-@import '../../../sass/theme/theme-small.scss';
+@import "../../../sass/theme/theme-small.scss";
 
-.search{
+.search {
   display: flex;
   align-items: center;
   justify-content: center;
   mat-form-field {
     max-width: 18em;
   }
+  button {
+    height: 3.3rem;
+  }
 }
 
-.categories{
-  max-width: 25em;
-  text-align: center;
-  margin: 0.5em auto auto;
-  font-size: 16px;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+.categories {
+  // Flex container
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  margin-top: 0.8rem;
 
   h2 {
-    display: inline-block;
     font-weight: bold;
     color: $mat-primary-900;
   }
 
   button {
-    margin-right: 0 ;
-    line-height: 2.1em;
-    padding: 0 0.6em;
+    margin-right: 0;
+    line-height: 2.1rem;
+    padding: 0 0.6rem;
     font-size: 1rem;
-    margin-bottom: 0.6em;
+    margin-bottom: 0.6rem;
     font-weight: normal;
   }
 
-  .mat-flat-button{
+  .mat-mdc-unelevated-button {
     border: 1px solid rgba(0, 0, 0, 0.12);
   }
 
-  @media (max-width: 768px){
-    margin-bottom: 0.5rem;
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
   }
-  @media (min-width: 768px){
+  @media (min-width: 768px) {
     margin-bottom: 3.5rem;
   }
 }
-
 
 .recipe-list {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  margin: 2em 0 4em 0;
+  margin: 1rem 0 4rem 0;
 }
 
-app-web-page-content h1{
+app-web-page-content h1 {
   font-family: Impacto, Impact, sans-serif;
-  @media (min-width: 768px){
-    font-size: 8em;
+  @media (min-width: 768px) {
+    font-size: 8rem;
     padding: 1.5rem 0;
   }
-  @media (min-width: 380px) and (max-width: 768px){
-    font-size: 5em;
+  @media (min-width: 380px) and (max-width: 768px) {
+    font-size: 5rem;
     padding: 0.5rem 0 0;
   }
-  @media (max-width: 380px){
-    font-size: 3.8em;
+  @media (max-width: 380px) {
+    font-size: 3.8rem;
     padding: 0.5rem 0 0;
   }
   text-align: center;
-  .mush{
-    color:black;
+  .mush {
+    color: black;
   }
-  .food{
-    color:$mat-primary-400;
+  .food {
+    color: $mat-primary-400;
   }
 }

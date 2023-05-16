@@ -8,9 +8,9 @@ import { RecipeService } from "../services/recipe.service";
 import { Subscription, forkJoin } from "rxjs";
 import { first, map, switchMap } from "rxjs/operators";
 import { RecipeAddVariantDialogComponent } from "../recipe-add-variant-dialog/recipe-add-variant-dialog.component";
-import { MatLegacySnackBar as MatSnackBar } from "@angular/material/legacy-snack-bar";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { IngredientQuantityService } from "../../ingredient/services/ingredient-quantity.service";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { IngredientGroupService } from "src/app/ingredient/services/ingredient-group.service";
 
 @Component({

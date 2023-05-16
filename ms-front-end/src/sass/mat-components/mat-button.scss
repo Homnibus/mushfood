@@ -1,11 +1,23 @@
-button.mat-raised-button,
-button.mat-stroked-button,
-button.mat-flat-button {
+@use "@angular/material" as mat;
+
+button.mat-mdc-raised-button,
+button.mat-mdc-outlined-button,
+button.mat-mdc-unelevated-button {
   margin: 0 0.65em;
   min-width: 3em;
 }
 
-.mat-raised-button {
+// Handle buttons appropriately, with respect to line-height
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button,
+.mat-mdc-unelevated-button {
+  padding: 0 1.15em;
+  margin: 0 0.65em;
+  min-width: 3em;
+  line-height: 36.4px;
+}
+
+.mat-mdc-raised-button {
   font-size: 16px;
 
   &:active:not([disabled]) {
@@ -14,30 +26,31 @@ button.mat-flat-button {
   }
 }
 
-.mat-raised-button.mat-primary {
-  border-bottom: 2px solid mat-color($mat-primary, 900);
+.mat-mdc-raised-button.mat-primary {
+  border-bottom: 2px solid mat.get-color-from-palette($mat-primary, 900);
 
   &[disabled] {
-    border-bottom: 2px solid mat-color($mat-primary, 300);
+    border-bottom: 2px solid mat.get-color-from-palette($mat-primary, 300);
   }
 }
 
-.mat-raised-button.mat-accent {
-  border-bottom: 2px solid mat-color($mat-accent, 900);
+.mat-mdc-raised-button.mat-accent {
+  border-bottom: 2px solid mat.get-color-from-palette($mat-accent, 900);
 
   &[disabled] {
-    border-bottom: 2px solid mat-color($mat-accent, 300);
+    border-bottom: 2px solid mat.get-color-from-palette($mat-accent, 300);
   }
 }
 
-.mat-raised-button.mat-warn {
-  border-bottom: 2px solid mat-color($mat-warn, 900);
+.mat-mdc-raised-button.mat-warn {
+  border-bottom: 2px solid mat.get-color-from-palette($mat-warn, 900);
 
   &[disabled] {
-    border-bottom: 2px solid mat-color($mat-warn, 300);
+    border-bottom: 2px solid mat.get-color-from-palette($mat-warn, 300);
   }
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 .mat-button-wrapper .mat-icon {
   margin-left: 4px;
 }

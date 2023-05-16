@@ -1,16 +1,9 @@
-.mat-list-item-content {
-  flex: 1;
-}
-
-.mat-list-base .mat-list-item {
+.mat-mdc-list .mat-mdc-list-item {
   height: auto;
-  transition: background-color 100ms ease, border 100ms ease;
-
-  &.mat-list-item-with-avatar {
-    height: auto;
-  }
+  border-radius: 4px;
+  padding: 0.3rem;
 
   &:hover {
-    background: rgba(0, 0, 0, .1);
+    background: rgba(0, 0, 0, 0.1);
   }
 }

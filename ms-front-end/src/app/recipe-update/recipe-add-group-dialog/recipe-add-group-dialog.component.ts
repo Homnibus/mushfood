@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import { UntypedFormBuilder, Validators } from "@angular/forms";
-import { MatLegacyDialogRef as MatDialogRef } from "@angular/material/legacy-dialog";
+import { MatDialogRef } from "@angular/material/dialog";
 
 @Component({
   selector: "app-recipe-add-group-dialog",

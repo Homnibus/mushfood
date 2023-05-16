@@ -13,7 +13,6 @@ const appRoutes: Routes = [
   declarations: [],
   imports: [
     RouterModule.forRoot(appRoutes, {
-      relativeLinkResolution: "legacy",
       scrollPositionRestoration: "enabled",
     }),
   ],

@@ -2,12 +2,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import * as CustomEditor from "ckeditor5-build-rescodex";
 import { FormControl } from "@angular/forms";
 import { Subscription, firstValueFrom } from "rxjs";
-import {
-  debounceTime,
-  distinctUntilChanged,
-  first,
-  map,
-} from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, first, map } from "rxjs/operators";
 import {
   FeedItem,
   IngredientQuantityMentionService,
@@ -59,7 +54,7 @@ export class RecipeUpdateInstructionComponent implements OnInit, OnDestroy {
     // The instruction also need to be updated when the mentions are changed by another component
     // TODO : trouver un moyen plus saint de faire cette vérification
     this.recipeService.updatedRecipe$.subscribe((updatedRecipe) => {
-      if (!this.isCkeditorFocused) {
+      if (this.isCkeditorFocused) {
         return;
       }
       this.recipeForm.setValue(updatedRecipe.instructions);

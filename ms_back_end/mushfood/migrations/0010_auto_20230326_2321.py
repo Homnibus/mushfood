@@ -22,7 +22,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+          migrations.RunSQL('SET CONSTRAINTS ALL IMMEDIATE;'),
         migrations.RunPython(create_ingredient_group),
+         migrations.RunSQL('SET CONSTRAINTS ALL DEFERRED;'),
         migrations.RemoveField(
             model_name='ingredientquantity',
             name='recipe',
